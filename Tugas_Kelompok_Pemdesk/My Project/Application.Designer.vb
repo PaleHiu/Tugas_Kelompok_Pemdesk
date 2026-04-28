@@ -33,7 +33,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.Tugas_Kelompok_Pemdesk.FrmScoreboardSetting
+            Me.MainForm = Global.Tugas_Kelompok_Pemdesk.ListOfCompetitor
         End Sub
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
