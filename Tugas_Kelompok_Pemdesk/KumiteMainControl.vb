@@ -309,6 +309,14 @@ Public Class KumiteMainControl
         Return p
     End Function
 
+    Private Sub btnStartScoreboard_Click(sender As Object, e As EventArgs)
+        ' 1. Membuat instance form scoreboard
+        Dim scBoard As New ScoreboardForm()
+
+        ' 2. Tampilkan Scoreboard secara Fullscreen
+        scBoard.Show()
+    End Sub
+
     Private Sub KumiteMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
     End Sub

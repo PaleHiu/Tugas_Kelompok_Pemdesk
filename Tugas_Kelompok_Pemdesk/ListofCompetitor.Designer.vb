@@ -1,5 +1,4 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class ListOfCompetitor
+﻿Partial Class ListOfCompetitor
     Inherits System.Windows.Forms.Form
 
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
