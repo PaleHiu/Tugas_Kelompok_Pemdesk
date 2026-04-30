@@ -4,6 +4,10 @@ Imports System.Drawing.Drawing2D
 
 Public Class KumiteMainControl
     Inherits Form
+    Public Shared frmScoreboardSettingApp As New FrmScoreboardSetting()
+    Public Shared frmLogActivityApp As New FormLogActivity()
+    Public Shared frmKeyboardShortcutApp As New FormKeyboardShortcut()
+
 
     ' --- Palet Warna Presisi ---
     Private ReadOnly COLOR_AKA As Color = Color.FromArgb(215, 25, 50)
@@ -217,9 +221,17 @@ Public Class KumiteMainControl
 
     Private Sub BuildFooter(p As Panel)
         ' Mengatur semua button footer agar presisi berada pada satu baris memanjang seperti pada gambar
-        AddFooterButton(p, "Settings ⚙", 5, 8, 85)
-        AddFooterButton(p, "Log Activity", 95, 8, 90)
-        AddFooterButton(p, "Shortcut ⌨", 190, 8, 85)
+        Dim btnSettings As Button = CreateBtn("Settings ⚙", 5, 8, 85, 40, Color.White, Color.Black, FONT_BOLD)
+        AddHandler btnSettings.Click, AddressOf btnSettings_Click
+        p.Controls.Add(btnSettings)
+
+        Dim btnLogActivity As Button = CreateBtn("Log Activity", 95, 8, 90, 40, Color.White, Color.Black, FONT_BOLD)
+        AddHandler btnLogActivity.Click, AddressOf btnLogActivity_Click
+        p.Controls.Add(btnLogActivity)
+
+        Dim btnShortcut As Button = CreateBtn("Shortcut ⌨", 190, 8, 85, 40, Color.White, Color.Black, FONT_BOLD)
+        AddHandler btnShortcut.Click, AddressOf btnShortcut_Click
+        p.Controls.Add(btnShortcut)
 
         AddFooterButton(p, "🖥", 280, 8, 40)
         AddFooterButton(p, "🔊", 325, 8, 40)
@@ -230,6 +242,38 @@ Public Class KumiteMainControl
 
         AddFooterButton(p, "Reset Match", 780, 8, 85)
         AddFooterButton(p, "Save Match Result 💾", 870, 8, 130)
+    End Sub
+
+    Private Sub btnSettings_Click(sender As Object, e As EventArgs)
+
+        If frmScoreboardSettingApp Is Nothing OrElse frmScoreboardSettingApp.IsDisposed Then
+            frmScoreboardSettingApp = New FrmScoreboardSetting()
+        End If
+
+        frmScoreboardSettingApp.ShowDialog()
+
+    End Sub
+
+
+    Private Sub btnLogActivity_Click(sender As Object, e As EventArgs)
+
+        If frmLogActivityApp Is Nothing OrElse frmLogActivityApp.IsDisposed Then
+            frmLogActivityApp = New FormLogActivity()
+        End If
+
+        frmLogActivityApp.ShowDialog()
+
+    End Sub
+
+
+    Private Sub btnShortcut_Click(sender As Object, e As EventArgs)
+
+        If frmKeyboardShortcutApp Is Nothing OrElse frmKeyboardShortcutApp.IsDisposed Then
+            frmKeyboardShortcutApp = New FormKeyboardShortcut()
+        End If
+
+        frmKeyboardShortcutApp.ShowDialog()
+
     End Sub
 
     ' --- HELPER FUNCTIONS ---
