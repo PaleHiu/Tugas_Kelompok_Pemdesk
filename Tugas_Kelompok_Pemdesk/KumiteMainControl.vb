@@ -10,6 +10,7 @@ Partial Public Class KumiteMainControl
     Public Shared frmLogActivityApp As FormLogActivity
     Public Shared frmKeyboardShortcutApp As FormKeyboardShortcut
     Public Shared frmHanteiApp As HanteiForm
+    Public Shared frmScoreboard As ScoreBoard
 
     ' Timer untuk Waiting Timer (dibuat manual karena tidak ada di Designer baru)
     Private WithEvents waitTimer As New Timer() With {.Interval = 1000}
@@ -24,12 +25,16 @@ Partial Public Class KumiteMainControl
         ' Setup tambahan setelah komponen siap
         Me.Text = "Kumite Main Control"
         Me.StartPosition = FormStartPosition.CenterScreen
+
+        frmLogActivityApp = New FormLogActivity()
     End Sub
 
     ' ==========================================================
     ' EVENT LOAD FORM
     ' ==========================================================
     Private Sub KumiteMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        AttachGlobalLogger(Me)
+        Me.KeyPreview = True
         ' Hubungkan event handler tombol-tombol (Kode lama Anda)
         AddHandler BtnSettings.Click, AddressOf BtnSettings_Click
         AddHandler BtnLogActivity.Click, AddressOf BtnLogActivity_Click
@@ -90,11 +95,10 @@ Partial Public Class KumiteMainControl
         frmScoreboardSettingApp.ShowDialog()
     End Sub
 
-    Private Sub BtnLogActivity_Click(sender As Object, e As EventArgs)
-        If frmLogActivityApp Is Nothing OrElse frmLogActivityApp.IsDisposed Then
-            frmLogActivityApp = New FormLogActivity()
-        End If
-        frmLogActivityApp.ShowDialog()
+    Private Sub BtnLogActivity_Click(sender As Object, e As EventArgs) Handles BtnLogActivity.Click
+        ' Cukup tampilkan saja, karena sudah di-New saat aplikasi pertama kali jalan
+        frmLogActivityApp.Show()
+        frmLogActivityApp.BringToFront()
     End Sub
 
     Private Sub BtnShortcut_Click(sender As Object, e As EventArgs)
@@ -111,9 +115,23 @@ Partial Public Class KumiteMainControl
         frmHanteiApp.ShowDialog()
     End Sub
 
+    ' ==========================================================
+    ' EVENT HANDLER TOMBOL START SCOREBOARD
+    ' ==========================================================
     Private Sub BtnStartScoreboard_Click(sender As Object, e As EventArgs)
-        Dim scBoard As New ScoreboardForm()
-        scBoard.Show()
+        ' 1. Cek apakah layar Score Board sudah terbuka
+        If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
+            ' 2. Jika belum, buat instance baru dari desain ScoreBoard kita
+            frmScoreboard = New ScoreBoard()
+
+            ' 3. Tampilkan layar Score Board
+            ' Kita menggunakan .Show() bukan .ShowDialog() agar Control Panel 
+            ' tetap bisa diklik dan digunakan bersamaan dengan Score Board.
+            frmScoreboard.Show()
+        Else
+            ' 4. Jika sudah terbuka tapi tertumpuk jendela lain, panggil ke depan
+            frmScoreboard.BringToFront()
+        End If
     End Sub
 
     ' ==========================================================
@@ -232,6 +250,8 @@ Partial Public Class KumiteMainControl
                 LblAkaWinner.Visible = True
             End If
         End If
+
+        SyncScoreboardPenalties()
     End Sub
 
     ' Fungsi Penalti AO (Biru)
@@ -290,6 +310,8 @@ Partial Public Class KumiteMainControl
                 LblAoWinner.Visible = True
             End If
         End If
+
+        SyncScoreboardPenalties()
     End Sub
 
     Private Sub DgvAoHistory_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DgvAoHistory.CellContentClick
@@ -333,6 +355,7 @@ Partial Public Class KumiteMainControl
     End Sub
 
     ' 1. Logika Tombol Start/Pause Timer
+    ' Logika Tombol Start/Pause Timer yang BENER
     Private Sub BtnStartTimer_Click(sender As Object, e As EventArgs) Handles BtnStartTimer.Click
         If matchTimer.Enabled Then
             ' Jika sedang jalan, maka Pause/Stop
@@ -340,7 +363,8 @@ Partial Public Class KumiteMainControl
             BtnStartTimer.Text = "Start Timer"
             BtnStartTimer.BackColor = Color.Gold
         Else
-            ' Validasi jika waktu sudah 00:00
+            ' CEK PAKAI VARIABEL YANG ADA: matchSecondsLeft
+            ' Jangan pakai GetTotalSeconds() karena fungsinya emang nggak lu buat
             If matchSecondsLeft <= 0 Then
                 MessageBox.Show("Waktu sudah habis! Silakan reset atau setel waktu baru.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
@@ -349,7 +373,7 @@ Partial Public Class KumiteMainControl
             ' Mulai timer
             matchTimer.Start()
             BtnStartTimer.Text = "Stop Timer"
-            BtnStartTimer.BackColor = Color.LightCoral ' Berubah merah saat jalan
+            BtnStartTimer.BackColor = Color.LightCoral
         End If
     End Sub
 
@@ -358,6 +382,7 @@ Partial Public Class KumiteMainControl
         If matchSecondsLeft > 0 Then
             matchSecondsLeft -= 1
             UpdateMatchTimerDisplay()
+            SyncScoreboardTimer()
         Else
             ' Waktu habis (Yame)
             matchTimer.Stop()
@@ -540,6 +565,7 @@ Partial Public Class KumiteMainControl
 
         ' 2. Tampilkan skor terbaru ke angka raksasa
         lblScore.Text = total.ToString()
+        SyncScoreboardPoints()
 
         ' =======================================================
         ' 3. LOGIKA WIN. POINT (CEK PEMENANG)
@@ -662,11 +688,379 @@ Partial Public Class KumiteMainControl
         Return ""
     End Function
 
-    Private Sub BtnAoKiken_Click(sender As Object, e As EventArgs) Handles BtnAoKiken.Click
+    ' ==========================================================
+    ' FUNGSI KIKEN & SHIKKAKU (UPDATE: ANTI DUPLIKAT WINNER)
+    ' ==========================================================
 
+    ' 1. Logika untuk Sudut AKA (Merah)
+    Private Sub BtnAkaKikenShikkaku_Click(sender As Object, e As EventArgs) Handles BtnAkaKiken.Click, BtnAkaShikkaku.Click
+        Dim clickedBtn As Button = CType(sender, Button)
+
+        ' MENCEGAH DUPLIKAT: Jika tombol ini mau diaktifkan (belum kuning)
+        If clickedBtn.BackColor <> Color.Yellow Then
+            ' Cek apakah musuh (AO) sudah mengaktifkan Kiken/Shikkaku lebih dulu?
+            If BtnAoKiken.BackColor = Color.Yellow OrElse BtnAoShikkaku.BackColor = Color.Yellow Then
+                MessageBox.Show("Tim AO sudah berstatus Kiken/Shikkaku terlebih dahulu." & vbCrLf & "Sistem mencegah duplikat pemenang. Batalkan status AO jika terjadi kesalahan operator.", "Peringatan Blokir", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return ' Hentikan proses, tombol AKA tidak jadi kuning
+            End If
+        End If
+
+        ' Toggle: Jika sudah kuning (aktif), maka matikan. Jika belum, nyalakan kuning.
+        If clickedBtn.BackColor = Color.Yellow Then
+            clickedBtn.BackColor = SystemColors.Control
+        Else
+            clickedBtn.BackColor = Color.Yellow
+
+            ' Cegah nyala bersamaan: Jika Kiken diklik, matikan Shikkaku, begitu sebaliknya
+            If clickedBtn.Name = "BtnAkaKiken" Then BtnAkaShikkaku.BackColor = SystemColors.Control
+            If clickedBtn.Name = "BtnAkaShikkaku" Then BtnAkaKiken.BackColor = SystemColors.Control
+        End If
+
+        ' Logika Winner: Jika AKA Kiken/Shikkaku, maka AO Menang
+        If BtnAkaKiken.BackColor = Color.Yellow OrElse BtnAkaShikkaku.BackColor = Color.Yellow Then
+            LblAoWinner.Visible = True ' Munculkan label pemenang di AO
+
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            ' Jika batal (Undo), sembunyikan Winner AO
+            LblAoWinner.Visible = False
+
+            ' SMART UNDO
+            RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+        End If
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles BtnAkaKiken.Click
+    ' 2. Logika untuk Sudut AO (Biru)
+    Private Sub BtnAoKikenShikkaku_Click(sender As Object, e As EventArgs) Handles BtnAoKiken.Click, BtnAoShikkaku.Click
+        Dim clickedBtn As Button = CType(sender, Button)
 
+        ' MENCEGAH DUPLIKAT: Jika tombol ini mau diaktifkan (belum kuning)
+        If clickedBtn.BackColor <> Color.Yellow Then
+            ' Cek apakah musuh (AKA) sudah mengaktifkan Kiken/Shikkaku lebih dulu?
+            If BtnAkaKiken.BackColor = Color.Yellow OrElse BtnAkaShikkaku.BackColor = Color.Yellow Then
+                MessageBox.Show("Tim AKA sudah berstatus Kiken/Shikkaku terlebih dahulu." & vbCrLf & "Sistem mencegah duplikat pemenang. Batalkan status AKA jika terjadi kesalahan operator.", "Peringatan Blokir", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return ' Hentikan proses, tombol AO tidak jadi kuning
+            End If
+        End If
+
+        ' Toggle: Jika sudah kuning (aktif), maka matikan. Jika belum, nyalakan kuning.
+        If clickedBtn.BackColor = Color.Yellow Then
+            clickedBtn.BackColor = SystemColors.Control
+        Else
+            clickedBtn.BackColor = Color.Yellow
+
+            ' Cegah nyala bersamaan: Jika Kiken diklik, matikan Shikkaku, begitu sebaliknya
+            If clickedBtn.Name = "BtnAoKiken" Then BtnAoShikkaku.BackColor = SystemColors.Control
+            If clickedBtn.Name = "BtnAoShikkaku" Then BtnAoKiken.BackColor = SystemColors.Control
+        End If
+
+        ' Logika Winner: Jika AO Kiken/Shikkaku, maka AKA Menang
+        If BtnAoKiken.BackColor = Color.Yellow OrElse BtnAoShikkaku.BackColor = Color.Yellow Then
+            LblAkaWinner.Visible = True ' Munculkan label pemenang di AKA
+
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            ' Jika batal (Undo), sembunyikan Winner AKA
+            LblAkaWinner.Visible = False
+
+            ' SMART UNDO
+            RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+        End If
     End Sub
+
+    ' ==========================================================
+    ' FUNGSI POP-UP TIMER KNOCKED OUT (UPDATE: OTOMATIS WINNER)
+    ' ==========================================================
+    Private Function ShowKnockOutCountdown(isAka As Boolean, sourceButton As Button, winnerLabel As Label) As DialogResult
+        ' 1. Buat Form Dasar
+        Dim frmKO As New Form()
+        frmKO.Size = New Size(600, 350)
+        frmKO.StartPosition = FormStartPosition.CenterParent
+        frmKO.FormBorderStyle = FormBorderStyle.FixedToolWindow
+        frmKO.Text = If(isAka, "AKA Knocked Out Countdown", "AO Knocked Out Countdown")
+
+        ' Tentukan warna berdasarkan sudut petarung
+        Dim bgColor As Color = If(isAka, Color.Crimson, Color.DodgerBlue)
+
+        ' 2. Buat Panel Atas (Latar Berwarna untuk Angka)
+        Dim pnlTop As New Panel() With {.Dock = DockStyle.Fill, .BackColor = bgColor}
+
+        ' 3. Buat Label Angka Raksasa
+        Dim lblNumber As New Label() With {
+            .AutoSize = False,
+            .Dock = DockStyle.Fill,
+            .TextAlign = ContentAlignment.MiddleCenter,
+            .Font = New Font("Segoe UI", 130, FontStyle.Bold),
+            .ForeColor = Color.White,
+            .Text = "10"
+        }
+        pnlTop.Controls.Add(lblNumber)
+
+        ' 4. Buat Panel Bawah (Latar Putih untuk Teks)
+        Dim pnlBottom As New Panel() With {.Dock = DockStyle.Bottom, .Height = 80, .BackColor = Color.White}
+
+        ' 5. Buat Label Teks "Knocked Out Countdown"
+        Dim lblText As New Label() With {
+            .AutoSize = False,
+            .Dock = DockStyle.Fill,
+            .TextAlign = ContentAlignment.MiddleCenter,
+            .Font = New Font("Segoe UI", 32, FontStyle.Bold),
+            .ForeColor = Color.Black,
+            .Text = "Knocked Out Countdown"
+        }
+        pnlBottom.Controls.Add(lblText)
+
+        frmKO.Controls.Add(pnlTop)
+        frmKO.Controls.Add(pnlBottom)
+
+        ' 6. Logika Timer
+        Dim timeLeft As Integer = 10
+        Dim koTimer As New Timer() With {.Interval = 1000}
+
+        ' Simpan kondisi tombol agar bisa berubah selama countdown
+        sourceButton.BackColor = bgColor
+        sourceButton.ForeColor = Color.White
+
+        AddHandler koTimer.Tick, Sub(senderObj, eArgs)
+                                     timeLeft -= 1
+                                     lblNumber.Text = timeLeft.ToString("00")
+                                     sourceButton.Text = $"Stop Countdown ({timeLeft:00})"
+
+                                     If timeLeft <= 0 Then
+                                         koTimer.Stop()
+
+                                         ' --- LOGIKA OTOMATIS SAAT 0 DETIK ---
+                                         winnerLabel.Visible = True ' Tampilkan Winner di sisi lawan
+
+                                         ' Hentikan timer pertandingan utama (Yame)
+                                         matchTimer.Stop()
+                                         BtnStartTimer.Text = "Start Timer"
+                                         BtnStartTimer.BackColor = Color.Gold
+
+                                         frmKO.DialogResult = DialogResult.OK
+                                         frmKO.Close()
+                                     End If
+                                 End Sub
+
+        ' Event saat popup ditutup (baik selesai timer atau klik X)
+        AddHandler frmKO.FormClosing, Sub(senderObj, eArgs)
+                                          koTimer.Stop()
+                                          ' Kembalikan tombol ke wujud asli agar bisa digunakan lagi
+                                          sourceButton.Text = "Knocked Out"
+                                          sourceButton.BackColor = SystemColors.Control
+                                          sourceButton.ForeColor = Color.Black
+                                      End Sub
+
+        koTimer.Start()
+        Return frmKO.ShowDialog()
+    End Function
+
+    ' ==========================================================
+    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI OTOMATIS)
+    ' ==========================================================
+
+    ' Tombol Knocked Out AKA (Merah)
+    Private Sub BtnAkaKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAkaKnockedOut.Click
+        ' Kirim LblAoWinner sebagai target yang akan menyala jika AKA KO
+        If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
+            MessageBox.Show("AKA Knocked Out!" & vbCrLf & "AO dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
+
+    ' Tombol Knocked Out AO (Biru)
+    Private Sub BtnAoKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAoKnockedOut.Click
+        ' Kirim LblAkaWinner sebagai target yang akan menyala jika AO KO
+        If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
+            MessageBox.Show("AO Knocked Out!" & vbCrLf & "AKA dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+    End Sub
+
+    ' ==========================================================
+    ' SMART GLOBAL LOGGER (AUTO-INJECT KE SEMUA TOMBOL)
+    ' ==========================================================
+
+    ' Fungsi 1: Menyisir seluruh form dan menempelkan perekam ke setiap tombol
+    Private Sub AttachGlobalLogger(parentControl As Control)
+        For Each ctrl As Control In parentControl.Controls
+            ' Jika kontrol ini adalah sebuah Button
+            If TypeOf ctrl Is Button Then
+                Dim btn As Button = CType(ctrl, Button)
+                ' Tambahkan 'mata-mata' (Event Handler) ke aksi kliknya secara dinamis
+                AddHandler btn.Click, AddressOf GlobalLogger_Click
+            End If
+
+            ' Jika kontrol ini punya anak (misal Panel di dalam Panel), lakukan pencarian rekursif
+            If ctrl.HasChildren Then
+                AttachGlobalLogger(ctrl)
+            End If
+        Next
+    End Sub
+
+    ' Fungsi 2: Aksi yang dijalankan ketika tombol APAPUN ditekan
+    Private Sub GlobalLogger_Click(sender As Object, e As EventArgs)
+        Dim btn As Button = CType(sender, Button)
+
+        ' Ambil teks dari tombol yang diklik. 
+        ' Bersihkan teks jika ada enter/baris baru (seperti pada tombol "Approve Knocked Out")
+        Dim actionText As String = btn.Text.Replace(vbCrLf, " ").Replace(vbLf, " ")
+
+        ' Abaikan jika tombol tidak memiliki teks (misal tombol icon kaca pembesar/profil)
+        If String.IsNullOrWhiteSpace(actionText) Then Return
+
+        ' Deteksi Cerdas: Apakah ini tombol AKA, AO, atau Sistem Umum?
+        Dim logDetail As String = ""
+        Dim logType As String = "SYSTEM"
+
+        ' Kita menebak konteks berdasarkan nama tombol (Name) di Designer
+        If btn.Name.StartsWith("BtnAka") Then
+            logDetail = $"(AKA) Clicked {actionText}"
+            logType = "AKA ACTION"
+        ElseIf btn.Name.StartsWith("BtnAo") Then
+            logDetail = $"(AO) Clicked {actionText}"
+            logType = "AO ACTION"
+        Else
+            logDetail = $"System Action: {actionText}"
+            logType = "GENERAL"
+        End If
+
+        ' Tangkap waktu pertandingan saat ini
+        Dim currentTime As String = "0:00"
+        If LblMatchTimerValue IsNot Nothing Then currentTime = LblMatchTimerValue.Text
+
+        ' Kirim datanya ke FormLogActivity!
+        If frmLogActivityApp IsNot Nothing AndAlso Not frmLogActivityApp.IsDisposed Then
+            frmLogActivityApp.InsertLog(logDetail, logType, currentTime)
+        End If
+    End Sub
+
+
+    ' ==========================================================
+    ' SISTEM PENGHUBUNG KEYBOARD SHORTCUT
+    ' ==========================================================
+    Private Sub KumiteMainControl_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        ' 1. Cek apakah sistem shortcut sedang ON di menu setup
+        If Not FormKeyboardShortcut.IsShortcutEnabled Then Exit Sub
+
+        ' 2. Jangan jalankan shortcut jika user sedang mengetik di TextBox (Nama/Team)
+        If TypeOf Me.ActiveControl Is TextBox Then Exit Sub
+
+        ' 3. Terjemahkan input keyboard ke format teks (Contoh: "Control+B")
+        Dim strShortcut As String = ""
+        If e.Control Then strShortcut &= "Control+"
+        If e.Shift Then strShortcut &= "Shift+"
+        If e.Alt Then strShortcut &= "Alt+"
+        strShortcut &= e.KeyCode.ToString()
+
+        ' 4. Cari aksi yang cocok di ShortcutMap
+        For Each entry In FormKeyboardShortcut.ShortcutMap
+            If entry.Value = strShortcut Then
+                ' JIKA COCOK, Jalankan fungsinya berdasarkan Nama Aksinya
+                ExecuteShortcutAction(entry.Key)
+
+                ' Hentikan fungsi asli windows (agar tidak bunyi Beep)
+                e.SuppressKeyPress = True
+                e.Handled = True
+                Exit For
+            End If
+        Next
+    End Sub
+
+    ' Fungsi Mapper: Menghubungkan Nama Teks ke Sub/Fungsi aslinya
+    Private Sub ExecuteShortcutAction(actionName As String)
+        Select Case actionName
+            Case "Start-Close Scoreboard" : BtnStartScoreboard_Click(Nothing, Nothing)
+            Case "Match Timer Start-Stop" : BtnStartTimer_Click(Nothing, Nothing)
+            Case "Match Timer Reset" : BtnResetTimer_Click(Nothing, Nothing)
+            Case "AKA - Ippon(3)" : BtnAkaIppon_Click(Nothing, Nothing)
+            Case "AKA - Wazaari(2)" : BtnAkaWazaari_Click(Nothing, Nothing)
+            Case "AKA - Yuko(1)" : BtnAkaYuko_Click(Nothing, Nothing)
+            Case "AO - Ippon(3)" : BtnAoIppon_Click(Nothing, Nothing)
+            Case "AO - Wazaari(2)" : BtnAoWazaari_Click(Nothing, Nothing)
+            Case "AO - Yuko(1)" : BtnAoYuko_Click(Nothing, Nothing)
+                ' Tambahkan case lainnya sesuai daftar di isiDataShortcut()
+        End Select
+    End Sub
+
+    ' ==========================================================
+    ' ENGINE SINKRONISASI REAL-TIME KE SCOREBOARD
+    ' ==========================================================
+
+    ''' <summary>
+    ''' Sinkronisasi Nama, Kontingen, dan Nomor Tatami.
+    ''' </summary>
+    Public Sub SyncScoreboardProfile()
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Mengupdate Label Nama dan Info (Team + Info)
+            frmScoreboard.LblAkaName.Text = TxtAkaNameMain.Text
+            frmScoreboard.LblAkaInfo.Text = TxtAkaTeam.Text & " (" & TxtAkaTeamInfo.Text & ")"
+
+            frmScoreboard.LblAoName.Text = TxtAoNameMain.Text
+            frmScoreboard.LblAoInfo.Text = TxtAoTeam.Text & " (" & TxtAoTeamInfo.Text & ")"
+
+            ' Mengupdate Nomor Tatami
+            frmScoreboard.LblTatamiNum.Text = NumTatami.Value.ToString()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Sinkronisasi Skor (Point) Utama AKA dan AO.
+    ''' </summary>
+    Public Sub SyncScoreboardPoints()
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblAkaScore.Text = LblAkaMainScore.Text
+            frmScoreboard.LblAoScore.Text = LblAoMainScore.Text
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Sinkronisasi Timer Pertandingan (0:00.0).
+    ''' </summary>
+    Public Sub SyncScoreboardTimer()
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Gunakan LblTimerMain untuk angka menit:detik 
+            ' Kita pisahkan milidetik jika Anda ingin tampilan lebih presisi
+            Dim timerFull As String = LblMatchTimerValue.Text
+            If timerFull.Contains(".") Then
+                frmScoreboard.LblTimerMain.Text = timerFull.Split("."c)(0)
+                frmScoreboard.LblTimerMilli.Text = "." & timerFull.Split("."c)(1)
+            Else
+                frmScoreboard.LblTimerMain.Text = timerFull
+            End If
+        End If
+    End Sub
+
+    Public Sub SyncScoreboardPenalties()
+        ' Pastikan menggunakan nama variabel form yang sudah dideklarasikan (frmScoreboard)
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+
+            ' Pastikan array di dalam form Scoreboard sudah terisi (Load sudah berjalan)
+            If frmScoreboard.AkaPenLabels IsNot Nothing Then
+                Dim akaBtns = {BtnAka1C, BtnAka2C, BtnAka3C, BtnAkaHC, BtnAkaH}
+                Dim aoBtns = {BtnAo1C, BtnAo2C, BtnAo3C, BtnAoHC, BtnAoH}
+
+                For i As Integer = 0 To 4
+                    ' Sinkronisasi AKA (Merah)
+                    If akaBtns(i).BackColor = Color.Crimson Then
+                        frmScoreboard.AkaPenLabels(i).BackColor = Color.Crimson
+                    Else
+                        frmScoreboard.AkaPenLabels(i).BackColor = Color.Transparent
+                    End If
+
+                    ' Sinkronisasi AO (Biru)
+                    If aoBtns(i).BackColor = Color.DodgerBlue Then
+                        frmScoreboard.AoPenLabels(i).BackColor = Color.DodgerBlue
+                    Else
+                        frmScoreboard.AoPenLabels(i).BackColor = Color.Transparent
+                    End If
+                Next
+            End If
+        End If
+    End Sub
+
+
+
 End Class
