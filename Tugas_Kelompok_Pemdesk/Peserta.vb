@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Data.SQLite
+Imports System.IO
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.Collections.Generic
@@ -50,8 +51,45 @@ Public Class Peserta
         picCircle.Image = GetDefaultProfileImage()
         UpdateTotalRecords()
         RefreshLeftTeamGrid()
+        LoadTeamsToComboBox()
+        LoadDataPeserta()
     End Sub
 
+    Private Sub LoadTeamsToComboBox()
+        cmbTeam.Items.Clear()
+
+        ' 1. AMBIL DARI DATABASE PERMANEN (Tabel team_lengkap)
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+                ' Kita coba ambil dari tabel team_lengkap yang baru kita buat di form Team
+                Dim query As String = "SELECT nama_team FROM team_lengkap"
+                Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                    Using reader = cmd.ExecuteReader()
+                        While reader.Read()
+                            Dim tName = reader("nama_team").ToString()
+                            If Not cmbTeam.Items.Contains(tName) Then
+                                cmbTeam.Items.Add(tName)
+                            End If
+                        End While
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            ' Jika tabel team_lengkap belum ada, kode akan lanjut ke langkah 2
+        End Try
+
+        ' 2. AMBIL DARI TIM YANG SUDAH TERLANJUR ADA DI TABEL (Cadangan)
+        ' Ini memastikan tim seperti "sss" atau "qqqaa" di layar Anda ikut masuk ke dropdown
+        For Each row As DataGridViewRow In gridCompetitors.Rows
+            If Not row.IsNewRow AndAlso row.Cells("ColTeamRight").Value IsNot Nothing Then
+                Dim tName = row.Cells("ColTeamRight").Value.ToString()
+                If Not cmbTeam.Items.Contains(tName) Then
+                    cmbTeam.Items.Add(tName)
+                End If
+            End If
+        Next
+    End Sub
     Private Sub gridCompetitors_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridCompetitors.DataError
         e.ThrowException = False
     End Sub
@@ -69,6 +107,7 @@ Public Class Peserta
         Dim displayImage As Image = GetSafeCompImage(If(selectedImagePath <> "", selectedImagePath, "No Image"))
 
         If editRowIndex >= 0 Then
+            ' --- LOGIKA UPDATE ---
             Dim row As DataGridViewRow = gridCompetitors.Rows(editRowIndex)
             row.Cells("ColName").Value = txtName.Text.Trim()
             row.Cells("ColTeamRight").Value = teamName
@@ -77,13 +116,30 @@ Public Class Peserta
             row.Cells("ColCompPictPath").Value = selectedImagePath
             editRowIndex = -1
         Else
-            gridCompetitors.Rows.Add("", "❌", "📝", txtName.Text.Trim(), teamName, txtTeamInfo.Text.Trim(), displayImage, selectedImagePath)
+            ' --- LOGIKA SIMPAN KE DATABASE (PERMANEN) ---
+            Try
+                ' Menggunakan System.Data.SQLite langsung agar tidak error
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Dim query As String = "INSERT INTO competitor (name, team, team_info) VALUES (@name, @team, @info)"
+                    Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@name", txtName.Text.Trim())
+                        cmd.Parameters.AddWithValue("@team", teamName)
+                        cmd.Parameters.AddWithValue("@info", txtTeamInfo.Text.Trim())
+                        cmd.ExecuteNonQuery()
+                    End Using
+                End Using
+
+                ' Tampilkan juga di tabel layar
+                gridCompetitors.Rows.Add("", "❌", "📝", txtName.Text.Trim(), teamName, txtTeamInfo.Text.Trim(), displayImage, selectedImagePath)
+            Catch ex As Exception
+                MessageBox.Show("Gagal menyimpan ke database: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
         End If
 
         UpdateRowNumbers()
         UpdateTotalRecords()
         RefreshLeftTeamGrid()
-
 
         gridCompetitors.CurrentCell = Nothing
         For Each row As DataGridViewRow In gridCompetitors.Rows
@@ -93,7 +149,7 @@ Public Class Peserta
             End If
         Next
 
-        MessageBox.Show("Data berhasil disimpan!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        MessageBox.Show("Data berhasil disimpan secara permanen!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
         ClearInput()
     End Sub
 
@@ -292,17 +348,29 @@ Public Class Peserta
             e.Graphics.DrawString(tName, New Font("Segoe UI", 9, FontStyle.Bold), textBrush, New Rectangle(e.CellBounds.X, e.CellBounds.Y + 5, e.CellBounds.Width, 20), New StringFormat() With {.Alignment = StringAlignment.Center})
 
             Dim teamImg As Image = Nothing
-            For Each r As DataGridViewRow In Dashboard.frmTeamApp.gridEntriesTeam.Rows
-                If r.Cells("ColTeamGrid").Value.ToString() = tName Then
-                    teamImg = TryCast(r.Cells("ColTeamPictGrid").Value, Image)
-                    Exit For
+
+            ' --- PROTEKSI AGAR TIDAK ERROR (OBJECT REFERENCE) ---
+            Try
+                ' Pastikan form Team dan tabelnya tidak kosong sebelum diakses
+                If Dashboard.frmTeamApp IsNot Nothing AndAlso Dashboard.frmTeamApp.gridEntriesTeam IsNot Nothing Then
+                    For Each r As DataGridViewRow In Dashboard.frmTeamApp.gridEntriesTeam.Rows
+                        If Not r.IsNewRow AndAlso r.Cells("ColTeamGrid").Value IsNot Nothing Then
+                            If r.Cells("ColTeamGrid").Value.ToString() = tName Then
+                                teamImg = TryCast(r.Cells("ColTeamPictGrid").Value, Image)
+                                Exit For
+                            End If
+                        End If
+                    Next
                 End If
-            Next
+            Catch
+                ' Jika error, biarkan teamImg tetap Nothing agar tidak crash
+            End Try
 
             Dim dRect = New Rectangle(e.CellBounds.X + (e.CellBounds.Width - 70) \ 2, e.CellBounds.Y + 30, 70, 70)
             If teamImg IsNot Nothing Then
                 e.Graphics.DrawImage(teamImg, dRect)
             Else
+                ' Jika gambar tidak ditemukan, gambar kotak abu-abu polos (tanpa crash)
                 e.Graphics.FillRectangle(Brushes.LightGray, dRect)
             End If
             e.Graphics.DrawRectangle(Pens.DarkGray, dRect)
@@ -390,13 +458,26 @@ Public Class Peserta
 
     Private Sub cmbTeam_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbTeam.SelectedIndexChanged
         txtTeamInfo.Clear()
+
         If cmbTeam.SelectedIndex <> -1 Then
-            For Each row As DataGridViewRow In Dashboard.frmTeamApp.gridEntriesTeam.Rows
-                If row.Cells("ColTeamGrid").Value.ToString() = cmbTeam.SelectedItem.ToString() Then
-                    txtTeamInfo.Text = row.Cells("ColTeamInfoGrid").Value.ToString()
-                    Exit For
-                End If
-            Next
+            Dim selectedTeam As String = cmbTeam.SelectedItem.ToString()
+
+            ' --- AMBIL INFO LANGSUNG DARI DATABASE AGAR TIDAK ERROR ---
+            Try
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Dim query As String = "SELECT team_info FROM team_lengkap WHERE nama_team = @nama"
+                    Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                        cmd.Parameters.AddWithValue("@nama", selectedTeam)
+                        Dim result = cmd.ExecuteScalar()
+                        If result IsNot Nothing Then
+                            txtTeamInfo.Text = result.ToString()
+                        End If
+                    End Using
+                End Using
+            Catch ex As Exception
+                ' Jika gagal di database, kosongkan saja info timnya
+            End Try
         End If
     End Sub
 
@@ -407,4 +488,31 @@ Public Class Peserta
         End If
     End Sub
 
+    Private Sub LoadDataPeserta()
+        Try
+            gridCompetitors.Rows.Clear()
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+                Dim query As String = "SELECT name, team, team_info FROM competitor"
+                Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                    Using reader = cmd.ExecuteReader()
+                        While reader.Read()
+                            Dim n As String = reader("name").ToString()
+                            Dim t As String = reader("team").ToString()
+                            Dim info As String = reader("team_info").ToString()
+
+                            ' Masukkan ke tabel layar
+                            gridCompetitors.Rows.Add("", "❌", "📝", n, t, info, GetSafeCompImage("No Image"), "No Image")
+                        End While
+                    End Using
+                End Using
+            End Using
+
+            UpdateRowNumbers()
+            UpdateTotalRecords()
+            RefreshLeftTeamGrid()
+        Catch ex As Exception
+            ' Abaikan jika database belum terbuat
+        End Try
+    End Sub
 End Class

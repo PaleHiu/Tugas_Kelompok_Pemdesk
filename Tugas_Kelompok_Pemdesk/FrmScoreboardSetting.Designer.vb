@@ -361,11 +361,23 @@ Partial Public Class FrmScoreboardSetting
             Dim bP As New Button() : bP.Text = "Play" : bP.Location = New Point(425, y) : bP.Width = 55 : bP.BackColor = Color.White
 
             ' Fungsionalitas Tombol Alert
+            ' (TAMPILKAN PATH JIKA SUDAH PERNAH DISIMPAN SEBELUMNYA)
+            If AudioController.SoundPaths.ContainsKey(s) Then
+                tx.Text = AudioController.SoundPaths(s)
+            End If
+
             AddHandler bS.Click, Sub()
                                      Dim ofd As New OpenFileDialog() : ofd.Filter = "Wave Files (*.wav)|*.wav"
-                                     If ofd.ShowDialog() = DialogResult.OK Then tx.Text = ofd.FileName
+                                     If ofd.ShowDialog() = DialogResult.OK Then
+                                         tx.Text = ofd.FileName
+                                         AudioController.SoundPaths(s) = ofd.FileName ' <-- JEMBATAN: SIMPAN PATH
+                                     End If
                                  End Sub
-            AddHandler bX.Click, Sub() tx.Text = ""
+
+            AddHandler bX.Click, Sub()
+                                     tx.Text = ""
+                                     AudioController.SoundPaths(s) = "" ' <-- JEMBATAN: HAPUS PATH
+                                 End Sub
             AddHandler bP.Click, Sub()
                                      If String.IsNullOrWhiteSpace(tx.Text) Then
                                          ' Tambahan Pop-up Error sesuai gambar yang kamu minta
@@ -418,6 +430,11 @@ Partial Public Class FrmScoreboardSetting
         AddHandler btnClose.Click, Sub() Me.Close()
 
         Dim btnSave As New Button() : btnSave.Text = "Save" : btnSave.Size = New Size(110, 35) : btnSave.Location = New Point(380, 125) : btnSave.BackColor = Color.White
+        ' --- TAMBAHAN LOGIKA TOMBOL SAVE ---
+        AddHandler btnSave.Click, Sub()
+                                      MessageBox.Show("Pengaturan Suara berhasil disimpan!", "Tersimpan", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                      Me.Close()
+                                  End Sub
 
         p.Controls.AddRange(New Control() {lblL, pbL, btnS, btnR, pbUser, chkL, lblN, btnClose, btnSave})
     End Sub
