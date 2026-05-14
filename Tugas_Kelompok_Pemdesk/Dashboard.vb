@@ -28,4 +28,8 @@
 
     End Sub
 
+    Private Sub Dashboard_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        ' Mematikan seluruh proses aplikasi agar file .exe tidak terkunci
+        Application.Exit()
+    End Sub
 End Class

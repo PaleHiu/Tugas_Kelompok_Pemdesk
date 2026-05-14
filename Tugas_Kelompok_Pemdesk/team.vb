@@ -38,7 +38,7 @@ Public Class team
 
         cmbCountryTeam.Items.AddRange(New String() {"Indonesia", "Malaysia", "Singapore", "Japan", "Brazil", "USA"})
         cmbCountryTeam.Enabled = False
-
+        LoadTeamsFromDatabase()
         UpdateTotalRecordsTeam()
     End Sub
 
@@ -97,6 +97,7 @@ Public Class team
 
     ' SINKRONISASI KE FORM PESERTA
     Private Sub SyncTeamsToPeserta()
+        SaveAllTeamsToDatabase()
         For Each frm As Form In Application.OpenForms
             If TypeOf frm Is Peserta Then
                 Dim formPeserta As Peserta = DirectCast(frm, Peserta)
@@ -435,4 +436,75 @@ Public Class team
         End If
     End Sub
 
+    ' --- FUNGSI MENYIMPAN SEMUA TIM KE DATABASE ---
+    Private Sub SaveAllTeamsToDatabase()
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+                ' 1. Buat tabelnya jika belum ada
+                Dim sqlCreate As String = "CREATE TABLE IF NOT EXISTS team_lengkap (nama_team TEXT, team_info TEXT, pict_path TEXT);"
+                Using cmdCreate As New System.Data.SQLite.SQLiteCommand(sqlCreate, conn)
+                    cmdCreate.ExecuteNonQuery()
+                End Using
+
+                ' 2. Hapus data lama agar tidak dobel
+                Dim sqlDelete As String = "DELETE FROM team_lengkap"
+                Using cmdDelete As New System.Data.SQLite.SQLiteCommand(sqlDelete, conn)
+                    cmdDelete.ExecuteNonQuery()
+                End Using
+
+                ' 3. Simpan ulang semua dari tabel di layar
+                For Each row As DataGridViewRow In gridEntriesTeam.Rows
+                    If Not row.IsNewRow Then
+                        Dim tName As String = row.Cells("ColTeamGrid").Value.ToString()
+                        Dim tInfo As String = row.Cells("ColTeamInfoGrid").Value.ToString()
+                        Dim pPath As String = row.Cells("ColTeamPictPath").Value.ToString()
+
+                        Dim sqlInsert As String = "INSERT INTO team_lengkap (nama_team, team_info, pict_path) VALUES (@nama, @info, @path)"
+                        Using cmdInsert As New System.Data.SQLite.SQLiteCommand(sqlInsert, conn)
+                            cmdInsert.Parameters.AddWithValue("@nama", tName)
+                            cmdInsert.Parameters.AddWithValue("@info", tInfo)
+                            cmdInsert.Parameters.AddWithValue("@path", pPath)
+                            cmdInsert.ExecuteNonQuery()
+                        End Using
+                    End If
+                Next
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ' --- FUNGSI MEMANGGIL TIM DARI DATABASE ---
+    Private Sub LoadTeamsFromDatabase()
+        Try
+            gridEntriesTeam.Rows.Clear()
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+                Dim query As String = "SELECT nama_team, team_info, pict_path FROM team_lengkap"
+                Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                    Using reader = cmd.ExecuteReader()
+                        While reader.Read()
+                            Dim tName As String = reader("nama_team").ToString()
+                            Dim tInfo As String = reader("team_info").ToString()
+                            Dim pPath As String = reader("pict_path").ToString()
+                            Dim displayImage As Image = GetTeamImage(pPath)
+
+                            Dim idx As Integer = gridEntriesTeam.Rows.Add()
+                            Dim row As DataGridViewRow = gridEntriesTeam.Rows(idx)
+                            row.Cells("ColRowNoTeam").Value = ""
+                            row.Cells("ColDeleteTeam").Value = "❌"
+                            row.Cells("ColEditTeam").Value = "📝"
+                            row.Cells("ColTeamGrid").Value = tName
+                            row.Cells("ColTeamInfoGrid").Value = tInfo
+                            row.Cells("ColTeamPictGrid").Value = displayImage
+                            row.Cells("ColTeamPictPath").Value = pPath
+                        End While
+                    End Using
+                End Using
+            End Using
+            UpdateRowNumbers()
+            UpdateTotalRecordsTeam()
+        Catch ex As Exception
+        End Try
+    End Sub
 End Class
