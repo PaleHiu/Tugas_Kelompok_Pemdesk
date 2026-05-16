@@ -5,7 +5,11 @@ Partial Public Class KumiteMainControl
 
     ' --- VARIABEL PENYIMPANAN SEMENTARA ---
     Public targetSide As String = ""
-
+    Public Shared AkaColor As Color = Color.Crimson
+    Public Shared AoColor As Color = Color.DodgerBlue
+    Public Shared AkaTextColor As Color = Color.White
+    Public Shared AoTextColor As Color = Color.White
+    Public Shared UseKnockoutCountdown As Boolean = True
     Public NextAkaName As String = ""
     Public NextAkaTeam As String = ""
     Public NextAkaInfo As String = ""
@@ -133,10 +137,10 @@ Partial Public Class KumiteMainControl
         End If
 
         ' Memberi warna dan menebalkan teks di kotak Next Match
-        TxtAkaName.ForeColor = Color.Crimson
+        TxtAkaName.ForeColor = AkaColor
         TxtAkaName.Font = New Font(TxtAkaName.Font, FontStyle.Bold)
 
-        TxtAoName.ForeColor = Color.DodgerBlue
+        TxtAoName.ForeColor = AoColor
         TxtAoName.Font = New Font(TxtAoName.Font, FontStyle.Bold)
     End Sub
 
@@ -245,11 +249,6 @@ Partial Public Class KumiteMainControl
         NumWaitSec.Value = 0
     End Sub
 
-    ' ==========================================================
-    ' FUNGSI LOGIKA TOMBOL PENALTI (P) SEKUENSIAL (BERURUTAN)
-    ' ==========================================================
-
-    ' Fungsi Penalti AKA (Merah)
     Private Sub BtnPenaltyAka_Click(sender As Object, e As EventArgs) Handles BtnAka1C.Click, BtnAka2C.Click, BtnAka3C.Click, BtnAkaHC.Click, BtnAkaH.Click
         Dim clickedBtn As Button = CType(sender, Button)
 
@@ -262,7 +261,7 @@ Partial Public Class KumiteMainControl
         ' 3. Cari batas tertinggi tombol yang saat ini sedang aktif (berwarna merah)
         Dim currentMaxIndex As Integer = -1
         For i As Integer = 4 To 0 Step -1
-            If arrBtns(i).BackColor = Color.Crimson Then
+            If arrBtns(i).BackColor = AkaColor Then
                 currentMaxIndex = i
                 Exit For
             End If
@@ -280,8 +279,8 @@ Partial Public Class KumiteMainControl
 
         For i As Integer = 0 To 4
             If i <= newMaxIndex Then
-                arrBtns(i).BackColor = Color.Crimson
-                arrBtns(i).ForeColor = Color.White
+                arrBtns(i).BackColor = AkaColor
+                arrBtns(i).ForeColor = AkaTextColor
             Else
                 arrBtns(i).BackColor = SystemColors.Control
                 arrBtns(i).ForeColor = Color.Black
@@ -296,7 +295,7 @@ Partial Public Class KumiteMainControl
 
             LblAoWinner.Visible = False
 
-            If BtnAoH.BackColor = Color.DodgerBlue Then
+            If BtnAoH.BackColor = AoColor Then
                 LblAkaWinner.Visible = True
             End If
         End If
@@ -318,7 +317,7 @@ Partial Public Class KumiteMainControl
         ' 3. Cari batas tertinggi tombol yang saat ini sedang aktif (berwarna biru)
         Dim currentMaxIndex As Integer = -1
         For i As Integer = 4 To 0 Step -1
-            If arrBtns(i).BackColor = Color.DodgerBlue Then
+            If arrBtns(i).BackColor = AoColor Then
                 currentMaxIndex = i
                 Exit For
             End If
@@ -338,8 +337,8 @@ Partial Public Class KumiteMainControl
         For i As Integer = 0 To 4
             If i <= newMaxIndex Then
                 ' Nyalakan tombol
-                arrBtns(i).BackColor = Color.DodgerBlue
-                arrBtns(i).ForeColor = Color.White
+                arrBtns(i).BackColor = AoColor
+                arrBtns(i).ForeColor = AoTextColor
             Else
                 ' Matikan tombol
                 arrBtns(i).BackColor = SystemColors.Control
@@ -357,7 +356,7 @@ Partial Public Class KumiteMainControl
             LblAkaWinner.Visible = False
 
             ' SMART UNDO: Jika ternyata AKA posisinya sedang 'H' (sempat tertahan), nyalakan kemenangan AO sekarang
-            If BtnAkaH.BackColor = Color.Crimson Then
+            If BtnAkaH.BackColor = AkaColor Then
                 LblAoWinner.Visible = True
             End If
         End If
@@ -661,9 +660,9 @@ Partial Public Class KumiteMainControl
             ' Jika wasit meralat skor (lewat tombol Change) sehingga poin turun di bawah Win Point.
             ' Kita harus menyembunyikan label WINNER, TAPI pastikan dulu dia tidak menang karena lawan kena diskualifikasi (H).
 
-            If lblScore.Name = "LblAkaMainScore" AndAlso BtnAoH.BackColor <> Color.DodgerBlue Then
+            If lblScore.Name = "LblAkaMainScore" AndAlso BtnAoH.BackColor <> AoColor Then
                 LblAkaWinner.Visible = False ' Sembunyikan jika batal menang dan lawan tidak kena H
-            ElseIf lblScore.Name = "LblAoMainScore" AndAlso BtnAkaH.BackColor <> Color.Crimson Then
+            ElseIf lblScore.Name = "LblAoMainScore" AndAlso BtnAkaH.BackColor <> AkaColor Then
                 LblAoWinner.Visible = False ' Sembunyikan jika batal menang dan lawan tidak kena H
             End If
         End If
@@ -850,7 +849,7 @@ Partial Public Class KumiteMainControl
         frmKO.Text = If(isAka, "AKA Knocked Out Countdown", "AO Knocked Out Countdown")
 
         ' Tentukan warna berdasarkan sudut petarung
-        Dim bgColor As Color = If(isAka, Color.Crimson, Color.DodgerBlue)
+        Dim bgColor As Color = If(isAka, AkaColor, AoColor)
 
         ' 2. Buat Panel Atas (Latar Berwarna untuk Angka)
         Dim pnlTop As New Panel() With {.Dock = DockStyle.Fill, .BackColor = bgColor}
@@ -927,22 +926,102 @@ Partial Public Class KumiteMainControl
     End Function
 
     ' ==========================================================
-    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI OTOMATIS)
+    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI PRO)
     ' ==========================================================
 
     ' Tombol Knocked Out AKA (Merah)
     Private Sub BtnAkaKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAkaKnockedOut.Click
-        ' Kirim LblAoWinner sebagai target yang akan menyala jika AKA KO
-        If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
-            MessageBox.Show("AKA Knocked Out!" & vbCrLf & "AO dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+        If BtnAkaKnockedOut.BackColor = AkaColor Then
+            BtnAkaKnockedOut.BackColor = SystemColors.Control
+            BtnAkaKnockedOut.ForeColor = Color.Black
+            LblAoWinner.Visible = False
+
+            ' Jika ternyata AO sedang K.O, berarti AKA yang harusnya kembali menang
+            If BtnAoKnockedOut.BackColor = AoColor Then
+                LblAkaWinner.Visible = True
+            End If
+
+            ' Hitung ulang skor barangkali AO menang karena poin
+            RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+            Return
+        End If
+
+        ' --- 2. LOGIKA K.O AKTIF ---
+        If UseKnockoutCountdown Then
+            ' MODE 1: Hitung Mundur 10 Detik
+            If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
+                ' Cegah Double Winner jika kedua pihak K.O
+                If BtnAoKnockedOut.BackColor = AoColor Then
+                    LblAoWinner.Visible = False
+                    LblAkaWinner.Visible = False
+                End If
+            End If
+        Else
+            ' MODE 2: Instan K.O (Tanpa Pop-up)
+            BtnAkaKnockedOut.BackColor = AkaColor
+            BtnAkaKnockedOut.ForeColor = AkaTextColor
+
+            ' Tentukan Pemenang (Cegah Double Winner)
+            If BtnAoKnockedOut.BackColor = AoColor Then
+                LblAoWinner.Visible = False
+                LblAkaWinner.Visible = False
+            Else
+                LblAoWinner.Visible = True
+            End If
+
+            AudioController.PlaySound("Knocked Out")
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
         End If
     End Sub
 
     ' Tombol Knocked Out AO (Biru)
     Private Sub BtnAoKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAoKnockedOut.Click
-        ' Kirim LblAkaWinner sebagai target yang akan menyala jika AO KO
-        If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
-            MessageBox.Show("AO Knocked Out!" & vbCrLf & "AKA dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+        If BtnAoKnockedOut.BackColor = AoColor Then
+            BtnAoKnockedOut.BackColor = SystemColors.Control
+            BtnAoKnockedOut.ForeColor = Color.Black
+            LblAkaWinner.Visible = False
+
+            ' Jika ternyata AKA sedang K.O, berarti AO yang harusnya kembali menang
+            If BtnAkaKnockedOut.BackColor = AkaColor Then
+                LblAoWinner.Visible = True
+            End If
+
+            ' Hitung ulang skor barangkali AKA menang karena poin
+            RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+            Return
+        End If
+
+        ' --- 2. LOGIKA K.O AKTIF ---
+        If UseKnockoutCountdown Then
+            ' MODE 1: Hitung Mundur 10 Detik
+            If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
+                ' Cegah Double Winner jika kedua pihak K.O
+                If BtnAkaKnockedOut.BackColor = AkaColor Then
+                    LblAkaWinner.Visible = False
+                    LblAoWinner.Visible = False
+                End If
+            End If
+        Else
+            ' MODE 2: Instan K.O (Tanpa Pop-up)
+            BtnAoKnockedOut.BackColor = AoColor
+            BtnAoKnockedOut.ForeColor = AoTextColor
+
+            ' Tentukan Pemenang (Cegah Double Winner)
+            If BtnAkaKnockedOut.BackColor = AkaColor Then
+                LblAkaWinner.Visible = False
+                LblAoWinner.Visible = False
+            Else
+                LblAkaWinner.Visible = True
+            End If
+
+            AudioController.PlaySound("Knocked Out")
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
         End If
     End Sub
 
@@ -1111,15 +1190,15 @@ Partial Public Class KumiteMainControl
 
                 For i As Integer = 0 To 4
                     ' Sinkronisasi AKA (Merah)
-                    If akaBtns(i).BackColor = Color.Crimson Then
-                        frmScoreboard.AkaPenLabels(i).BackColor = Color.Crimson
+                    If akaBtns(i).BackColor = AkaColor Then
+                        frmScoreboard.AkaPenLabels(i).BackColor = AkaColor
                     Else
                         frmScoreboard.AkaPenLabels(i).BackColor = Color.Transparent
                     End If
 
                     ' Sinkronisasi AO (Biru)
-                    If aoBtns(i).BackColor = Color.DodgerBlue Then
-                        frmScoreboard.AoPenLabels(i).BackColor = Color.DodgerBlue
+                    If aoBtns(i).BackColor = AoColor Then
+                        frmScoreboard.AoPenLabels(i).BackColor = AoColor
                     Else
                         frmScoreboard.AoPenLabels(i).BackColor = Color.Transparent
                     End If

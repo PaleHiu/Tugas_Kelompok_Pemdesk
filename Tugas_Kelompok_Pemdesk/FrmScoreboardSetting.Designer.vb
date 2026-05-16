@@ -102,12 +102,13 @@ Partial Public Class FrmScoreboardSetting
     Private Function MakeFontGroup(title As String, defFont As String, isBold As Boolean, clr As Color) As GroupBox
         Dim g As New GroupBox() : g.Text = title : g.Dock = DockStyle.Fill : g.Margin = New Padding(3)
         Dim lblF As New Label() : lblF.Text = "Font" : lblF.Location = New Point(10, 25) : lblF.AutoSize = True
-
         Dim cb As ComboBox = MakeCombo(defFont) : cb.Location = New Point(75, 22) : cb.Width = 140
-
+        cb.Name = "Cbo" & title.Replace(" ", "")
         Dim lblC As New Label() : lblC.Text = "Font Color" : lblC.Location = New Point(10, 58) : lblC.AutoSize = True
         Dim cp As Panel = MakeColorPicker(clr) : cp.Location = New Point(75, 54)
+        cp.Name = "PnlColor" & title.Replace(" ", "")
         Dim chk As New CheckBox() : chk.Text = "Bold" : chk.Checked = isBold : chk.Location = New Point(225, 56) : chk.AutoSize = True
+        chk.Name = "Chk" & title.Replace(" ", "")
 
         g.Controls.AddRange(New Control() {lblF, cb, lblC, cp, chk})
         Return g
@@ -132,12 +133,12 @@ Partial Public Class FrmScoreboardSetting
 
         Dim gpT As New GroupBox() : gpT.Text = "Kumite Timer & Score" : gpT.Size = New Size(490, 95)
         Dim lblT1 As New Label() : lblT1.Text = "Font (Timer)" : lblT1.Location = New Point(10, 25) : lblT1.AutoSize = True
-        Dim cbT1 As ComboBox = MakeCombo("Arial") : cbT1.Location = New Point(100, 22) : cbT1.Width = 150
-        Dim chkT1 As New CheckBox() : chkT1.Text = "Bold" : chkT1.Checked = True : chkT1.Location = New Point(260, 24) : chkT1.AutoSize = True
+        Dim cbT1 As ComboBox = MakeCombo("Arial") : cbT1.Location = New Point(100, 22) : cbT1.Width = 150 : cbT1.Name = "CboFontTimer"
+        Dim chkT1 As New CheckBox() : chkT1.Text = "Bold" : chkT1.Checked = True : chkT1.Location = New Point(260, 24) : chkT1.AutoSize = True : chkT1.Name = "ChkTimerBold"
 
         Dim lblT2 As New Label() : lblT2.Text = "Font (Score)" : lblT2.Location = New Point(10, 55) : lblT2.AutoSize = True
-        Dim cbT2 As ComboBox = MakeCombo("Microsoft Sans Serif") : cbT2.Location = New Point(100, 52) : cbT2.Width = 150
-        Dim chkT2 As New CheckBox() : chkT2.Text = "Bold" : chkT2.Checked = True : chkT2.Location = New Point(260, 54) : chkT2.AutoSize = True
+        Dim cbT2 As ComboBox = MakeCombo("Microsoft Sans Serif") : cbT2.Location = New Point(100, 52) : cbT2.Width = 150 : cbT2.Name = "CboFontScore"
+        Dim chkT2 As New CheckBox() : chkT2.Text = "Bold" : chkT2.Checked = True : chkT2.Location = New Point(260, 54) : chkT2.AutoSize = True : chkT2.Name = "ChkScoreBold"
         gpT.Controls.AddRange(New Control() {lblT1, cbT1, chkT1, lblT2, cbT2, chkT2})
 
         Dim gpD As New GroupBox() : gpD.Text = "Kumite Match Detail" : gpD.Size = New Size(490, 140)
@@ -149,7 +150,7 @@ Partial Public Class FrmScoreboardSetting
         Dim chkDb As New CheckBox() : chkDb.Text = "Bold" : chkDb.Checked = True : chkDb.Location = New Point(260, 54) : chkDb.AutoSize = True
 
         Dim chkD1 As New CheckBox() : chkD1.Text = "Display Score Popup" : chkD1.Checked = True : chkD1.Location = New Point(10, 85) : chkD1.AutoSize = True
-        Dim chkD2 As New CheckBox() : chkD2.Text = "Knocked Out Countdown" : chkD2.Checked = True : chkD2.Location = New Point(10, 105) : chkD2.AutoSize = True
+        Dim chkD2 As New CheckBox() : chkD2.Text = "Knocked Out Countdown" : chkD2.Checked = KumiteMainControl.UseKnockoutCountdown : chkD2.Location = New Point(10, 105) : chkD2.AutoSize = True : chkD2.Name = "ChkKnockoutCountdown"
         gpD.Controls.AddRange(New Control() {lblDf, cbDf, lblDc, cpD, chkDb, chkD1, chkD2})
 
         Dim gpR As New GroupBox() : gpR.Size = New Size(490, 200) : gpR.Text = "Round Info"
@@ -269,8 +270,12 @@ Partial Public Class FrmScoreboardSetting
         Dim lblT As New Label() : lblT.Text = title : lblT.Font = New Font("Segoe UI", 8.5, FontStyle.Bold) : lblT.Location = New Point(5, 0) : lblT.AutoSize = True
         Dim lblB As New Label() : lblB.Text = "BackColor" : lblB.Location = New Point(5, 28) : lblB.AutoSize = True
         Dim cp1 As Panel = MakeColorPicker(clr) : cp1.Location = New Point(100, 25)
+        If title.Contains("AKA") Then cp1.Name = "PanelWarnaAka"
+        If title.Contains("AO") Then cp1.Name = "PanelWarnaAo"
         Dim lblS As New Label() : lblS.Text = "Selected" & vbCrLf & "Text Color" : lblS.Location = New Point(5, 58) : lblS.AutoSize = True
         Dim cp2 As Panel = MakeColorPicker(Color.White) : cp2.Location = New Point(100, 60)
+        If title.Contains("AKA") Then cp2.Name = "PanelTextAka"
+        If title.Contains("AO") Then cp2.Name = "PanelTextAo"
         p.Controls.AddRange(New Control() {lblT, lblB, cp1, lblS, cp2})
         Return p
     End Function
@@ -430,18 +435,91 @@ Partial Public Class FrmScoreboardSetting
         AddHandler btnClose.Click, Sub() Me.Close()
 
         Dim btnSave As New Button() : btnSave.Text = "Save" : btnSave.Size = New Size(110, 35) : btnSave.Location = New Point(380, 125) : btnSave.BackColor = Color.White
-        ' --- TAMBAHAN LOGIKA TOMBOL SAVE ---
+
         AddHandler btnSave.Click, Sub()
-                                      MessageBox.Show("Pengaturan Suara berhasil disimpan!", "Tersimpan", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                      Dim mainFrm As KumiteMainControl = TryCast(Application.OpenForms("KumiteMainControl"), KumiteMainControl)
+                                      If mainFrm Is Nothing Then Return
+
+                                      ' 1. SIMPAN WARNA PENALTI
+                                      Dim arrAka = Me.Controls.Find("PanelWarnaAka", True)
+                                      If arrAka.Length > 0 Then KumiteMainControl.AkaColor = arrAka(0).BackColor
+
+                                      Dim arrAo = Me.Controls.Find("PanelWarnaAo", True)
+                                      If arrAo.Length > 0 Then KumiteMainControl.AoColor = arrAo(0).BackColor
+
+                                      Dim arrTxtAka = Me.Controls.Find("PanelTextAka", True)
+                                      If arrTxtAka.Length > 0 Then KumiteMainControl.AkaTextColor = arrTxtAka(0).BackColor
+
+                                      Dim arrTxtAo = Me.Controls.Find("PanelTextAo", True)
+                                      If arrTxtAo.Length > 0 Then KumiteMainControl.AoTextColor = arrTxtAo(0).BackColor
+
+                                      mainFrm.SyncScoreboardPenalties()
+
+                                      ' 2. SIMPAN FONT HEADER (PLAYER, TEAM, TEAM INFO)
+                                      Dim cbPName = Me.Controls.Find("CboPlayerName", True)
+                                      Dim chkPName = Me.Controls.Find("ChkPlayerName", True)
+                                      Dim clrPName = Me.Controls.Find("PnlColorPlayerName", True)
+                                      If cbPName.Length > 0 Then
+                                          Dim fStyle = If(DirectCast(chkPName(0), CheckBox).Checked, FontStyle.Bold, FontStyle.Regular)
+                                          Dim pFont As New Font(cbPName(0).Text, mainFrm.TxtAkaNameMain.Font.Size, fStyle)
+                                          mainFrm.TxtAkaNameMain.Font = pFont
+                                          mainFrm.TxtAkaNameMain.ForeColor = clrPName(0).BackColor
+                                          mainFrm.TxtAoNameMain.Font = pFont
+                                          mainFrm.TxtAoNameMain.ForeColor = clrPName(0).BackColor
+                                      End If
+
+                                      Dim cbTeam = Me.Controls.Find("CboTeam", True)
+                                      Dim chkTeam = Me.Controls.Find("ChkTeam", True)
+                                      Dim clrTeam = Me.Controls.Find("PnlColorTeam", True)
+                                      If cbTeam.Length > 0 Then
+                                          Dim fStyle = If(DirectCast(chkTeam(0), CheckBox).Checked, FontStyle.Bold, FontStyle.Regular)
+                                          Dim tFont As New Font(cbTeam(0).Text, mainFrm.TxtAkaTeam.Font.Size, fStyle)
+                                          mainFrm.TxtAkaTeam.Font = tFont
+                                          mainFrm.TxtAkaTeam.ForeColor = clrTeam(0).BackColor
+                                          mainFrm.TxtAoTeam.Font = tFont
+                                          mainFrm.TxtAoTeam.ForeColor = clrTeam(0).BackColor
+                                      End If
+
+                                      Dim cbTInfo = Me.Controls.Find("CboTeamInfo", True)
+                                      Dim chkTInfo = Me.Controls.Find("ChkTeamInfo", True)
+                                      Dim clrTInfo = Me.Controls.Find("PnlColorTeamInfo", True)
+                                      If cbTInfo.Length > 0 Then
+                                          Dim fStyle = If(DirectCast(chkTInfo(0), CheckBox).Checked, FontStyle.Bold, FontStyle.Regular)
+                                          Dim tiFont As New Font(cbTInfo(0).Text, mainFrm.TxtAkaTeamInfo.Font.Size, fStyle)
+                                          mainFrm.TxtAkaTeamInfo.Font = tiFont
+                                          mainFrm.TxtAkaTeamInfo.ForeColor = clrTInfo(0).BackColor
+                                          mainFrm.TxtAoTeamInfo.Font = tiFont
+                                          mainFrm.TxtAoTeamInfo.ForeColor = clrTInfo(0).BackColor
+                                      End If
+
+                                      ' 3. SIMPAN FONT KE SCOREBOARD RAKSASA
+                                      If KumiteMainControl.frmScoreboard IsNot Nothing AndAlso Not KumiteMainControl.frmScoreboard.IsDisposed Then
+                                          Dim arrCbT1 = Me.Controls.Find("CboFontTimer", True)
+                                          Dim arrChkT1 = Me.Controls.Find("ChkTimerBold", True)
+                                          Dim arrCbT2 = Me.Controls.Find("CboFontScore", True)
+                                          Dim arrChkT2 = Me.Controls.Find("ChkScoreBold", True)
+
+                                          If arrCbT1.Length > 0 AndAlso arrCbT2.Length > 0 AndAlso arrChkT1.Length > 0 AndAlso arrChkT2.Length > 0 Then
+                                              KumiteMainControl.frmScoreboard.ApplyCustomFont(
+                                                  arrCbT1(0).Text, DirectCast(arrChkT1(0), CheckBox).Checked,
+                                                  arrCbT2(0).Text, DirectCast(arrChkT2(0), CheckBox).Checked)
+                                          End If
+                                      End If
+
+                                      ' 4. SIMPAN SETELAN CHECKBOX KNOCKOUT (Sekarang diletakkan di luar, pasti terbaca!)
+                                      Dim arrChkKO = Me.Controls.Find("ChkKnockoutCountdown", True)
+                                      If arrChkKO.Length > 0 Then
+                                          KumiteMainControl.UseKnockoutCountdown = DirectCast(arrChkKO(0), CheckBox).Checked
+                                      End If
+
+                                      MessageBox.Show("Pengaturan berhasil disimpan dan diterapkan!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
                                       Me.Close()
                                   End Sub
 
         p.Controls.AddRange(New Control() {lblL, pbL, btnS, btnR, pbUser, chkL, lblN, btnClose, btnSave})
     End Sub
 
-    ' Shared font list agar tidak di-load ulang setiap MakeCombo dipanggil
     Private Shared _fontNames As List(Of String) = Nothing
-
     Private Shared Function GetFontNames() As List(Of String)
         If _fontNames Is Nothing Then
             _fontNames = New List(Of String)
