@@ -7,8 +7,16 @@ Public Class ListOfCompetitor
         InitializeComponent()
     End Sub
     Private Sub ListOfCompetitor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        LoadTeam()
-        LoadCompetitor("")
+        Try
+            ' Kita jalankan fungsi bawaannya di dalam pengawasan Try
+            LoadTeam()
+            LoadCompetitor("")
+        Catch ex As Exception
+            ' Jika ada kode yang bikin crash, baris ini akan langsung menangkap 
+            ' dan memunculkan pesan box berisi letak error-nya!
+            MessageBox.Show("Form gagal terbuka karena ada silent crash di dalam Load: " & vbCrLf & ex.Message,
+                            "Pelacak Error Misterius", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     ' ... (sisanya biarkan saja)
