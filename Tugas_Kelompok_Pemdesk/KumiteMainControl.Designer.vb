@@ -54,7 +54,7 @@ Partial Class KumiteMainControl
         BtnAoUserIcon1 = New Button()
         LblAoTeamTitle = New Label()
         TxtAoTeam = New TextBox()
-        BtnAoSearch2 = New Button()
+        BtnAoTeamSearch = New Button()
         LblAoTeamInfoTitle = New Label()
         TxtAoTeamInfo = New TextBox()
         PicAoTeamLogo = New PictureBox()
@@ -99,7 +99,7 @@ Partial Class KumiteMainControl
         BtnAkaUserIcon1 = New Button()
         LblAkaTeamTitle = New Label()
         TxtAkaTeam = New TextBox()
-        BtnAkaSearch2 = New Button()
+        BtnAkaTeamSearch = New Button()
         LblAkaTeamInfoTitle = New Label()
         TxtAkaTeamInfo = New TextBox()
         PicAkaTeamLogo = New PictureBox()
@@ -232,7 +232,7 @@ Partial Class KumiteMainControl
         ' LblNextMatch
         ' 
         LblNextMatch.BackColor = Color.Gold
-        LblNextMatch.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblNextMatch.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblNextMatch.Location = New Point(11, 11)
         LblNextMatch.Name = "LblNextMatch"
         LblNextMatch.Size = New Size(91, 32)
@@ -243,7 +243,7 @@ Partial Class KumiteMainControl
         ' TxtAkaName
         ' 
         TxtAkaName.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaName.Font = New Font("Segoe UI", 9.0F)
+        TxtAkaName.Font = New Font("Segoe UI", 9F)
         TxtAkaName.Location = New Point(114, 12)
         TxtAkaName.Margin = New Padding(3, 4, 3, 4)
         TxtAkaName.Name = "TxtAkaName"
@@ -265,7 +265,7 @@ Partial Class KumiteMainControl
         ' LblVS
         ' 
         LblVS.BackColor = Color.Gold
-        LblVS.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblVS.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblVS.Location = New Point(337, 11)
         LblVS.Name = "LblVS"
         LblVS.Size = New Size(34, 32)
@@ -288,7 +288,7 @@ Partial Class KumiteMainControl
         ' TxtAoName
         ' 
         TxtAoName.BorderStyle = BorderStyle.FixedSingle
-        TxtAoName.Font = New Font("Segoe UI", 9.0F)
+        TxtAoName.Font = New Font("Segoe UI", 9F)
         TxtAoName.Location = New Point(423, 12)
         TxtAoName.Margin = New Padding(3, 4, 3, 4)
         TxtAoName.Name = "TxtAoName"
@@ -529,7 +529,7 @@ Partial Class KumiteMainControl
         ' 
         LblAoTitle.BackColor = Color.DodgerBlue
         LblAoTitle.Dock = DockStyle.Top
-        LblAoTitle.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        LblAoTitle.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         LblAoTitle.ForeColor = Color.White
         LblAoTitle.Location = New Point(0, 0)
         LblAoTitle.Name = "LblAoTitle"
@@ -555,7 +555,7 @@ Partial Class KumiteMainControl
         PnlAoInfo.Controls.Add(BtnAoUserIcon1)
         PnlAoInfo.Controls.Add(LblAoTeamTitle)
         PnlAoInfo.Controls.Add(TxtAoTeam)
-        PnlAoInfo.Controls.Add(BtnAoSearch2)
+        PnlAoInfo.Controls.Add(BtnAoTeamSearch)
         PnlAoInfo.Controls.Add(LblAoTeamInfoTitle)
         PnlAoInfo.Controls.Add(TxtAoTeamInfo)
         PnlAoInfo.Controls.Add(PicAoTeamLogo)
@@ -610,14 +610,14 @@ Partial Class KumiteMainControl
         TxtAoTeam.TabIndex = 4
         TxtAoTeam.Text = "Dojo Rajawali"
         ' 
-        ' BtnAoSearch2
+        ' BtnAoTeamSearch
         ' 
-        BtnAoSearch2.Location = New Point(257, 44)
-        BtnAoSearch2.Margin = New Padding(3, 4, 3, 4)
-        BtnAoSearch2.Name = "BtnAoSearch2"
-        BtnAoSearch2.Size = New Size(29, 33)
-        BtnAoSearch2.TabIndex = 5
-        BtnAoSearch2.Text = "🔍"
+        BtnAoTeamSearch.Location = New Point(257, 44)
+        BtnAoTeamSearch.Margin = New Padding(3, 4, 3, 4)
+        BtnAoTeamSearch.Name = "BtnAoTeamSearch"
+        BtnAoTeamSearch.Size = New Size(29, 33)
+        BtnAoTeamSearch.TabIndex = 5
+        BtnAoTeamSearch.Text = "🔍"
         ' 
         ' LblAoTeamInfoTitle
         ' 
@@ -847,7 +847,7 @@ Partial Class KumiteMainControl
         ' 
         ' LblAoMainScore
         ' 
-        LblAoMainScore.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        LblAoMainScore.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         LblAoMainScore.Location = New Point(720, 40)
         LblAoMainScore.Name = "LblAoMainScore"
         LblAoMainScore.Size = New Size(133, 80)
@@ -993,7 +993,7 @@ Partial Class KumiteMainControl
         ' 
         LblAkaTitle.BackColor = Color.Crimson
         LblAkaTitle.Dock = DockStyle.Top
-        LblAkaTitle.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        LblAkaTitle.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         LblAkaTitle.ForeColor = Color.White
         LblAkaTitle.Location = New Point(0, 0)
         LblAkaTitle.Name = "LblAkaTitle"
@@ -1019,7 +1019,7 @@ Partial Class KumiteMainControl
         PnlAkaInfo.Controls.Add(BtnAkaUserIcon1)
         PnlAkaInfo.Controls.Add(LblAkaTeamTitle)
         PnlAkaInfo.Controls.Add(TxtAkaTeam)
-        PnlAkaInfo.Controls.Add(BtnAkaSearch2)
+        PnlAkaInfo.Controls.Add(BtnAkaTeamSearch)
         PnlAkaInfo.Controls.Add(LblAkaTeamInfoTitle)
         PnlAkaInfo.Controls.Add(TxtAkaTeamInfo)
         PnlAkaInfo.Controls.Add(PicAkaTeamLogo)
@@ -1074,14 +1074,14 @@ Partial Class KumiteMainControl
         TxtAkaTeam.TabIndex = 4
         TxtAkaTeam.Text = "Dojo Rajawali"
         ' 
-        ' BtnAkaSearch2
+        ' BtnAkaTeamSearch
         ' 
-        BtnAkaSearch2.Location = New Point(257, 44)
-        BtnAkaSearch2.Margin = New Padding(3, 4, 3, 4)
-        BtnAkaSearch2.Name = "BtnAkaSearch2"
-        BtnAkaSearch2.Size = New Size(29, 33)
-        BtnAkaSearch2.TabIndex = 5
-        BtnAkaSearch2.Text = "🔍"
+        BtnAkaTeamSearch.Location = New Point(257, 44)
+        BtnAkaTeamSearch.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaTeamSearch.Name = "BtnAkaTeamSearch"
+        BtnAkaTeamSearch.Size = New Size(29, 33)
+        BtnAkaTeamSearch.TabIndex = 5
+        BtnAkaTeamSearch.Text = "🔍"
         ' 
         ' LblAkaTeamInfoTitle
         ' 
@@ -1302,7 +1302,7 @@ Partial Class KumiteMainControl
         ' 
         ' LblAkaMainScore
         ' 
-        LblAkaMainScore.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        LblAkaMainScore.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         LblAkaMainScore.Location = New Point(715, 44)
         LblAkaMainScore.Name = "LblAkaMainScore"
         LblAkaMainScore.Size = New Size(125, 80)
@@ -1815,7 +1815,7 @@ Partial Class KumiteMainControl
         ' LblMatchTimerValue
         ' 
         LblMatchTimerValue.AutoSize = True
-        LblMatchTimerValue.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+        LblMatchTimerValue.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
         LblMatchTimerValue.Location = New Point(90, 11)
         LblMatchTimerValue.Name = "LblMatchTimerValue"
         LblMatchTimerValue.Size = New Size(70, 28)
@@ -1877,7 +1877,7 @@ Partial Class KumiteMainControl
         ' 
         ' KumiteMainControl
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
         ClientSize = New Size(1200, 875)
@@ -2006,7 +2006,7 @@ Partial Class KumiteMainControl
     Friend WithEvents TxtAkaNameMain As TextBox
     Friend WithEvents LblAkaTeamTitle As Label
     Friend WithEvents TxtAkaTeam As TextBox
-    Friend WithEvents BtnAkaSearch2 As Button
+    Friend WithEvents BtnAkaTeamSearch As Button
     Friend WithEvents LblAkaTeamInfoTitle As Label
     Friend WithEvents TxtAkaTeamInfo As TextBox
     Friend WithEvents BtnAkaShikkaku As Button
@@ -2044,7 +2044,7 @@ Partial Class KumiteMainControl
     Friend WithEvents BtnAoUserIcon1 As Button
     Friend WithEvents LblAoTeamTitle As Label
     Friend WithEvents TxtAoTeam As TextBox
-    Friend WithEvents BtnAoSearch2 As Button
+    Friend WithEvents BtnAoTeamSearch As Button
     Friend WithEvents LblAoTeamInfoTitle As Label
     Friend WithEvents TxtAoTeamInfo As TextBox
     Friend WithEvents PicAoTeamLogo As PictureBox

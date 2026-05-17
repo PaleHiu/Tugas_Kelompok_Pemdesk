@@ -35,6 +35,44 @@ Partial Public Class KumiteMainControl
         End If
     End Sub
 
+    ' --- FUNGSI UPDATE TEAM & INFO SAJA (DARI LIST OF TEAM) ---
+    Public Sub UpdateTeamData(team As String, info As String)
+        If targetSide = "AKA" Then
+            NextAkaTeam = team
+            NextAkaInfo = info
+            TxtAkaTeam.Text = team
+            TxtAkaTeamInfo.Text = info
+
+            ' Memperbarui teks gabungan "Nama | Tim" jika pesertanya sudah dipilih
+            If NextAkaName <> "" Then
+                TxtAkaName.Text = NextAkaName & " | " & team
+            End If
+
+        ElseIf targetSide = "AO" Then
+            NextAoTeam = team
+            NextAoInfo = info
+            TxtAoTeam.Text = team
+            TxtAoTeamInfo.Text = info
+
+            ' Memperbarui teks gabungan "Nama | Tim" jika pesertanya sudah dipilih
+            If NextAoName <> "" Then
+                TxtAoName.Text = NextAoName & " | " & team
+            End If
+        End If
+    End Sub
+
+    Private Sub BtnAkaTeamSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaTeamSearch.Click
+        targetSide = "AKA"
+        Dim frm As New ListOfTeam()
+        frm.ShowDialog()
+    End Sub
+
+    Private Sub BtnAoTeamSearch_Click(sender As Object, e As EventArgs) Handles BtnAoTeamSearch.Click
+        targetSide = "AO"
+        Dim frm As New ListOfTeam()
+        frm.ShowDialog()
+    End Sub
+
     ' --- FUNGSI TOMBOL LOAD NEXT MATCH ---
     Private Sub BtnLoadNextMatch_Click(sender As Object, e As EventArgs) Handles BtnLoadNextMatch.Click
         ' Memasukkan data ke sisi AKA (Merah)
@@ -58,13 +96,13 @@ Partial Public Class KumiteMainControl
     End Sub
 
     ' Menggabungkan klik ikon 👤 dan 🔍 untuk AKA
-    Private Sub BtnAkaSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaSearch2.Click, BtnAkaIcon.Click
+    Private Sub BtnAkaSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIcon.Click
         targetSide = "AKA"
         ListOfCompetitor.ShowDialog()
     End Sub
 
     ' Menggabungkan klik ikon 👤 dan 🔍 untuk AO
-    Private Sub BtnAoSearch_Click(sender As Object, e As EventArgs) Handles BtnAoSearch2.Click, BtnAoIcon.Click
+    Private Sub BtnAoSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIcon.Click
         targetSide = "AO"
         ListOfCompetitor.ShowDialog()
     End Sub
