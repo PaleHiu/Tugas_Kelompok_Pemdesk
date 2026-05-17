@@ -26,14 +26,127 @@ Partial Public Class KumiteMainControl
             NextAkaInfo = info
             ' Format teks jadi "Nama | Tim"
             TxtAkaName.Text = nama & " | " & team
+
+            ' Panggil foto dari database ke PictureBox AKA milikmu
+            LoadMatchImages(nama, team, PicAkaProfile, PicAkaTeamLogo)
+
         ElseIf targetSide = "AO" Then
             NextAoName = nama
             NextAoTeam = team
             NextAoInfo = info
             ' Format teks jadi "Nama | Tim"
             TxtAoName.Text = nama & " | " & team
+
+            ' Panggil foto dari database ke PictureBox AO milikmu
+            LoadMatchImages(nama, team, PicAoProfile, PicAoTeamLogo)
         End If
     End Sub
+
+    ' ==========================================================
+    ' FUNGSI PENCARI GAMBAR DARI DATABASE
+    ' ==========================================================
+    Private Sub LoadMatchImages(nama As String, namaTeam As String, boxComp As PictureBox, boxTeam As PictureBox)
+
+        ' 1. FIX UKURAN: Memaksa gambar mengecil secara proporsional dan pas di tengah frame
+        boxComp.SizeMode = PictureBoxSizeMode.Zoom
+        boxTeam.SizeMode = PictureBoxSizeMode.Zoom
+
+        ' 2. FIX WARNA: Paksa background menjadi warna Putih agar menghilangkan kotak hitam pekat
+        boxComp.BackColor = Color.White
+        boxTeam.BackColor = Color.White
+
+        ' Kosongkan gambar pertandingan sebelumnya
+        boxComp.Image = Nothing
+        boxTeam.Image = Nothing
+
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+
+                ' Cari Foto Peserta di tabel competitor
+                Try
+                    Dim qComp As String = "SELECT pict_path FROM competitor WHERE name = @n AND team = @t LIMIT 1"
+                    Using cmdComp As New System.Data.SQLite.SQLiteCommand(qComp, conn)
+                        cmdComp.Parameters.AddWithValue("@n", nama)
+                        cmdComp.Parameters.AddWithValue("@t", namaTeam)
+                        Dim result = cmdComp.ExecuteScalar()
+
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxComp.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+
+                ' Cari Logo Tim di tabel team_lengkap
+                Try
+                    Dim qTeam As String = "SELECT pict_path FROM team_lengkap WHERE nama_team = @nt LIMIT 1"
+                    Using cmdTeam As New System.Data.SQLite.SQLiteCommand(qTeam, conn)
+                        cmdTeam.Parameters.AddWithValue("@nt", namaTeam)
+                        Dim result = cmdTeam.ExecuteScalar()
+
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxTeam.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ' ==========================================================
+    ' FUNGSI MEMUAT GAMBAR AMAN DENGAN 1 PARAMETER SINKRON
+    ' ==========================================================
+    Private Function LoadSafeImage(path As String) As Image
+        Try
+            ' Cek jika path kosong atau bernilai "No Image", langsung lewati tanpa error
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+
+            path = path.Trim()
+
+            ' Membaca file gambar dengan aman
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                Using ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                End Using
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
+
+    ' ==========================================================
+    ' FUNGSI MEMUAT GAMBAR AMAN & MENJAGA TRANSPARANSI
+    ' ==========================================================
+    Private Function LoadSafeImage(path As String, tipe As String) As Image
+        Try
+            ' 1. CEGAL ERROR "No Image": Jika path kosong atau bernilai "No Image" (karena peserta memang tidak pakai foto), 
+            ' maka langsung kembalikan kosong (Nothing) TANPA memunculkan pesan error!
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+
+            path = path.Trim()
+
+            ' 2. Load gambar jika file benar-benar ada
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                ' Trik Anti-Hitam: Kita langsung load dari MemoryStream tanpa dibungkus New Bitmap() lagi
+                ' Ini akan menjaga efek transparansi gambar PNG 100% utuh!
+                Dim ms As New IO.MemoryStream(bytes)
+                Return Image.FromStream(ms)
+            Else
+                MessageBox.Show($"File gambar untuk {tipe} tidak ditemukan di komputer:{vbCrLf}{path}", "Gambar Hilang", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
 
     ' --- FUNGSI UPDATE TEAM & INFO SAJA (DARI LIST OF TEAM) ---
     Public Sub UpdateTeamData(team As String, info As String)
@@ -95,16 +208,26 @@ Partial Public Class KumiteMainControl
         MessageBox.Show("Data pertandingan berhasil di-load!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
-    ' Menggabungkan klik ikon 👤 dan 🔍 untuk AKA
+    ' Klik ikon 👤 untuk AKA
     Private Sub BtnAkaSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIcon.Click
         targetSide = "AKA"
-        ListOfCompetitor.ShowDialog()
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error Tombol AKA", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
-    ' Menggabungkan klik ikon 👤 dan 🔍 untuk AO
+    ' Klik ikon 👤 untuk AO
     Private Sub BtnAoSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIcon.Click
         targetSide = "AO"
-        ListOfCompetitor.ShowDialog()
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error Tombol AO", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Public Shared frmScoreboardSettingApp As FrmScoreboardSetting
@@ -618,9 +741,11 @@ Partial Public Class KumiteMainControl
 
     ' Tombol Reset Score AKA (Merah)
     Private Sub BtnAkaResetScore_Click(sender As Object, e As EventArgs) Handles BtnAkaResetScore.Click
-        ' Kosongkan tabel dan kembalikan angka ke 0
+        ' Kosongkan tabel
         DgvAkaHistory.Rows.Clear()
-        LblAkaMainScore.Text = "0"
+
+        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
 
         ' Matikan label WINNER secara paksa
         LblAkaWinner.Visible = False
@@ -628,9 +753,11 @@ Partial Public Class KumiteMainControl
 
     ' Tombol Reset Score AO (Biru)
     Private Sub BtnAoResetScore_Click(sender As Object, e As EventArgs) Handles BtnAoResetScore.Click
-        ' Kosongkan tabel dan kembalikan angka ke 0
+        ' Kosongkan tabel
         DgvAoHistory.Rows.Clear()
-        LblAoMainScore.Text = "0"
+
+        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
 
         ' Matikan label WINNER secara paksa
         LblAoWinner.Visible = False
@@ -643,17 +770,31 @@ Partial Public Class KumiteMainControl
 
     ' Helper: Menghitung ulang seluruh poin yang ada di tabel
     ' ==========================================================
-    ' FUNGSI KALKULASI ULANG SKOR & PENENTUAN PEMENANG (WIN. POINT)
+    ' FUNGSI KALKULASI ULANG SKOR & PENENTUAN PEMENANG (WIN.POINT)
     ' ==========================================================
     Private Sub RecalculateTotalScore(dgv As DataGridView, lblScore As Label)
-        ' 1. Hitung ulang total poin dari tabel
+        ' 1. Hitung ulang total poin DAN JUMLAH KLIK dari tabel
         Dim total As Integer = 0
+        Dim countIppon As Integer = 0
+        Dim countWazaari As Integer = 0
+        Dim countYuko As Integer = 0
+
         For Each row As DataGridViewRow In dgv.Rows
             If Not row.IsNewRow AndAlso row.Cells.Count > 2 AndAlso row.Cells(2).Value IsNot Nothing Then
                 Dim typeStr As String = row.Cells(2).Value.ToString()
-                If typeStr.Contains("(3)") Then total += 3
-                If typeStr.Contains("(2)") Then total += 2
-                If typeStr.Contains("(1)") Then total += 1
+                ' Deteksi tipe skor dan hitung jumlah kemunculannya
+                If typeStr.Contains("(3)") Then
+                    total += 3
+                    countIppon += 1
+                End If
+                If typeStr.Contains("(2)") Then
+                    total += 2
+                    countWazaari += 1
+                End If
+                If typeStr.Contains("(1)") Then
+                    total += 1
+                    countYuko += 1
+                End If
             End If
         Next
 
@@ -662,7 +803,20 @@ Partial Public Class KumiteMainControl
         SyncScoreboardPoints()
 
         ' =======================================================
-        ' 3. LOGIKA WIN. POINT (CEK PEMENANG)
+        ' 3. UPDATE SCORE SUMMARY (RINGKASAN POIN)
+        ' =======================================================
+        If lblScore.Name = "LblAkaMainScore" Then
+            LblAkaIpponCount.Text = "Ippon  " & countIppon.ToString()
+            LblAkaWazaariCount.Text = "Waza-ari  " & countWazaari.ToString()
+            LblAkaYukoCount.Text = "Yuko  " & countYuko.ToString()
+        ElseIf lblScore.Name = "LblAoMainScore" Then
+            LblAoIpponCount.Text = "Ippon  " & countIppon.ToString()
+            LblAoWazaariCount.Text = "Waza-ari  " & countWazaari.ToString()
+            LblAoYukoCount.Text = "Yuko  " & countYuko.ToString()
+        End If
+
+        ' =======================================================
+        ' 4. LOGIKA WIN.POINT (CEK PEMENANG)
         ' =======================================================
         ' Ambil nilai batas kemenangan secara real-time dari kontrol UI (bisa di-adjust kapan saja)
         Dim batasMenang As Integer = CInt(NumWinPoint.Value)
@@ -693,11 +847,10 @@ Partial Public Class KumiteMainControl
 
         Else
             ' =======================================================
-            ' 4. LOGIKA PEMBATALAN (SMART UNDO)
+            ' 5. LOGIKA PEMBATALAN (SMART UNDO)
             ' =======================================================
             ' Jika wasit meralat skor (lewat tombol Change) sehingga poin turun di bawah Win Point.
             ' Kita harus menyembunyikan label WINNER, TAPI pastikan dulu dia tidak menang karena lawan kena diskualifikasi (H).
-
             If lblScore.Name = "LblAkaMainScore" AndAlso BtnAoH.BackColor <> AoColor Then
                 LblAkaWinner.Visible = False ' Sembunyikan jika batal menang dan lawan tidak kena H
             ElseIf lblScore.Name = "LblAoMainScore" AndAlso BtnAkaH.BackColor <> AkaColor Then
@@ -1245,6 +1398,15 @@ Partial Public Class KumiteMainControl
         End If
     End Sub
 
+    Private Sub BtnAkaUserIcon1_Click(sender As Object, e As EventArgs) Handles BtnAkaUserIcon1.Click
+        targetSide = "AKA"
+        Dim frm As New ListOfCompetitor()
+        frm.ShowDialog()
+    End Sub
 
-
+    Private Sub BtnAoUserIcon1_Click(sender As Object, e As EventArgs) Handles BtnAoUserIcon1.Click
+        targetSide = "AO"
+        Dim frm As New ListOfCompetitor()
+        frm.ShowDialog()
+    End Sub
 End Class
