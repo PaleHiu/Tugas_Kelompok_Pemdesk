@@ -8,13 +8,13 @@
 
     Private Sub BukaFormPeserta(sender As Object, e As EventArgs) _
         Handles pnlCompetitors.Click, picCompetitors.Click, lblCompetitors.Click
-        frmPesertaApp.ShowDialog()
+        frmPesertaApp.Show()
 
     End Sub
 
     Private Sub pnlKumite_Click(sender As Object, e As EventArgs) _
         Handles pnlKumite.Click, picKumite.Click, lblKumite.Click
-        frmKumiteApp.ShowDialog()
+        frmKumiteApp.Show()
 
     End Sub
 
