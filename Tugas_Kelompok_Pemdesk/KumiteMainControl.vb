@@ -329,6 +329,9 @@ Partial Public Class KumiteMainControl
     End Sub
 
     Private Sub BtnHantei_Click(sender As Object, e As EventArgs)
+        ' --- TAMBAHAN AUDIO HANTEI ---
+        AudioController.PlaySound("Hantei")
+
         If frmHanteiApp Is Nothing OrElse frmHanteiApp.IsDisposed Then
             frmHanteiApp = New HanteiForm()
         End If
@@ -462,7 +465,18 @@ Partial Public Class KumiteMainControl
         End If
 
         SyncScoreboardPenalties()
-        AudioController.PlaySound("Get Penalties")
+
+        ' ==========================================================
+        ' MODIFIKASI AUDIO PENALTI AKA (Sesuai Peraturan Kumite)
+        ' ==========================================================
+        If newMaxIndex = 4 Then
+            ' Jika mencapai batas indeks 4 (Hansoku / H) -> Mainkan suara Winner
+            AudioController.PlaySound("Winner by Point")
+        Else
+            ' Jika di indeks 0-3 (1C, 2C, 3C, HC) atau batal -> Mainkan suara Penalty
+            AudioController.PlaySound("Get Penalties")
+        End If
+
     End Sub
 
     ' Fungsi Penalti AO (Biru)
@@ -523,7 +537,18 @@ Partial Public Class KumiteMainControl
         End If
 
         SyncScoreboardPenalties()
-        AudioController.PlaySound("Get Penalties")
+
+        ' ==========================================================
+        ' MODIFIKASI AUDIO PENALTI AO (Sesuai Peraturan Kumite)
+        ' ==========================================================
+        If newMaxIndex = 4 Then
+            ' Jika mencapai batas indeks 4 (Hansoku / H) -> Mainkan suara Winner
+            AudioController.PlaySound("Winner by Point")
+        Else
+            ' Jika di indeks 0-3 (1C, 2C, 3C, HC) atau batal -> Mainkan suara Penalty
+            AudioController.PlaySound("Get Penalties")
+        End If
+
     End Sub
 
     Private Sub DgvAoHistory_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DgvAoHistory.CellContentClick
@@ -553,6 +578,9 @@ Partial Public Class KumiteMainControl
     Private WithEvents matchTimer As New Timer() With {.Interval = 1000}
     Private matchSecondsLeft As Integer = 120 ' Default 2 menit (120 detik)
 
+    ' --- TAMBAHAN BARU: Gembok Anti-Looping ---
+    Private isSyncingTimer As Boolean = False
+
     ' Fungsi pembantu untuk memperbarui tampilan teks waktu (M:SS.0)
     Private Sub UpdateMatchTimerDisplay()
         Dim mins As Integer = matchSecondsLeft \ 60
@@ -562,8 +590,31 @@ Partial Public Class KumiteMainControl
         LblMatchTimerValue.Text = String.Format("{0}:{1:00}.0", mins, secs)
 
         ' Opsional: Sinkronkan juga dengan NumericUpDown agar selaras
+        ' --- MODIFIKASI: Kunci gembok agar ValueChanged tidak terpancing otomatis ---
+        isSyncingTimer = True
         NumMatchMin.Value = mins
         NumMatchSec.Value = secs
+        isSyncingTimer = False
+    End Sub
+
+    ' ==========================================================
+    ' TAMBAHAN BARU: EVENT HANDLER INPUT MANUAL (NUMERIC UP DOWN)
+    ' ==========================================================
+    Private Sub NumMatch_ValueChanged(sender As Object, e As EventArgs) Handles NumMatchMin.ValueChanged, NumMatchSec.ValueChanged
+        ' Jika perubahan nilai dilakukan oleh sistem (UpdateMatchTimerDisplay), abaikan!
+        If isSyncingTimer Then Return
+
+        ' Jika nilai diubah secara MANUAL oleh user (diklik panah atas/bawah atau diketik):
+        ' 1. Perbarui variabel utama penampung waktu
+        matchSecondsLeft = CInt(NumMatchMin.Value * 60) + CInt(NumMatchSec.Value)
+
+        ' 2. Perbarui teks label "Adjust Timer" seketika
+        Dim mins As Integer = matchSecondsLeft \ 60
+        Dim secs As Integer = matchSecondsLeft Mod 60
+        LblMatchTimerValue.Text = String.Format("{0}:{1:00}.0", mins, secs)
+
+        ' 3. Langsung lempar perubahan ke layar Scoreboard Raksasa
+        SyncScoreboardTimer()
     End Sub
 
     ' 1. Logika Tombol Start/Pause Timer
@@ -595,6 +646,14 @@ Partial Public Class KumiteMainControl
             matchSecondsLeft -= 1
             UpdateMatchTimerDisplay()
             SyncScoreboardTimer()
+
+            ' ==========================================================
+            ' TAMBAHAN AUDIO: 15 Second Warning (Atoshi Baraku)
+            ' ==========================================================
+            If matchSecondsLeft = 15 Then
+                AudioController.PlaySound("15 Second")
+            End If
+
         Else
             ' Waktu habis (Yame)
             matchTimer.Stop()
@@ -965,7 +1024,7 @@ Partial Public Class KumiteMainControl
             If clickedBtn.Name = "BtnAkaKiken" Then BtnAkaShikkaku.BackColor = SystemColors.Control
             If clickedBtn.Name = "BtnAkaShikkaku" Then
                 BtnAkaKiken.BackColor = SystemColors.Control
-                AudioController.PlaySound("Get Penalties")
+                ' (Suara Penalty lama dihapus dari sini agar tidak bertabrakan)
             End If
         End If
 
@@ -976,6 +1035,9 @@ Partial Public Class KumiteMainControl
             matchTimer.Stop()
             BtnStartTimer.Text = "Start Timer"
             BtnStartTimer.BackColor = Color.Gold
+
+            ' --- MODIFIKASI AUDIO: K.O / Diskualifikasi -> Lawan Menang ---
+            AudioController.PlaySound("Winner by Point")
         Else
             ' Jika batal (Undo), sembunyikan Winner AO
             LblAoWinner.Visible = False
@@ -1008,7 +1070,7 @@ Partial Public Class KumiteMainControl
             If clickedBtn.Name = "BtnAoKiken" Then BtnAoShikkaku.BackColor = SystemColors.Control
             If clickedBtn.Name = "BtnAoShikkaku" Then
                 BtnAoKiken.BackColor = SystemColors.Control
-                AudioController.PlaySound("Get Penalties")
+                ' (Suara Penalty lama dihapus dari sini agar tidak bertabrakan)
             End If
         End If
 
@@ -1019,6 +1081,9 @@ Partial Public Class KumiteMainControl
             matchTimer.Stop()
             BtnStartTimer.Text = "Start Timer"
             BtnStartTimer.BackColor = Color.Gold
+
+            ' --- MODIFIKASI AUDIO: K.O / Diskualifikasi -> Lawan Menang ---
+            AudioController.PlaySound("Winner by Point")
         Else
             ' Jika batal (Undo), sembunyikan Winner AKA
             LblAkaWinner.Visible = False
@@ -1409,4 +1474,40 @@ Partial Public Class KumiteMainControl
         Dim frm As New ListOfCompetitor()
         frm.ShowDialog()
     End Sub
+
+    ' ==========================================================
+    ' INTERFACES INTEGRASI: TOMBOL SHOW WINNER AKA & AO (KODE FINAL)
+    ' ==========================================================
+
+    ' 1. Eksekusi Tampilan Pemenang Sudut AKA (Merah)
+    Private Sub BtnAkaShowWinner_Click(sender As Object, e As EventArgs) Handles BtnAkaShowWinner.Click
+        ' Mengambil data dari TextBox input nama utama milik AKA
+        Dim atletName As String = TxtAkaNameMain.Text
+        Dim atletTeam As String = TxtAkaTeam.Text
+
+        ' Failsafe: Jika form kosong/belum di-load, beri nama default
+        If String.IsNullOrWhiteSpace(atletName) Then atletName = "AKA COMPETITOR"
+        If String.IsNullOrWhiteSpace(atletTeam) Then atletTeam = "CONTINGENT AKA"
+
+        ' Buka jendela WinnerForm dengan konfigurasi AKA (True)
+        Dim showWin As New WinnerForm(True, atletName, atletTeam)
+        showWin.ShowDialog()
+    End Sub
+
+    ' 2. Eksekusi Tampilan Pemenang Sudut AO (Biru)
+    Private Sub BtnAoShowWinner_Click(sender As Object, e As EventArgs) Handles BtnAoShowWinner.Click
+        ' Mengambil data dari TextBox input nama utama milik AO
+        Dim atletName As String = TxtAoNameMain.Text
+        Dim atletTeam As String = TxtAoTeam.Text
+
+        ' Failsafe: Jika form kosong/belum di-load, beri nama default
+        If String.IsNullOrWhiteSpace(atletName) Then atletName = "AO COMPETITOR"
+        If String.IsNullOrWhiteSpace(atletTeam) Then atletTeam = "CONTINGENT AO"
+
+        ' Buka jendela WinnerForm dengan konfigurasi AO (False)
+        Dim showWin As New WinnerForm(False, atletName, atletTeam)
+        showWin.ShowDialog()
+    End Sub
+
+
 End Class
