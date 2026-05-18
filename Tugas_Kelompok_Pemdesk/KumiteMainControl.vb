@@ -3,9 +3,233 @@ Imports System.Windows.Forms
 
 Partial Public Class KumiteMainControl
 
+    ' --- VARIABEL PENYIMPANAN SEMENTARA ---
+    Public targetSide As String = ""
+    Public Shared AkaColor As Color = Color.Crimson
+    Public Shared AoColor As Color = Color.DodgerBlue
+    Public Shared AkaTextColor As Color = Color.White
+    Public Shared AoTextColor As Color = Color.White
+    Public Shared UseKnockoutCountdown As Boolean = True
+    Public NextAkaName As String = ""
+    Public NextAkaTeam As String = ""
+    Public NextAkaInfo As String = ""
+
+    Public NextAoName As String = ""
+    Public NextAoTeam As String = ""
+    Public NextAoInfo As String = ""
+
+    ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
+    Public Sub SetCompetitorData(nama As String, team As String, info As String)
+        If targetSide = "AKA" Then
+            NextAkaName = nama
+            NextAkaTeam = team
+            NextAkaInfo = info
+            ' Format teks jadi "Nama | Tim"
+            TxtAkaName.Text = nama & " | " & team
+
+            ' Panggil foto dari database ke PictureBox AKA milikmu
+            LoadMatchImages(nama, team, PicAkaProfile, PicAkaTeamLogo)
+
+        ElseIf targetSide = "AO" Then
+            NextAoName = nama
+            NextAoTeam = team
+            NextAoInfo = info
+            ' Format teks jadi "Nama | Tim"
+            TxtAoName.Text = nama & " | " & team
+
+            ' Panggil foto dari database ke PictureBox AO milikmu
+            LoadMatchImages(nama, team, PicAoProfile, PicAoTeamLogo)
+        End If
+    End Sub
+
     ' ==========================================================
-    ' DEKLARASI GLOBAL FORM (STATE MANAGER)
+    ' FUNGSI PENCARI GAMBAR DARI DATABASE
     ' ==========================================================
+    Private Sub LoadMatchImages(nama As String, namaTeam As String, boxComp As PictureBox, boxTeam As PictureBox)
+
+        ' 1. FIX UKURAN: Memaksa gambar mengecil secara proporsional dan pas di tengah frame
+        boxComp.SizeMode = PictureBoxSizeMode.Zoom
+        boxTeam.SizeMode = PictureBoxSizeMode.Zoom
+
+        ' 2. FIX WARNA: Paksa background menjadi warna Putih agar menghilangkan kotak hitam pekat
+        boxComp.BackColor = Color.White
+        boxTeam.BackColor = Color.White
+
+        ' Kosongkan gambar pertandingan sebelumnya
+        boxComp.Image = Nothing
+        boxTeam.Image = Nothing
+
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+
+                ' Cari Foto Peserta di tabel competitor
+                Try
+                    Dim qComp As String = "SELECT pict_path FROM competitor WHERE name = @n AND team = @t LIMIT 1"
+                    Using cmdComp As New System.Data.SQLite.SQLiteCommand(qComp, conn)
+                        cmdComp.Parameters.AddWithValue("@n", nama)
+                        cmdComp.Parameters.AddWithValue("@t", namaTeam)
+                        Dim result = cmdComp.ExecuteScalar()
+
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxComp.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+
+                ' Cari Logo Tim di tabel team_lengkap
+                Try
+                    Dim qTeam As String = "SELECT pict_path FROM team_lengkap WHERE nama_team = @nt LIMIT 1"
+                    Using cmdTeam As New System.Data.SQLite.SQLiteCommand(qTeam, conn)
+                        cmdTeam.Parameters.AddWithValue("@nt", namaTeam)
+                        Dim result = cmdTeam.ExecuteScalar()
+
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxTeam.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ' ==========================================================
+    ' FUNGSI MEMUAT GAMBAR AMAN DENGAN 1 PARAMETER SINKRON
+    ' ==========================================================
+    Private Function LoadSafeImage(path As String) As Image
+        Try
+            ' Cek jika path kosong atau bernilai "No Image", langsung lewati tanpa error
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+
+            path = path.Trim()
+
+            ' Membaca file gambar dengan aman
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                Using ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                End Using
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
+
+    ' ==========================================================
+    ' FUNGSI MEMUAT GAMBAR AMAN & MENJAGA TRANSPARANSI
+    ' ==========================================================
+    Private Function LoadSafeImage(path As String, tipe As String) As Image
+        Try
+            ' 1. CEGAL ERROR "No Image": Jika path kosong atau bernilai "No Image" (karena peserta memang tidak pakai foto), 
+            ' maka langsung kembalikan kosong (Nothing) TANPA memunculkan pesan error!
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+
+            path = path.Trim()
+
+            ' 2. Load gambar jika file benar-benar ada
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                ' Trik Anti-Hitam: Kita langsung load dari MemoryStream tanpa dibungkus New Bitmap() lagi
+                ' Ini akan menjaga efek transparansi gambar PNG 100% utuh!
+                Dim ms As New IO.MemoryStream(bytes)
+                Return Image.FromStream(ms)
+            Else
+                MessageBox.Show($"File gambar untuk {tipe} tidak ditemukan di komputer:{vbCrLf}{path}", "Gambar Hilang", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
+
+    ' --- FUNGSI UPDATE TEAM & INFO SAJA (DARI LIST OF TEAM) ---
+    Public Sub UpdateTeamData(team As String, info As String)
+        If targetSide = "AKA" Then
+            NextAkaTeam = team
+            NextAkaInfo = info
+            TxtAkaTeam.Text = team
+            TxtAkaTeamInfo.Text = info
+
+            ' Memperbarui teks gabungan "Nama | Tim" jika pesertanya sudah dipilih
+            If NextAkaName <> "" Then
+                TxtAkaName.Text = NextAkaName & " | " & team
+            End If
+
+        ElseIf targetSide = "AO" Then
+            NextAoTeam = team
+            NextAoInfo = info
+            TxtAoTeam.Text = team
+            TxtAoTeamInfo.Text = info
+
+            ' Memperbarui teks gabungan "Nama | Tim" jika pesertanya sudah dipilih
+            If NextAoName <> "" Then
+                TxtAoName.Text = NextAoName & " | " & team
+            End If
+        End If
+    End Sub
+
+    Private Sub BtnAkaTeamSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaTeamSearch.Click
+        targetSide = "AKA"
+        Dim frm As New ListOfTeam()
+        frm.ShowDialog()
+    End Sub
+
+    Private Sub BtnAoTeamSearch_Click(sender As Object, e As EventArgs) Handles BtnAoTeamSearch.Click
+        targetSide = "AO"
+        Dim frm As New ListOfTeam()
+        frm.ShowDialog()
+    End Sub
+
+    ' --- FUNGSI TOMBOL LOAD NEXT MATCH ---
+    Private Sub BtnLoadNextMatch_Click(sender As Object, e As EventArgs) Handles BtnLoadNextMatch.Click
+        ' Memasukkan data ke sisi AKA (Merah)
+        If NextAkaName <> "" Then
+            TxtAkaNameMain.Text = NextAkaName
+            TxtAkaTeam.Text = NextAkaTeam
+            TxtAkaTeamInfo.Text = NextAkaInfo
+        End If
+
+        ' Memasukkan data ke sisi AO (Biru)
+        If NextAoName <> "" Then
+            TxtAoNameMain.Text = NextAoName
+            TxtAoTeam.Text = NextAoTeam
+            TxtAoTeamInfo.Text = NextAoInfo
+        End If
+
+        ' Otomatis sinkronkan nama di layar Scoreboard raksasa (jika terbuka)
+        SyncScoreboardProfile()
+
+        MessageBox.Show("Data pertandingan berhasil di-load!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End Sub
+
+    ' Klik ikon 👤 untuk AKA
+    Private Sub BtnAkaSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIcon.Click
+        targetSide = "AKA"
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error Tombol AKA", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Klik ikon 👤 untuk AO
+    Private Sub BtnAoSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIcon.Click
+        targetSide = "AO"
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error Tombol AO", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
     Public Shared frmScoreboardSettingApp As FrmScoreboardSetting
     Public Shared frmLogActivityApp As FormLogActivity
     Public Shared frmKeyboardShortcutApp As FormKeyboardShortcut
@@ -15,9 +239,6 @@ Partial Public Class KumiteMainControl
     ' Timer untuk Waiting Timer (dibuat manual karena tidak ada di Designer baru)
     Private WithEvents waitTimer As New Timer() With {.Interval = 1000}
 
-    ' ==========================================================
-    ' KONSTRUKTOR FORM UTAMA
-    ' ==========================================================
     Public Sub New()
         ' Wajib dipanggil pertama - menginisialisasi semua komponen dari Designer
         InitializeComponent()
@@ -29,9 +250,6 @@ Partial Public Class KumiteMainControl
         frmLogActivityApp = New FormLogActivity()
     End Sub
 
-    ' ==========================================================
-    ' EVENT LOAD FORM
-    ' ==========================================================
     Private Sub KumiteMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         AttachGlobalLogger(Me)
         Me.KeyPreview = True
@@ -44,11 +262,6 @@ Partial Public Class KumiteMainControl
         AddHandler BtnStartWait.Click, AddressOf BtnStartWait_Click
         AddHandler ResetTimer.Click, AddressOf ResetTimer_Click
 
-        ' =======================================================
-        ' PENGUNCIAN UKURAN, PERATAAN TEKS, & SCROLLBAR TABEL
-        ' =======================================================
-
-        ' 1. Matikan fitur resize manual & AKTIFKAN SCROLLBAR VERTIKAL SAJA
         DgvAkaHistory.AllowUserToResizeColumns = False
         DgvAkaHistory.AllowUserToResizeRows = False
         DgvAkaHistory.ScrollBars = ScrollBars.Vertical ' <- Kembalikan ke Vertical
@@ -83,6 +296,13 @@ Partial Public Class KumiteMainControl
             DgvAoHistory.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             DgvAoHistory.Columns(3).Width = 65
         End If
+
+        ' Memberi warna dan menebalkan teks di kotak Next Match
+        TxtAkaName.ForeColor = AkaColor
+        TxtAkaName.Font = New Font(TxtAkaName.Font, FontStyle.Bold)
+
+        TxtAoName.ForeColor = AoColor
+        TxtAoName.Font = New Font(TxtAoName.Font, FontStyle.Bold)
     End Sub
 
     ' ==========================================================
@@ -190,11 +410,6 @@ Partial Public Class KumiteMainControl
         NumWaitSec.Value = 0
     End Sub
 
-    ' ==========================================================
-    ' FUNGSI LOGIKA TOMBOL PENALTI (P) SEKUENSIAL (BERURUTAN)
-    ' ==========================================================
-
-    ' Fungsi Penalti AKA (Merah)
     Private Sub BtnPenaltyAka_Click(sender As Object, e As EventArgs) Handles BtnAka1C.Click, BtnAka2C.Click, BtnAka3C.Click, BtnAkaHC.Click, BtnAkaH.Click
         Dim clickedBtn As Button = CType(sender, Button)
 
@@ -207,7 +422,7 @@ Partial Public Class KumiteMainControl
         ' 3. Cari batas tertinggi tombol yang saat ini sedang aktif (berwarna merah)
         Dim currentMaxIndex As Integer = -1
         For i As Integer = 4 To 0 Step -1
-            If arrBtns(i).BackColor = Color.Crimson Then
+            If arrBtns(i).BackColor = AkaColor Then
                 currentMaxIndex = i
                 Exit For
             End If
@@ -223,35 +438,31 @@ Partial Public Class KumiteMainControl
             newMaxIndex = clickedIndex
         End If
 
-        ' 5. Terapkan warna ke semua tombol berdasarkan batas yang baru
         For i As Integer = 0 To 4
             If i <= newMaxIndex Then
-                ' Nyalakan tombol (Urutan di bawah/sama dengan batas)
-                arrBtns(i).BackColor = Color.Crimson
-                arrBtns(i).ForeColor = Color.White
+                arrBtns(i).BackColor = AkaColor
+                arrBtns(i).ForeColor = AkaTextColor
             Else
-                ' Matikan tombol (Urutan di atas batas)
                 arrBtns(i).BackColor = SystemColors.Control
                 arrBtns(i).ForeColor = Color.Black
             End If
         Next
 
-        ' 6. KONDISI WINNER: Jika H menyala, AO menang (HANYA JIKA AKA belum dideklarasikan menang)
         If newMaxIndex = 4 Then
             If LblAkaWinner.Visible = False Then
                 LblAoWinner.Visible = True
             End If
         Else
-            ' Jika batal 'H', sembunyikan label pemenang AO
+
             LblAoWinner.Visible = False
 
-            ' SMART UNDO: Jika ternyata AO posisinya sedang 'H' (sempat tertahan), nyalakan kemenangan AKA sekarang
-            If BtnAoH.BackColor = Color.DodgerBlue Then
+            If BtnAoH.BackColor = AoColor Then
                 LblAkaWinner.Visible = True
             End If
         End If
 
         SyncScoreboardPenalties()
+        AudioController.PlaySound("Get Penalties")
     End Sub
 
     ' Fungsi Penalti AO (Biru)
@@ -267,7 +478,7 @@ Partial Public Class KumiteMainControl
         ' 3. Cari batas tertinggi tombol yang saat ini sedang aktif (berwarna biru)
         Dim currentMaxIndex As Integer = -1
         For i As Integer = 4 To 0 Step -1
-            If arrBtns(i).BackColor = Color.DodgerBlue Then
+            If arrBtns(i).BackColor = AoColor Then
                 currentMaxIndex = i
                 Exit For
             End If
@@ -287,8 +498,8 @@ Partial Public Class KumiteMainControl
         For i As Integer = 0 To 4
             If i <= newMaxIndex Then
                 ' Nyalakan tombol
-                arrBtns(i).BackColor = Color.DodgerBlue
-                arrBtns(i).ForeColor = Color.White
+                arrBtns(i).BackColor = AoColor
+                arrBtns(i).ForeColor = AoTextColor
             Else
                 ' Matikan tombol
                 arrBtns(i).BackColor = SystemColors.Control
@@ -306,12 +517,13 @@ Partial Public Class KumiteMainControl
             LblAkaWinner.Visible = False
 
             ' SMART UNDO: Jika ternyata AKA posisinya sedang 'H' (sempat tertahan), nyalakan kemenangan AO sekarang
-            If BtnAkaH.BackColor = Color.Crimson Then
+            If BtnAkaH.BackColor = AkaColor Then
                 LblAoWinner.Visible = True
             End If
         End If
 
         SyncScoreboardPenalties()
+        AudioController.PlaySound("Get Penalties")
     End Sub
 
     Private Sub DgvAoHistory_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DgvAoHistory.CellContentClick
@@ -388,6 +600,10 @@ Partial Public Class KumiteMainControl
             matchTimer.Stop()
             BtnStartTimer.Text = "Start Timer"
             BtnStartTimer.BackColor = Color.Gold
+
+            ' --- PANGGIL SUARA END OF TIMER ---
+            AudioController.PlaySound("End of Timer")
+
             MessageBox.Show("Waktu Pertandingan Habis (Yame)!", "Time's Up", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
@@ -513,7 +729,8 @@ Partial Public Class KumiteMainControl
         ' 3. Tambahkan Baris Baru ke Tabel (Nomor, Timer, Tipe Skor, Tombol Action)
         ' Kolom ke-4 (indeks 3) otomatis terisi teks "Change" karena settingan Designer
         dgv.Rows.Add(noUrut, waktuSaatIni, scoreType, "Change")
-
+        ' --- PANGGIL SUARA GET POINT ---
+        AudioController.PlaySound("Get Point")
         ' 4. Kalkulasi ulang seluruh skor di tabel agar selalu akurat
         RecalculateTotalScore(dgv, lblScore)
     End Sub
@@ -524,9 +741,11 @@ Partial Public Class KumiteMainControl
 
     ' Tombol Reset Score AKA (Merah)
     Private Sub BtnAkaResetScore_Click(sender As Object, e As EventArgs) Handles BtnAkaResetScore.Click
-        ' Kosongkan tabel dan kembalikan angka ke 0
+        ' Kosongkan tabel
         DgvAkaHistory.Rows.Clear()
-        LblAkaMainScore.Text = "0"
+
+        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
 
         ' Matikan label WINNER secara paksa
         LblAkaWinner.Visible = False
@@ -534,9 +753,11 @@ Partial Public Class KumiteMainControl
 
     ' Tombol Reset Score AO (Biru)
     Private Sub BtnAoResetScore_Click(sender As Object, e As EventArgs) Handles BtnAoResetScore.Click
-        ' Kosongkan tabel dan kembalikan angka ke 0
+        ' Kosongkan tabel
         DgvAoHistory.Rows.Clear()
-        LblAoMainScore.Text = "0"
+
+        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
 
         ' Matikan label WINNER secara paksa
         LblAoWinner.Visible = False
@@ -549,17 +770,31 @@ Partial Public Class KumiteMainControl
 
     ' Helper: Menghitung ulang seluruh poin yang ada di tabel
     ' ==========================================================
-    ' FUNGSI KALKULASI ULANG SKOR & PENENTUAN PEMENANG (WIN. POINT)
+    ' FUNGSI KALKULASI ULANG SKOR & PENENTUAN PEMENANG (WIN.POINT)
     ' ==========================================================
     Private Sub RecalculateTotalScore(dgv As DataGridView, lblScore As Label)
-        ' 1. Hitung ulang total poin dari tabel
+        ' 1. Hitung ulang total poin DAN JUMLAH KLIK dari tabel
         Dim total As Integer = 0
+        Dim countIppon As Integer = 0
+        Dim countWazaari As Integer = 0
+        Dim countYuko As Integer = 0
+
         For Each row As DataGridViewRow In dgv.Rows
             If Not row.IsNewRow AndAlso row.Cells.Count > 2 AndAlso row.Cells(2).Value IsNot Nothing Then
                 Dim typeStr As String = row.Cells(2).Value.ToString()
-                If typeStr.Contains("(3)") Then total += 3
-                If typeStr.Contains("(2)") Then total += 2
-                If typeStr.Contains("(1)") Then total += 1
+                ' Deteksi tipe skor dan hitung jumlah kemunculannya
+                If typeStr.Contains("(3)") Then
+                    total += 3
+                    countIppon += 1
+                End If
+                If typeStr.Contains("(2)") Then
+                    total += 2
+                    countWazaari += 1
+                End If
+                If typeStr.Contains("(1)") Then
+                    total += 1
+                    countYuko += 1
+                End If
             End If
         Next
 
@@ -568,13 +803,29 @@ Partial Public Class KumiteMainControl
         SyncScoreboardPoints()
 
         ' =======================================================
-        ' 3. LOGIKA WIN. POINT (CEK PEMENANG)
+        ' 3. UPDATE SCORE SUMMARY (RINGKASAN POIN)
+        ' =======================================================
+        If lblScore.Name = "LblAkaMainScore" Then
+            LblAkaIpponCount.Text = "Ippon  " & countIppon.ToString()
+            LblAkaWazaariCount.Text = "Waza-ari  " & countWazaari.ToString()
+            LblAkaYukoCount.Text = "Yuko  " & countYuko.ToString()
+        ElseIf lblScore.Name = "LblAoMainScore" Then
+            LblAoIpponCount.Text = "Ippon  " & countIppon.ToString()
+            LblAoWazaariCount.Text = "Waza-ari  " & countWazaari.ToString()
+            LblAoYukoCount.Text = "Yuko  " & countYuko.ToString()
+        End If
+
+        ' =======================================================
+        ' 4. LOGIKA WIN.POINT (CEK PEMENANG)
         ' =======================================================
         ' Ambil nilai batas kemenangan secara real-time dari kontrol UI (bisa di-adjust kapan saja)
         Dim batasMenang As Integer = CInt(NumWinPoint.Value)
 
         ' Jika skor mencapai atau melebihi batas kemenangan
         If total >= batasMenang AndAlso batasMenang > 0 Then
+
+            ' --- PANGGIL SUARA WINNER ---
+            AudioController.PlaySound("Winner by Point")
 
             ' Cek siapa yang mencapai poin tersebut
             If lblScore.Name = "LblAkaMainScore" Then
@@ -596,14 +847,13 @@ Partial Public Class KumiteMainControl
 
         Else
             ' =======================================================
-            ' 4. LOGIKA PEMBATALAN (SMART UNDO)
+            ' 5. LOGIKA PEMBATALAN (SMART UNDO)
             ' =======================================================
             ' Jika wasit meralat skor (lewat tombol Change) sehingga poin turun di bawah Win Point.
             ' Kita harus menyembunyikan label WINNER, TAPI pastikan dulu dia tidak menang karena lawan kena diskualifikasi (H).
-
-            If lblScore.Name = "LblAkaMainScore" AndAlso BtnAoH.BackColor <> Color.DodgerBlue Then
+            If lblScore.Name = "LblAkaMainScore" AndAlso BtnAoH.BackColor <> AoColor Then
                 LblAkaWinner.Visible = False ' Sembunyikan jika batal menang dan lawan tidak kena H
-            ElseIf lblScore.Name = "LblAoMainScore" AndAlso BtnAkaH.BackColor <> Color.Crimson Then
+            ElseIf lblScore.Name = "LblAoMainScore" AndAlso BtnAkaH.BackColor <> AkaColor Then
                 LblAoWinner.Visible = False ' Sembunyikan jika batal menang dan lawan tidak kena H
             End If
         End If
@@ -713,7 +963,10 @@ Partial Public Class KumiteMainControl
 
             ' Cegah nyala bersamaan: Jika Kiken diklik, matikan Shikkaku, begitu sebaliknya
             If clickedBtn.Name = "BtnAkaKiken" Then BtnAkaShikkaku.BackColor = SystemColors.Control
-            If clickedBtn.Name = "BtnAkaShikkaku" Then BtnAkaKiken.BackColor = SystemColors.Control
+            If clickedBtn.Name = "BtnAkaShikkaku" Then
+                BtnAkaKiken.BackColor = SystemColors.Control
+                AudioController.PlaySound("Get Penalties")
+            End If
         End If
 
         ' Logika Winner: Jika AKA Kiken/Shikkaku, maka AO Menang
@@ -753,7 +1006,10 @@ Partial Public Class KumiteMainControl
 
             ' Cegah nyala bersamaan: Jika Kiken diklik, matikan Shikkaku, begitu sebaliknya
             If clickedBtn.Name = "BtnAoKiken" Then BtnAoShikkaku.BackColor = SystemColors.Control
-            If clickedBtn.Name = "BtnAoShikkaku" Then BtnAoKiken.BackColor = SystemColors.Control
+            If clickedBtn.Name = "BtnAoShikkaku" Then
+                BtnAoKiken.BackColor = SystemColors.Control
+                AudioController.PlaySound("Get Penalties")
+            End If
         End If
 
         ' Logika Winner: Jika AO Kiken/Shikkaku, maka AKA Menang
@@ -784,7 +1040,7 @@ Partial Public Class KumiteMainControl
         frmKO.Text = If(isAka, "AKA Knocked Out Countdown", "AO Knocked Out Countdown")
 
         ' Tentukan warna berdasarkan sudut petarung
-        Dim bgColor As Color = If(isAka, Color.Crimson, Color.DodgerBlue)
+        Dim bgColor As Color = If(isAka, AkaColor, AoColor)
 
         ' 2. Buat Panel Atas (Latar Berwarna untuk Angka)
         Dim pnlTop As New Panel() With {.Dock = DockStyle.Fill, .BackColor = bgColor}
@@ -836,6 +1092,7 @@ Partial Public Class KumiteMainControl
                                          ' --- LOGIKA OTOMATIS SAAT 0 DETIK ---
                                          winnerLabel.Visible = True ' Tampilkan Winner di sisi lawan
 
+                                         AudioController.PlaySound("Knocked Out")
                                          ' Hentikan timer pertandingan utama (Yame)
                                          matchTimer.Stop()
                                          BtnStartTimer.Text = "Start Timer"
@@ -860,22 +1117,102 @@ Partial Public Class KumiteMainControl
     End Function
 
     ' ==========================================================
-    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI OTOMATIS)
+    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI PRO)
     ' ==========================================================
 
     ' Tombol Knocked Out AKA (Merah)
     Private Sub BtnAkaKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAkaKnockedOut.Click
-        ' Kirim LblAoWinner sebagai target yang akan menyala jika AKA KO
-        If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
-            MessageBox.Show("AKA Knocked Out!" & vbCrLf & "AO dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+        If BtnAkaKnockedOut.BackColor = AkaColor Then
+            BtnAkaKnockedOut.BackColor = SystemColors.Control
+            BtnAkaKnockedOut.ForeColor = Color.Black
+            LblAoWinner.Visible = False
+
+            ' Jika ternyata AO sedang K.O, berarti AKA yang harusnya kembali menang
+            If BtnAoKnockedOut.BackColor = AoColor Then
+                LblAkaWinner.Visible = True
+            End If
+
+            ' Hitung ulang skor barangkali AO menang karena poin
+            RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+            Return
+        End If
+
+        ' --- 2. LOGIKA K.O AKTIF ---
+        If UseKnockoutCountdown Then
+            ' MODE 1: Hitung Mundur 10 Detik
+            If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
+                ' Cegah Double Winner jika kedua pihak K.O
+                If BtnAoKnockedOut.BackColor = AoColor Then
+                    LblAoWinner.Visible = False
+                    LblAkaWinner.Visible = False
+                End If
+            End If
+        Else
+            ' MODE 2: Instan K.O (Tanpa Pop-up)
+            BtnAkaKnockedOut.BackColor = AkaColor
+            BtnAkaKnockedOut.ForeColor = AkaTextColor
+
+            ' Tentukan Pemenang (Cegah Double Winner)
+            If BtnAoKnockedOut.BackColor = AoColor Then
+                LblAoWinner.Visible = False
+                LblAkaWinner.Visible = False
+            Else
+                LblAoWinner.Visible = True
+            End If
+
+            AudioController.PlaySound("Knocked Out")
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
         End If
     End Sub
 
     ' Tombol Knocked Out AO (Biru)
     Private Sub BtnAoKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAoKnockedOut.Click
-        ' Kirim LblAkaWinner sebagai target yang akan menyala jika AO KO
-        If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
-            MessageBox.Show("AO Knocked Out!" & vbCrLf & "AKA dinyatakan sebagai pemenang.", "Keputusan Wasit", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+        If BtnAoKnockedOut.BackColor = AoColor Then
+            BtnAoKnockedOut.BackColor = SystemColors.Control
+            BtnAoKnockedOut.ForeColor = Color.Black
+            LblAkaWinner.Visible = False
+
+            ' Jika ternyata AKA sedang K.O, berarti AO yang harusnya kembali menang
+            If BtnAkaKnockedOut.BackColor = AkaColor Then
+                LblAoWinner.Visible = True
+            End If
+
+            ' Hitung ulang skor barangkali AKA menang karena poin
+            RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+            Return
+        End If
+
+        ' --- 2. LOGIKA K.O AKTIF ---
+        If UseKnockoutCountdown Then
+            ' MODE 1: Hitung Mundur 10 Detik
+            If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
+                ' Cegah Double Winner jika kedua pihak K.O
+                If BtnAkaKnockedOut.BackColor = AkaColor Then
+                    LblAkaWinner.Visible = False
+                    LblAoWinner.Visible = False
+                End If
+            End If
+        Else
+            ' MODE 2: Instan K.O (Tanpa Pop-up)
+            BtnAoKnockedOut.BackColor = AoColor
+            BtnAoKnockedOut.ForeColor = AoTextColor
+
+            ' Tentukan Pemenang (Cegah Double Winner)
+            If BtnAkaKnockedOut.BackColor = AkaColor Then
+                LblAkaWinner.Visible = False
+                LblAoWinner.Visible = False
+            Else
+                LblAkaWinner.Visible = True
+            End If
+
+            AudioController.PlaySound("Knocked Out")
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
         End If
     End Sub
 
@@ -1044,15 +1381,15 @@ Partial Public Class KumiteMainControl
 
                 For i As Integer = 0 To 4
                     ' Sinkronisasi AKA (Merah)
-                    If akaBtns(i).BackColor = Color.Crimson Then
-                        frmScoreboard.AkaPenLabels(i).BackColor = Color.Crimson
+                    If akaBtns(i).BackColor = AkaColor Then
+                        frmScoreboard.AkaPenLabels(i).BackColor = AkaColor
                     Else
                         frmScoreboard.AkaPenLabels(i).BackColor = Color.Transparent
                     End If
 
                     ' Sinkronisasi AO (Biru)
-                    If aoBtns(i).BackColor = Color.DodgerBlue Then
-                        frmScoreboard.AoPenLabels(i).BackColor = Color.DodgerBlue
+                    If aoBtns(i).BackColor = AoColor Then
+                        frmScoreboard.AoPenLabels(i).BackColor = AoColor
                     Else
                         frmScoreboard.AoPenLabels(i).BackColor = Color.Transparent
                     End If
@@ -1061,6 +1398,15 @@ Partial Public Class KumiteMainControl
         End If
     End Sub
 
+    Private Sub BtnAkaUserIcon1_Click(sender As Object, e As EventArgs) Handles BtnAkaUserIcon1.Click
+        targetSide = "AKA"
+        Dim frm As New ListOfCompetitor()
+        frm.ShowDialog()
+    End Sub
 
-
+    Private Sub BtnAoUserIcon1_Click(sender As Object, e As EventArgs) Handles BtnAoUserIcon1.Click
+        targetSide = "AO"
+        Dim frm As New ListOfCompetitor()
+        frm.ShowDialog()
+    End Sub
 End Class
