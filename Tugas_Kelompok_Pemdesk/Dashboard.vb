@@ -8,13 +8,40 @@
 
     Private Sub BukaFormPeserta(sender As Object, e As EventArgs) _
         Handles pnlCompetitors.Click, picCompetitors.Click, lblCompetitors.Click
-        frmPesertaApp.ShowDialog()
+
+        ' ==========================================================
+        ' GERBANG VALIDASI: CEK STATUS MEMORI FORM PESERTA (ANTI-CRASH)
+        ' ==========================================================
+        ' Jika variabel frmPesertaApp belum dibuat ATAU sudah pernah ditutup sebelumnya
+        If frmPesertaApp Is Nothing OrElse frmPesertaApp.IsDisposed Then
+
+            ' Maka lahirkan kembali objek form Peserta yang segar ke dalam RAM
+            frmPesertaApp = New Peserta()
+
+        End If
+
+        ' Tampilkan form Peserta secara independen dan fleksibel (Modeless)
+        frmPesertaApp.Show()
 
     End Sub
 
     Private Sub pnlKumite_Click(sender As Object, e As EventArgs) _
         Handles pnlKumite.Click, picKumite.Click, lblKumite.Click
-        frmKumiteApp.ShowDialog()
+
+        ' ==========================================================
+        ' GERBANG VALIDASI: CEK STATUS MEMORI FORM (ANTI-CRASH)
+        ' ==========================================================
+        ' Jika variabel frmKumiteApp belum ada nilainya (Nothing) 
+        ' ATAU sudah pernah ditutup oleh user sebelumnya (IsDisposed)
+        If frmKumiteApp Is Nothing OrElse frmKumiteApp.IsDisposed Then
+
+            ' Maka buat ulang pondasi form Kumite yang baru ke dalam memori
+            frmKumiteApp = New KumiteMainControl()
+
+        End If
+
+        ' Tampilkan form Kumite dengan aman dan fleksibel (Modeless)
+        frmKumiteApp.Show()
 
     End Sub
 
