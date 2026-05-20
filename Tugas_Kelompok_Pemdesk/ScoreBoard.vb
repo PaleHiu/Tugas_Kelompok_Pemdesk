@@ -148,4 +148,27 @@ Partial Public Class ScoreBoard
         ScoreBoard_SizeChanged(Nothing, Nothing)
     End Sub
 
+    Public Sub ApplyMatchDetailStyle(fontName As String, isBold As Boolean, textColor As Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+
+            ' Mencegah error crash kalau sistem belum mendaftarkan label ini
+            If Not ctrlFonts.ContainsKey(LblMatchDesc) Then
+                ctrlFonts.Add(LblMatchDesc, 24.0F)
+            Else
+                ctrlFonts(LblMatchDesc) = 24.0F
+            End If
+
+            ' Aplikasikan wujud barunya
+            LblMatchDesc.Font = New Font(fontName, 24.0F, style)
+            LblMatchDesc.ForeColor = textColor
+
+            ' PAKSA sistem untuk me-refresh/menggambar ulang layar detik itu juga
+            LblMatchDesc.Refresh()
+
+        Catch ex As Exception
+            ' Jika ada error, jangan diam, tapi teriak lewat popup
+            MessageBox.Show("Gagal mengganti font Match Detail: " & ex.Message, "Error Scoreboard", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class
