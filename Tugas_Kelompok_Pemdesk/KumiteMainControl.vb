@@ -43,7 +43,7 @@ Partial Public Class KumiteMainControl
     End Sub
 
     ' ==========================================================
-    ' FUNGSI PENCARI GAMBAR DARI DATABASE
+    ' FUNGSI PENCARI GAMBAR DARI DATABASE (UPDATED: SUPPORT BENDERA)
     ' ==========================================================
     Private Sub LoadMatchImages(nama As String, namaTeam As String, boxComp As PictureBox, boxTeam As PictureBox)
 
@@ -86,7 +86,8 @@ Partial Public Class KumiteMainControl
                         Dim result = cmdTeam.ExecuteScalar()
 
                         If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
-                            boxTeam.Image = LoadSafeImage(result.ToString())
+                            ' [PERBAIKAN MUTLAK] Menggunakan fungsi pembaca bendera khusus
+                            boxTeam.Image = GetSafeTeamImage(result.ToString())
                         End If
                     End Using
                 Catch ex As Exception
@@ -95,6 +96,56 @@ Partial Public Class KumiteMainControl
         Catch ex As Exception
         End Try
     End Sub
+
+    ' ==========================================================
+    ' FUNGSI KHUSUS PEMBACA LOGO TIM / BENDERA NEGARA (NEW)
+    ' ==========================================================
+    Private Function GetSafeTeamImage(pathOrFlag As String) As Image
+        Try
+            If String.IsNullOrWhiteSpace(pathOrFlag) OrElse pathOrFlag.Trim() = "No Image" Then
+                Return Nothing
+            End If
+
+            pathOrFlag = pathOrFlag.Trim()
+
+            ' 1. JIKA INI ADALAH BENDERA (Ada teks "Flag: ")
+            If pathOrFlag.StartsWith("Flag: ") Then
+                Dim countryName As String = pathOrFlag.Replace("Flag: ", "").Trim()
+                Dim flagPathPNG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.png")
+                Dim flagPathJPG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.jpg")
+
+                Dim finalPath As String = ""
+                If System.IO.File.Exists(flagPathPNG) Then finalPath = flagPathPNG
+                If System.IO.File.Exists(flagPathJPG) Then finalPath = flagPathJPG
+
+                If finalPath <> "" Then
+                    Dim bytes As Byte() = System.IO.File.ReadAllBytes(finalPath)
+                    Using ms As New IO.MemoryStream(bytes)
+                        Return Image.FromStream(ms)
+                    End Using
+                Else
+                    ' Kotak darurat jika gambar bendera asli di folder tidak ditemukan
+                    Dim bmp As New Bitmap(100, 60)
+                    Using g As Graphics = Graphics.FromImage(bmp)
+                        g.Clear(Color.LightGray)
+                        g.DrawRectangle(Pens.Black, 0, 0, 99, 59)
+                        g.DrawString(countryName, New Font("Segoe UI", 8, FontStyle.Bold), Brushes.Black, New PointF(5, 20))
+                    End Using
+                    Return bmp
+                End If
+
+                ' 2. JIKA INI ADALAH LOGO CUSTOM BIASA (Alamat File)
+            ElseIf System.IO.File.Exists(pathOrFlag) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(pathOrFlag)
+                Using ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                End Using
+            End If
+        Catch ex As Exception
+        End Try
+
+        Return Nothing
+    End Function
 
     ' ==========================================================
     ' FUNGSI MEMUAT GAMBAR AMAN DENGAN 1 PARAMETER SINKRON
@@ -260,8 +311,8 @@ Partial Public Class KumiteMainControl
         End If
 
         ' 3. SAKLAR GAIB: Memanggil properti ".Handle" akan memaksa sistem operasi Windows 
-        ' untuk membangun kerangka form ini secara diam-diam. Aksi ini otomatis memicu 
-        ' event 'FormKeyboardShortcut_Load' dan menjalankan 'isiDataShortcut()' tanpa perlu muncul di layar!
+        ' untuk membangun kerangka form ini secara diam-diam.
+        ' Aksi ini otomatis memicu event 'FormKeyboardShortcut_Load' dan menjalankan 'isiDataShortcut()' tanpa perlu muncul di layar!
         Dim phantomHandle As IntPtr = frmKeyboardShortcutApp.Handle
 
         ' ==========================================================
@@ -270,7 +321,11 @@ Partial Public Class KumiteMainControl
         Me.FormBorderStyle = FormBorderStyle.FixedSingle ' 1. Mengunci border agar tidak bisa ditarik/di-stretch manual
         Me.MaximizeBox = False                           ' 2. Mematikan fungsi tombol kotak (Maximize) di pojok kanan atas
         Me.StartPosition = FormStartPosition.CenterScreen ' 3. Memaksa aplikasi muncul rapi tepat di tengah-tengah monitor
-        ' Hubungkan event handler tombol-tombol (Kode lama Anda)
+
+        ' ==========================================================
+        ' SEBAR SENSOR KLIK AREA KOSONG KE SELURUH LAYAR
+        ' ==========================================================
+        AttachBackgroundClickSensor(Me)
 
         ' ==========================================================
         ' DEFAULT LOCK: WIN. POINT & TATAMI
@@ -280,6 +335,8 @@ Partial Public Class KumiteMainControl
         ' Mematikan tombol Save, dan menyalakan tombol Edit
         BtnSaveWinPoint.Enabled = False
         BtnEditWinPoint.Enabled = True
+
+        ' Hubungkan event handler tombol-tombol
         AddHandler BtnSettings.Click, AddressOf BtnSettings_Click
         AddHandler BtnLogActivity.Click, AddressOf BtnLogActivity_Click
         AddHandler BtnShortcut.Click, AddressOf BtnShortcut_Click
@@ -1364,8 +1421,7 @@ Partial Public Class KumiteMainControl
     Private Sub GlobalLogger_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)
 
-        ' Ambil teks dari tombol yang diklik. 
-        ' Bersihkan teks jika ada enter/baris baru (seperti pada tombol "Approve Knocked Out")
+        ' Ambil teks dari tombol yang diklik. Bersihkan teks jika ada enter/baris baru (seperti pada tombol "Approve Knocked Out")
         Dim actionText As String = btn.Text.Replace(vbCrLf, " ").Replace(vbLf, " ")
 
         ' Abaikan jika tombol tidak memiliki teks (misal tombol icon kaca pembesar/profil)
@@ -1773,8 +1829,7 @@ Partial Public Class KumiteMainControl
     End Sub
 
     ' 2. FORCE SYNC: Fungsi tombol "Switch" untuk memaksa sinkronisasi
-    ' [!] PERHATIAN: Silakan ganti "BtnSwitchTatami" di bawah ini dengan nama asli tombol Switch Anda di Properties Designer
-    Private Sub BtnSwitchTatami_Click(sender As Object, e As EventArgs) Handles BtnSwitchPosition.Click ' (Catatan: Handles-nya biarkan sesuai bawaan VS Anda)
+    Private Sub BtnSwitchPosition_Click(sender As Object, e As EventArgs) Handles BtnSwitchPosition.Click
         ' Mencari jendela ScoreBoard yang sedang aktif/terbuka di layar
         Dim frmSb As ScoreBoard = CType(Application.OpenForms("ScoreBoard"), ScoreBoard)
 

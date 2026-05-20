@@ -543,12 +543,34 @@ Public Class Peserta
         End If
     End Sub
 
+    ' =========================================================================
+    ' [UPDATED] SISTEM AUTO-COPY IMAGE (MEMBUAT GAMBAR PORTABLE/PERMANEN)
+    ' =========================================================================
     Private Sub btnSelectPic_Click(sender As Object, e As EventArgs) Handles btnSelectPic.Click
         Dim ofd As New OpenFileDialog()
-        ofd.Filter = "Images|*.jpg;*.png"
+        ofd.Filter = "Images|*.jpg;*.jpeg;*.png"
         If ofd.ShowDialog() = DialogResult.OK Then
-            selectedImagePath = ofd.FileName
-            picCircle.Image = GetSafeCompImage(selectedImagePath)
+            Try
+                ' 1. Buat folder "Images_Peserta" di sebelah file aplikasi (.exe)
+                Dim localFolder As String = IO.Path.Combine(Application.StartupPath, "Images_Peserta")
+                If Not IO.Directory.Exists(localFolder) Then
+                    IO.Directory.CreateDirectory(localFolder)
+                End If
+
+                ' 2. Buat nama file unik (berdasarkan waktu)
+                Dim fileExt As String = IO.Path.GetExtension(ofd.FileName)
+                Dim uniqueFileName As String = "Peserta_" & DateTime.Now.ToString("yyyyMMddHHmmss") & fileExt
+                Dim destinationPath As String = IO.Path.Combine(localFolder, uniqueFileName)
+
+                ' 3. COPY (Salin) foto asli ke dalam folder aplikasi
+                IO.File.Copy(ofd.FileName, destinationPath, True)
+
+                ' 4. Gunakan path dari folder aplikasi sebagai data permanen
+                selectedImagePath = destinationPath
+                picCircle.Image = GetSafeCompImage(selectedImagePath)
+            Catch ex As Exception
+                MessageBox.Show("Gagal menyalin gambar: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
         End If
     End Sub
 
@@ -588,12 +610,33 @@ Public Class Peserta
         End If
     End Sub
 
+    ' =========================================================================
+    ' [UPDATED] SISTEM AUTO-CREATE TABEL DATABASE (ANTI CRASH)
+    ' =========================================================================
     Private Sub LoadDataPeserta()
         Try
             gridCompetitors.Rows.Clear()
             Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
                 conn.Open()
-                ' Panggil kolom pict_path yang baru saja kita buat!
+
+                ' --- PERBAIKAN MUTLAK: OTOMATIS BUAT TABEL JIKA BELUM ADA ---
+                Dim sqlCreate As String = "CREATE TABLE IF NOT EXISTS competitor (name TEXT, team TEXT, team_info TEXT);"
+                Using cmdCreate As New System.Data.SQLite.SQLiteCommand(sqlCreate, conn)
+                    cmdCreate.ExecuteNonQuery()
+                End Using
+
+                ' --- PERBAIKAN MUTLAK: SUNTIKKAN KOLOM GAMBAR JIKA DATABASE VERSI LAMA ---
+                Try
+                    Dim sqlAlter As String = "ALTER TABLE competitor ADD COLUMN pict_path TEXT;"
+                    Using cmdAlter As New System.Data.SQLite.SQLiteCommand(sqlAlter, conn)
+                        cmdAlter.ExecuteNonQuery()
+                    End Using
+                Catch exAlter As Exception
+                    ' Abaikan saja jika kolom pict_path sudah ada di dalam database
+                End Try
+                ' -------------------------------------------------------------
+
+                ' Panggil kolom pict_path yang baru saja kita pastikan keberadaannya!
                 Dim query As String = "SELECT name, team, team_info, pict_path FROM competitor"
                 Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
                     Using reader = cmd.ExecuteReader()
@@ -619,7 +662,7 @@ Public Class Peserta
             UpdateTotalRecords()
             RefreshLeftTeamGrid()
         Catch ex As Exception
-            ' Abaikan jika database belum terbuat
+            ' Abaikan jika database belum terbuat / ada masalah lain
         End Try
     End Sub
 End Class
