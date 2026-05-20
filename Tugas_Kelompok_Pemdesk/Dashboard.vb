@@ -59,4 +59,9 @@
         ' Mematikan seluruh proses aplikasi agar file .exe tidak terkunci
         Application.Exit()
     End Sub
+
+    Private Sub picKata_Click(sender As Object, e As EventArgs) Handles picKata.Click
+        Dim formKata As New FrmKataMain()
+        formKata.Show()
+    End Sub
 End Class

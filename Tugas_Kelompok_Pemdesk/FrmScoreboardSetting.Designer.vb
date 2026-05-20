@@ -18,32 +18,35 @@ Partial Public Class FrmScoreboardSetting
     ' 3. InitializeComponent
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.root = New System.Windows.Forms.TableLayoutPanel()
-        Me.SuspendLayout()
-
-        Me.root.ColumnCount = 1
-        Me.root.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0F))
-        Me.root.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.root.Location = New System.Drawing.Point(0, 0)
-        Me.root.Name = "root"
-        Me.root.Padding = New System.Windows.Forms.Padding(10)
-        Me.root.RowCount = 2
-        Me.root.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115.0F))
-        Me.root.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0F))
-        Me.root.Size = New System.Drawing.Size(1060, 840)
-        Me.root.TabIndex = 0
-
-        Me.BackColor = System.Drawing.Color.FromArgb(240, 240, 240)
-        Me.ClientSize = New System.Drawing.Size(1060, 840)
-        Me.Controls.Add(Me.root)
-        ' Font form dibuat Bold agar teks utama ComboBox terlihat tegas
-        Me.Font = New System.Drawing.Font("Segoe UI", 9.0F, FontStyle.Bold)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.MaximizeBox = False
-        Me.Name = "FrmScoreboardSetting"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Scoreboard Setting"
-        Me.ResumeLayout(False)
+        root = New TableLayoutPanel()
+        SuspendLayout()
+        ' 
+        ' root
+        ' 
+        root.ColumnCount = 1
+        root.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 100F))
+        root.Dock = DockStyle.Fill
+        root.Location = New Point(0, 0)
+        root.Name = "root"
+        root.Padding = New Padding(10)
+        root.RowCount = 2
+        root.RowStyles.Add(New RowStyle(SizeType.Absolute, 115F))
+        root.RowStyles.Add(New RowStyle(SizeType.Percent, 100F))
+        root.Size = New Size(1387, 840)
+        root.TabIndex = 0
+        ' 
+        ' FrmScoreboardSetting
+        ' 
+        BackColor = Color.FromArgb(CByte(240), CByte(240), CByte(240))
+        ClientSize = New Size(1387, 840)
+        Controls.Add(root)
+        Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        FormBorderStyle = FormBorderStyle.FixedDialog
+        MaximizeBox = False
+        Name = "FrmScoreboardSetting"
+        StartPosition = FormStartPosition.CenterScreen
+        Text = "Scoreboard Setting"
+        ResumeLayout(False)
     End Sub
 
     ' 4. Pindahkan logika build UI ke sub terpisah
@@ -143,11 +146,11 @@ Partial Public Class FrmScoreboardSetting
 
         Dim gpD As New GroupBox() : gpD.Text = "Kumite Match Detail" : gpD.Size = New Size(490, 140)
         Dim lblDf As New Label() : lblDf.Text = "Font" : lblDf.Location = New Point(10, 25) : lblDf.AutoSize = True
-        Dim cbDf As ComboBox = MakeCombo("Microsoft Sans Serif") : cbDf.Location = New Point(100, 22) : cbDf.Width = 150
+        Dim cbDf As ComboBox = MakeCombo("Microsoft Sans Serif") : cbDf.Location = New Point(100, 22) : cbDf.Width = 150 : cbDf.Name = "CboMatchDetailFont"
 
         Dim lblDc As New Label() : lblDc.Text = "Font Color" : lblDc.Location = New Point(10, 55) : lblDc.AutoSize = True
-        Dim cpD As Panel = MakeColorPicker(Color.Yellow) : cpD.Location = New Point(100, 52)
-        Dim chkDb As New CheckBox() : chkDb.Text = "Bold" : chkDb.Checked = True : chkDb.Location = New Point(260, 54) : chkDb.AutoSize = True
+        Dim cpD As Panel = MakeColorPicker(Color.Yellow) : cpD.Location = New Point(100, 52) : cpD.Name = "PnlMatchDetailColor"
+        Dim chkDb As New CheckBox() : chkDb.Text = "Bold" : chkDb.Checked = True : chkDb.Location = New Point(260, 54) : chkDb.AutoSize = True : chkDb.Name = "ChkMatchDetailBold"
 
         Dim chkD1 As New CheckBox() : chkD1.Text = "Display Score Popup" : chkD1.Checked = True : chkD1.Location = New Point(10, 85) : chkD1.AutoSize = True
         Dim chkD2 As New CheckBox() : chkD2.Text = "Knocked Out Countdown" : chkD2.Checked = KumiteMainControl.UseKnockoutCountdown : chkD2.Location = New Point(10, 105) : chkD2.AutoSize = True : chkD2.Name = "ChkKnockoutCountdown"
@@ -510,6 +513,25 @@ Partial Public Class FrmScoreboardSetting
                                       Dim arrChkKO = Me.Controls.Find("ChkKnockoutCountdown", True)
                                       If arrChkKO.Length > 0 Then
                                           KumiteMainControl.UseKnockoutCountdown = DirectCast(arrChkKO(0), CheckBox).Checked
+                                      End If
+
+                                      Dim arrCbMD = Me.Controls.Find("CboMatchDetailFont", True)
+                                      Dim arrChkMD = Me.Controls.Find("ChkMatchDetailBold", True)
+                                      Dim arrClrMD = Me.Controls.Find("PnlMatchDetailColor", True)
+
+                                      If arrCbMD.Length > 0 AndAlso arrChkMD.Length > 0 AndAlso arrClrMD.Length > 0 Then
+                                          ' 1. Simpan ke Memori Global di Main Control
+                                          KumiteMainControl.MatchDetailFontName = arrCbMD(0).Text
+                                          KumiteMainControl.MatchDetailIsBold = DirectCast(arrChkMD(0), CheckBox).Checked
+                                          KumiteMainControl.MatchDetailColor = arrClrMD(0).BackColor
+
+                                          ' 2. Jika Scoreboard KEBETULAN sedang terbuka, update langsung layarnya
+                                          If mainFrm.frmScoreboard IsNot Nothing AndAlso Not mainFrm.frmScoreboard.IsDisposed Then
+                                              mainFrm.frmScoreboard.ApplyMatchDetailStyle(
+                                                  KumiteMainControl.MatchDetailFontName,
+                                                  KumiteMainControl.MatchDetailIsBold,
+                                                  KumiteMainControl.MatchDetailColor)
+                                          End If
                                       End If
 
                                       MessageBox.Show("Pengaturan berhasil disimpan dan diterapkan!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
