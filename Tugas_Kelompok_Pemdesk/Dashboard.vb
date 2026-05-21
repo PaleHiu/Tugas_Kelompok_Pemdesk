@@ -4,6 +4,7 @@
     Public Shared frmPesertaApp As New Peserta()
     Public Shared frmTeamApp As New team()
     Public Shared frmKumiteApp As New KumiteMainControl()
+    Public Shared frmKataApp As New KataMainControl()
 
 
     Private Sub BukaFormPeserta(sender As Object, e As EventArgs) _
