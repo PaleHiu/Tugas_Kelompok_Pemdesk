@@ -61,8 +61,10 @@
         Application.Exit()
     End Sub
 
-    Private Sub picKata_Click(sender As Object, e As EventArgs) Handles picKata.Click
-        Dim formKata As New FrmKataMain()
-        formKata.Show()
+    Private Sub picKata_Click(sender As Object, e As EventArgs) Handles picKata.Click, lblKata.Click, pnlKata.Click
+        If frmKataApp Is Nothing OrElse frmKataApp.IsDisposed Then
+            frmKataApp = New KataMainControl()
+        End If
+        frmKataApp.Show()
     End Sub
 End Class
