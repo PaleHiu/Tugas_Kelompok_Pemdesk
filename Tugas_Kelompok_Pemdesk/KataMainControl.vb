@@ -1,5 +1,7 @@
 ﻿Public Class KataMainControl
     Private PnlFlagSystem As New Panel()
+    Dim frmWait As New FrmWaitingTimer
+    Dim totalTime As Double
 
     Private AkaFlags(6) As Button
     Private AoFlags(6) As Button
@@ -333,6 +335,41 @@
             PnlPointInputsAo.Visible = False
 
             PnlFlagSystem.Visible = True
+    Private Sub BtnStartWaitingTimer_Click(sender As Object, e As EventArgs) Handles BtnStartWaitingTimer.Click
+
+        totalTime = (NumWaitMin.Value * 60) + NumWaitSec.Value
+
+        frmWait.Show()
+
+        Timer1.Start()
+
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+
+        If totalTime > 0 Then
+
+            totalTime -= 0.1
+
+            Dim menit As Integer = Math.Floor(totalTime / 60)
+            Dim detik As Integer = Math.Floor(totalTime Mod 60)
+            Dim mili As Integer = (totalTime * 10) Mod 10
+
+            LblTimerDisplayMain.Text =
+            menit & ":" &
+            detik.ToString("00") &
+            "." &
+            mili.ToString()
+
+            frmWait.UpdateTimer(LblTimerDisplayMain.Text)
+
+        Else
+
+            Timer1.Stop()
+
+            frmWait.Hide()
+
+            MessageBox.Show("Waktu Habis!")
 
         End If
 
