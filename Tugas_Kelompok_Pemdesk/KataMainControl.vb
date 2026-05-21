@@ -7,19 +7,16 @@
     Private TotalJudge As Integer = 5
     Private AkaScore As Integer = 0
     Private AoScore As Integer = 0
-    ' Konstruktor bawaan (wajib ada untuk merender Form)
+    Public Shared KataDetailFontName As String = "Microsoft Sans Serif"
+    Public Shared KataDetailIsBold As Boolean = True
+    Public Shared KataDetailColor As Color = Color.Yellow
     Public Sub New()
-
-        ' Panggilan ini diwajibkan oleh desainer Windows Forms untuk membangun UI
-        ' yang ada di dalam file KataMainControl.Design.vb
         InitializeComponent()
 
         SetupFlagSystem()
         SetupJudgeSelector()
         UpdateJudgeDisplay()
-        ' (Logika, Timer, Database, dan Event Click dikosongkan sementara 
-        ' agar kita bisa fokus melihat hasil render UI terlebih dahulu)
-
+        ApplyKataMatchDetailStyle(KataDetailFontName, KataDetailIsBold, KataDetailColor)
     End Sub
 
     Private Sub UpdateJudgeDisplay()
@@ -390,5 +387,17 @@
 
     End Sub
 
+    Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
 
+            If LblJudgeStatusTitle IsNot Nothing Then
+                LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
+                LblJudgeStatusTitle.ForeColor = textColor
+                LblJudgeStatusTitle.Refresh()
+            End If
+
+        Catch ex As Exception
+        End Try
+    End Sub
 End Class
