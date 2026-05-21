@@ -203,6 +203,7 @@ Partial Class KataMainControl
     ' ============================================================
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         PnlLeftBar = New Panel()
         BtnQRCode = New Button()
         PnlJ5 = New Panel()
@@ -370,6 +371,7 @@ Partial Class KataMainControl
         BtnAkaUpdateInfo = New Button()
         LblAkaName = New Label()
         LblAkaHeader = New Label()
+        Timer1 = New Timer(components)
         PnlLeftBar.SuspendLayout()
         PnlJ5.SuspendLayout()
         PnlJ4.SuspendLayout()
@@ -428,7 +430,7 @@ Partial Class KataMainControl
         PnlLeftBar.Dock = DockStyle.Left
         PnlLeftBar.Location = New Point(0, 40)
         PnlLeftBar.Name = "PnlLeftBar"
-        PnlLeftBar.Size = New Size(65, 724)
+        PnlLeftBar.Size = New Size(65, 709)
         PnlLeftBar.TabIndex = 0
         ' 
         ' BtnQRCode
@@ -843,7 +845,7 @@ Partial Class KataMainControl
         PnlFooter.Controls.Add(CmbServer)
         PnlFooter.Controls.Add(LblServer)
         PnlFooter.Dock = DockStyle.Bottom
-        PnlFooter.Location = New Point(65, 719)
+        PnlFooter.Location = New Point(65, 704)
         PnlFooter.Name = "PnlFooter"
         PnlFooter.Size = New Size(1287, 45)
         PnlFooter.TabIndex = 2
@@ -1100,7 +1102,7 @@ Partial Class KataMainControl
         PnlRightBar.Dock = DockStyle.Right
         PnlRightBar.Location = New Point(1142, 40)
         PnlRightBar.Name = "PnlRightBar"
-        PnlRightBar.Size = New Size(210, 679)
+        PnlRightBar.Size = New Size(210, 664)
         PnlRightBar.TabIndex = 3
         ' 
         ' BtnStartTimer
@@ -1380,7 +1382,7 @@ Partial Class KataMainControl
         LblTatami.Font = New Font("Segoe UI", 8.0F)
         LblTatami.Location = New Point(8, 364)
         LblTatami.Name = "LblTatami"
-        LblTatami.Size = New Size(39, 13)
+        LblTatami.Size = New Size(40, 13)
         LblTatami.TabIndex = 22
         LblTatami.Text = "Tatami"
         ' 
@@ -1426,7 +1428,7 @@ Partial Class KataMainControl
         LblTextAlign.Font = New Font("Segoe UI", 8.0F)
         LblTextAlign.Location = New Point(8, 314)
         LblTextAlign.Name = "LblTextAlign"
-        LblTextAlign.Size = New Size(56, 13)
+        LblTextAlign.Size = New Size(57, 13)
         LblTextAlign.TabIndex = 18
         LblTextAlign.Text = "Text Align"
         ' 
@@ -1666,7 +1668,7 @@ Partial Class KataMainControl
         PnlMainWorkspace.Dock = DockStyle.Fill
         PnlMainWorkspace.Location = New Point(65, 40)
         PnlMainWorkspace.Name = "PnlMainWorkspace"
-        PnlMainWorkspace.Size = New Size(1077, 679)
+        PnlMainWorkspace.Size = New Size(1077, 664)
         PnlMainWorkspace.TabIndex = 4
         ' 
         ' PnlCenterScore
@@ -1685,7 +1687,7 @@ Partial Class KataMainControl
         PnlCenterScore.Location = New Point(235, 0)
         PnlCenterScore.Name = "PnlCenterScore"
         PnlCenterScore.Padding = New Padding(6)
-        PnlCenterScore.Size = New Size(607, 679)
+        PnlCenterScore.Size = New Size(607, 664)
         PnlCenterScore.TabIndex = 2
         ' 
         ' TotalScoreAO
@@ -1893,7 +1895,7 @@ Partial Class KataMainControl
         PnlPointInputsAka.Controls.Add(LblAkaJ2)
         PnlPointInputsAka.Controls.Add(NumAkaJ1)
         PnlPointInputsAka.Controls.Add(LblAkaJ1)
-        PnlPointInputsAka.Location = New Point(84, 59)
+        PnlPointInputsAka.Location = New Point(84, 52)
         PnlPointInputsAka.Name = "PnlPointInputsAka"
         PnlPointInputsAka.RightToLeft = RightToLeft.No
         PnlPointInputsAka.Size = New Size(178, 340)
@@ -2081,7 +2083,7 @@ Partial Class KataMainControl
         PnlAo.Dock = DockStyle.Right
         PnlAo.Location = New Point(842, 0)
         PnlAo.Name = "PnlAo"
-        PnlAo.Size = New Size(235, 679)
+        PnlAo.Size = New Size(235, 664)
         PnlAo.TabIndex = 1
         ' 
         ' LblAoWinnerStatus
@@ -2299,7 +2301,7 @@ Partial Class KataMainControl
         PnlAka.Dock = DockStyle.Left
         PnlAka.Location = New Point(0, 0)
         PnlAka.Name = "PnlAka"
-        PnlAka.Size = New Size(235, 679)
+        PnlAka.Size = New Size(235, 664)
         PnlAka.TabIndex = 0
         ' 
         ' LblAkaWinnerStatus
@@ -2493,11 +2495,14 @@ Partial Class KataMainControl
         LblAkaHeader.Text = "AKA"
         LblAkaHeader.TextAlign = ContentAlignment.MiddleCenter
         ' 
+        ' Timer1
+        ' 
+        ' 
         ' KataMainControl
         ' 
         AutoScaleDimensions = New SizeF(7.0F, 15.0F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1352, 764)
+        ClientSize = New Size(1352, 749)
         Controls.Add(PnlMainWorkspace)
         Controls.Add(PnlRightBar)
         Controls.Add(PnlFooter)
@@ -2566,5 +2571,6 @@ Partial Class KataMainControl
     Friend WithEvents TotalScoreAKA As NumericUpDown
     Friend WithEvents TotalScoreAO As NumericUpDown
     Friend WithEvents BtnSelectPlayer As Button
+    Friend WithEvents Timer1 As Timer
 
 End Class
