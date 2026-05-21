@@ -10,6 +10,9 @@ Partial Public Class KumiteMainControl
     Public Shared AkaTextColor As Color = Color.White
     Public Shared AoTextColor As Color = Color.White
     Public Shared UseKnockoutCountdown As Boolean = True
+    Public Shared MatchDetailFontName As String = "Microsoft Sans Serif"
+    Public Shared MatchDetailIsBold As Boolean = True
+    Public Shared MatchDetailColor As Color = Color.Yellow
     Public NextAkaName As String = ""
     Public NextAkaTeam As String = ""
     Public NextAkaInfo As String = ""
@@ -429,13 +432,20 @@ Partial Public Class KumiteMainControl
         If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
             ' 2. Jika belum, buat instance baru dari desain ScoreBoard kita
             frmScoreboard = New ScoreBoard()
-
-            ' 3. Tampilkan layar Score Board
-            ' Kita menggunakan .Show() bukan .ShowDialog() agar Control Panel 
-            ' tetap bisa diklik dan digunakan bersamaan dengan Score Board.
             frmScoreboard.Show()
+            frmScoreboard.LblMatchDesc.Text = TxtMatchDesc.Text
+            If PicPreviewLogo.Image IsNot Nothing Then
+                frmScoreboard.PicMatchLogo.Image = PicPreviewLogo.Image
+            End If
+
+            frmScoreboard.ApplyMatchDetailStyle(MatchDetailFontName, MatchDetailIsBold, MatchDetailColor)
+            ' (Opsional tapi penting): Sinkronisasi data utama lainnya agar Scoreboard tidak kosong melompong saat dibuka
+            SyncScoreboardProfile()
+            SyncScoreboardPoints()
+            SyncScoreboardTimer()
+            SyncScoreboardPenalties()
         Else
-            ' 4. Jika sudah terbuka tapi tertumpuk jendela lain, panggil ke depan
+            ' 3. Jika sudah terbuka tapi tertumpuk jendela lain, panggil ke depan
             frmScoreboard.BringToFront()
         End If
     End Sub
@@ -1519,6 +1529,7 @@ Partial Public Class KumiteMainControl
 
             ' Mengupdate Nomor Tatami
             frmScoreboard.LblTatamiNum.Text = NumTatami.Value.ToString()
+            frmScoreboard.LblMatchDesc.Text = TxtMatchDesc.Text
         End If
     End Sub
 
@@ -1875,4 +1886,38 @@ Partial Public Class KumiteMainControl
         Next
     End Sub
 
+    Private Sub BtnSendMatchInfo_Click(sender As Object, e As EventArgs) Handles BtnSendMatchInfo.Click
+        ' 1. Jika layar Scoreboard kebetulan SEDANG TERBUKA, langsung update secara live di layar
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Update Teks
+            frmScoreboard.LblMatchDesc.Text = TxtMatchDesc.Text
+
+            ' Update Logo
+            If PicPreviewLogo.Image IsNot Nothing Then
+                frmScoreboard.PicMatchLogo.Image = PicPreviewLogo.Image
+            Else
+                frmScoreboard.PicMatchLogo.Image = Nothing
+            End If
+        End If
+
+        ' 2. SELALU munculkan notifikasi sukses persis seperti aplikasi aslinya!
+        ' (Tanpa peduli layarnya sedang dibuka atau ditutup, sistem akan menganggapnya sukses tersimpan di memori).
+        MessageBox.Show("Information updated!", "Update", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End Sub
+
+    Private Sub BtnSelectLogo_Click(sender As Object, e As EventArgs) Handles BtnSelectLogo.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp"
+            If ofd.ShowDialog() = DialogResult.OK Then
+                ' Gunakan MemoryStream agar gambar transparan (PNG) tidak jadi hitam
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(ofd.FileName)
+                Dim ms As New IO.MemoryStream(bytes)
+                PicPreviewLogo.Image = Image.FromStream(ms)
+            End If
+        End Using
+    End Sub
+
+    Private Sub BtnRemoveLogo_Click(sender As Object, e As EventArgs) Handles BtnRemoveLogo.Click
+        PicPreviewLogo.Image = Nothing
+    End Sub
 End Class
