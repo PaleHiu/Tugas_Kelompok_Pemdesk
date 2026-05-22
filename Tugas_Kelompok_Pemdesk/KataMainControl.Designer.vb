@@ -98,7 +98,6 @@ Partial Class KataMainControl
     Friend WithEvents Rb3Judge As System.Windows.Forms.RadioButton
     Friend WithEvents TabMatchDetail As System.Windows.Forms.TabControl
     Friend WithEvents TabPageDetail As System.Windows.Forms.TabPage
-    Friend WithEvents TxtMatchDetail As System.Windows.Forms.TextBox
     Friend WithEvents TabPageLogo As System.Windows.Forms.TabPage
     Friend WithEvents BtnMatchDetailR As System.Windows.Forms.Button
     Friend WithEvents BtnMatchDetailMinus As System.Windows.Forms.Button
@@ -149,7 +148,7 @@ Partial Class KataMainControl
     Friend WithEvents TxtAkaTeam2 As System.Windows.Forms.TextBox
     Friend WithEvents LblAkaKata As System.Windows.Forms.Label
     Friend WithEvents CmbAkaKata As System.Windows.Forms.ComboBox
-    Friend WithEvents LblAkaDisqualification As System.Windows.Forms.Label
+    Friend WithEvents BtnDiskualifikasiAka As System.Windows.Forms.Label
     Friend WithEvents BtnKikenAka As System.Windows.Forms.Button
     Friend WithEvents PicAkaCircle As System.Windows.Forms.PictureBox
     Friend WithEvents PicAkaAvatar As System.Windows.Forms.PictureBox
@@ -217,7 +216,7 @@ Partial Class KataMainControl
     Friend WithEvents TxtAoTeam2 As System.Windows.Forms.TextBox
     Friend WithEvents LblAoKata As System.Windows.Forms.Label
     Friend WithEvents CmbAoKata As System.Windows.Forms.ComboBox
-    Friend WithEvents LblAoDisqualification As System.Windows.Forms.Label
+    Friend WithEvents BtnDiskualifikasiAo As System.Windows.Forms.Label
     Friend WithEvents BtnKikenAo As System.Windows.Forms.Button
     Friend WithEvents PicAoCircle As System.Windows.Forms.PictureBox
     Friend WithEvents PicAoAvatar As System.Windows.Forms.PictureBox
@@ -226,6 +225,13 @@ Partial Class KataMainControl
     ' ============================================================
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim TabPageDetail As TabPage
+        TxtMatchDetail = New TextBox()
+        LblTextAlign = New Label()
+        CmbTextAlign = New ComboBox()
+        BtnMatchDetailPlus = New Button()
+        BtnMatchDetailMinus = New Button()
+        BtnMatchDetailR = New Button()
         PnlLeftBar = New Panel()
         BtnQRCode = New Button()
         PnlJ7 = New Panel()
@@ -318,14 +324,7 @@ Partial Class KataMainControl
         LblTatami = New Label()
         BtnDetailScorePlus = New Button()
         ChkDetailScore = New CheckBox()
-        CmbTextAlign = New ComboBox()
-        LblTextAlign = New Label()
-        BtnMatchDetailPlus = New Button()
-        BtnMatchDetailMinus = New Button()
-        BtnMatchDetailR = New Button()
         TabMatchDetail = New TabControl()
-        TabPageDetail = New TabPage()
-        TxtMatchDetail = New TextBox()
         TabPageLogo = New TabPage()
         RbFlagSystem = New RadioButton()
         BtnManualOnline = New Button()
@@ -341,56 +340,6 @@ Partial Class KataMainControl
         TotalScoreAKA = New NumericUpDown()
         BtnResetScoreAka = New Button()
         BtnResetScoreAo = New Button()
-        PnlFlagInputsAka = New Panel()
-        PnlFlagInputsAo = New Panel()
-        Me.PnlFlagAo6 = New Panel()
-        Label1 = New Label()
-        Label2 = New Label()
-        PnlFlagAo7 = New Panel()
-        PicFlagAo7 = New Label()
-        LblFlagAo7 = New Label()
-        LblTotalScoreAkaTitle = New Label()
-        LblTotalScoreAoTitle = New Label()
-        LblJudgeScoreTitle = New Label()
-        PnlAo = New Panel()
-        LblAoWinnerStatus = New Label()
-        PicAoAvatar = New PictureBox()
-        PicAoCircle = New PictureBox()
-        BtnKikenAo = New Button()
-        LblAoDisqualification = New Label()
-        CmbAoKata = New ComboBox()
-        LblAoKata = New Label()
-        TxtAoTeam2 = New TextBox()
-        TxtAoTeam1 = New TextBox()
-        BtnAoSearch = New Button()
-        BtnAoSwap = New Button()
-        LblAoTeam = New Label()
-        TxtAoNameMain = New TextBox()
-        BtnAoExtraIcon = New Button()
-        BtnAoUpdateInfo = New Button()
-        LblAoName = New Label()
-        LblAoHeader = New Label()
-        PnlAka = New Panel()
-        LblAkaWinnerStatus = New Label()
-        PicAkaAvatar = New PictureBox()
-        PicAkaCircle = New PictureBox()
-        BtnKikenAka = New Button()
-        PnlPointInputsAka = New Panel()
-        NumAkaJ7 = New NumericUpDown()
-        LblAkaJ7 = New Label()
-        NumAkaJ6 = New NumericUpDown()
-        LblAkaJ6 = New Label()
-        NumAkaJ5 = New NumericUpDown()
-        LblAkaJ5 = New Label()
-        NumAkaJ4 = New NumericUpDown()
-        LblAkaJ4 = New Label()
-        NumAkaJ3 = New NumericUpDown()
-        LblAkaJ3 = New Label()
-        NumAkaJ2 = New NumericUpDown()
-        LblAkaJ2 = New Label()
-        NumAkaJ1 = New NumericUpDown()
-        LblAkaJ1 = New Label()
-        LblAkaDisqualification = New Label()
         PnlPointInputsAo = New Panel()
         NumAoJ7 = New NumericUpDown()
         LblAoJ7 = New Label()
@@ -406,6 +355,94 @@ Partial Class KataMainControl
         LblAoJ2 = New Label()
         NumAoJ1 = New NumericUpDown()
         LblAoJ1 = New Label()
+        PnlPointInputsAka = New Panel()
+        NumAkaJ7 = New NumericUpDown()
+        LblAkaJ7 = New Label()
+        NumAkaJ6 = New NumericUpDown()
+        LblAkaJ6 = New Label()
+        NumAkaJ5 = New NumericUpDown()
+        LblAkaJ5 = New Label()
+        NumAkaJ4 = New NumericUpDown()
+        LblAkaJ4 = New Label()
+        NumAkaJ3 = New NumericUpDown()
+        LblAkaJ3 = New Label()
+        NumAkaJ2 = New NumericUpDown()
+        LblAkaJ2 = New Label()
+        NumAkaJ1 = New NumericUpDown()
+        LblAkaJ1 = New Label()
+        PnlFlagInputsAka = New Panel()
+        PnlFlagAka7 = New Panel()
+        Label25 = New Label()
+        Label26 = New Label()
+        PnlFlagAka6 = New Panel()
+        Label23 = New Label()
+        Label24 = New Label()
+        PnlFlagAka5 = New Panel()
+        Label21 = New Label()
+        Label22 = New Label()
+        PnlFlagAka4 = New Panel()
+        Label19 = New Label()
+        Label20 = New Label()
+        PnlFlagAka3 = New Panel()
+        Label17 = New Label()
+        Label18 = New Label()
+        PnlFlagAka2 = New Panel()
+        Label15 = New Label()
+        Label16 = New Label()
+        PnlFlagAka1 = New Panel()
+        Label13 = New Label()
+        Label14 = New Label()
+        PnlFlagInputsAo = New Panel()
+        PnlFlagAo1 = New Panel()
+        Label11 = New Label()
+        Label12 = New Label()
+        PnlFlagAo2 = New Panel()
+        Label9 = New Label()
+        Label10 = New Label()
+        PnlFlagAo3 = New Panel()
+        Label7 = New Label()
+        Label8 = New Label()
+        PnlFlagAo4 = New Panel()
+        Label5 = New Label()
+        Label6 = New Label()
+        PnlFlagAo5 = New Panel()
+        Label3 = New Label()
+        Label4 = New Label()
+        PnlFlagAo6 = New Panel()
+        Label1 = New Label()
+        Label2 = New Label()
+        PnlFlagAo7 = New Panel()
+        PicFlagAo7 = New Label()
+        LblFlagAo7 = New Label()
+        LblTotalScoreAkaTitle = New Label()
+        LblTotalScoreAoTitle = New Label()
+        LblJudgeScoreTitle = New Label()
+        PnlAo = New Panel()
+        LblAoWinner = New Label()
+        LblAoWinnerStatus = New Label()
+        PicAoAvatar = New PictureBox()
+        PicAoCircle = New PictureBox()
+        BtnKikenAo = New Button()
+        BtnDiskualifikasiAo = New Label()
+        CmbAoKata = New ComboBox()
+        LblAoKata = New Label()
+        TxtAoTeam2 = New TextBox()
+        TxtAoTeam1 = New TextBox()
+        BtnAoSearch = New Button()
+        BtnAoSwap = New Button()
+        LblAoTeam = New Label()
+        TxtAoNameMain = New TextBox()
+        BtnAoExtraIcon = New Button()
+        BtnAoUpdateInfo = New Button()
+        LblAoName = New Label()
+        LblAoHeader = New Label()
+        PnlAka = New Panel()
+        LblAkaWinner = New Label()
+        LblAkaWinnerStatus = New Label()
+        PicAkaAvatar = New PictureBox()
+        PicAkaCircle = New PictureBox()
+        BtnKikenAka = New Button()
+        BtnDiskualifikasiAka = New Label()
         CmbAkaKata = New ComboBox()
         LblAkaKata = New Label()
         TxtAkaTeam2 = New TextBox()
@@ -418,42 +455,8 @@ Partial Class KataMainControl
         BtnAkaUpdateInfo = New Button()
         LblAkaName = New Label()
         LblAkaHeader = New Label()
-        Me.PnlFlagAo5 = New Panel()
-        Label3 = New Label()
-        Label4 = New Label()
-        Me.PnlFlagAo4 = New Panel()
-        Label5 = New Label()
-        Label6 = New Label()
-        Me.PnlFlagAo3 = New Panel()
-        Label7 = New Label()
-        Label8 = New Label()
-        Me.PnlFlagAo2 = New Panel()
-        Label9 = New Label()
-        Label10 = New Label()
-        Me.PnlFlagAo1 = New Panel()
-        Label11 = New Label()
-        Label12 = New Label()
-        PnlFlagAka1 = New Panel()
-        Label13 = New Label()
-        Label14 = New Label()
-        PnlFlagAka2 = New Panel()
-        Label15 = New Label()
-        Label16 = New Label()
-        PnlFlagAka3 = New Panel()
-        Label17 = New Label()
-        Label18 = New Label()
-        PnlFlagAka4 = New Panel()
-        Label19 = New Label()
-        Label20 = New Label()
-        PnlFlagAka5 = New Panel()
-        Label21 = New Label()
-        Label22 = New Label()
-        PnlFlagAka6 = New Panel()
-        Label23 = New Label()
-        Label24 = New Label()
-        PnlFlagAka7 = New Panel()
-        Label25 = New Label()
-        Label26 = New Label()
+        TabPageDetail = New TabPage()
+        TabPageDetail.SuspendLayout()
         PnlLeftBar.SuspendLayout()
         PnlJ7.SuspendLayout()
         PnlJ6.SuspendLayout()
@@ -475,29 +478,10 @@ Partial Class KataMainControl
         GrpScoreboardSelect.SuspendLayout()
         CType(NumTatamiId, ComponentModel.ISupportInitialize).BeginInit()
         TabMatchDetail.SuspendLayout()
-        TabPageDetail.SuspendLayout()
         PnlMainWorkspace.SuspendLayout()
         PnlCenterScore.SuspendLayout()
         CType(TotalScoreAO, ComponentModel.ISupportInitialize).BeginInit()
         CType(TotalScoreAKA, ComponentModel.ISupportInitialize).BeginInit()
-        PnlFlagInputsAka.SuspendLayout()
-        PnlFlagInputsAo.SuspendLayout()
-        Me.PnlFlagAo6.SuspendLayout()
-        PnlFlagAo7.SuspendLayout()
-        PnlAo.SuspendLayout()
-        CType(PicAoAvatar, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PicAoCircle, ComponentModel.ISupportInitialize).BeginInit()
-        PnlAka.SuspendLayout()
-        CType(PicAkaAvatar, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PicAkaCircle, ComponentModel.ISupportInitialize).BeginInit()
-        PnlPointInputsAka.SuspendLayout()
-        CType(NumAkaJ7, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ6, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ5, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ4, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ3, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ2, ComponentModel.ISupportInitialize).BeginInit()
-        CType(NumAkaJ1, ComponentModel.ISupportInitialize).BeginInit()
         PnlPointInputsAo.SuspendLayout()
         CType(NumAoJ7, ComponentModel.ISupportInitialize).BeginInit()
         CType(NumAoJ6, ComponentModel.ISupportInitialize).BeginInit()
@@ -506,19 +490,122 @@ Partial Class KataMainControl
         CType(NumAoJ3, ComponentModel.ISupportInitialize).BeginInit()
         CType(NumAoJ2, ComponentModel.ISupportInitialize).BeginInit()
         CType(NumAoJ1, ComponentModel.ISupportInitialize).BeginInit()
-        Me.PnlFlagAo5.SuspendLayout()
-        Me.PnlFlagAo4.SuspendLayout()
-        Me.PnlFlagAo3.SuspendLayout()
-        Me.PnlFlagAo2.SuspendLayout()
-        Me.PnlFlagAo1.SuspendLayout()
-        PnlFlagAka1.SuspendLayout()
-        PnlFlagAka2.SuspendLayout()
-        PnlFlagAka3.SuspendLayout()
-        PnlFlagAka4.SuspendLayout()
-        PnlFlagAka5.SuspendLayout()
-        PnlFlagAka6.SuspendLayout()
+        PnlPointInputsAka.SuspendLayout()
+        CType(NumAkaJ7, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ6, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ5, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ4, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ3, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ2, ComponentModel.ISupportInitialize).BeginInit()
+        CType(NumAkaJ1, ComponentModel.ISupportInitialize).BeginInit()
+        PnlFlagInputsAka.SuspendLayout()
         PnlFlagAka7.SuspendLayout()
+        PnlFlagAka6.SuspendLayout()
+        PnlFlagAka5.SuspendLayout()
+        PnlFlagAka4.SuspendLayout()
+        PnlFlagAka3.SuspendLayout()
+        PnlFlagAka2.SuspendLayout()
+        PnlFlagAka1.SuspendLayout()
+        PnlFlagInputsAo.SuspendLayout()
+        PnlFlagAo1.SuspendLayout()
+        PnlFlagAo2.SuspendLayout()
+        PnlFlagAo3.SuspendLayout()
+        PnlFlagAo4.SuspendLayout()
+        PnlFlagAo5.SuspendLayout()
+        PnlFlagAo6.SuspendLayout()
+        PnlFlagAo7.SuspendLayout()
+        PnlAo.SuspendLayout()
+        CType(PicAoAvatar, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAoCircle, ComponentModel.ISupportInitialize).BeginInit()
+        PnlAka.SuspendLayout()
+        CType(PicAkaAvatar, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAkaCircle, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
+        ' 
+        ' TabPageDetail
+        ' 
+        TabPageDetail.Controls.Add(TxtMatchDetail)
+        TabPageDetail.Controls.Add(LblTextAlign)
+        TabPageDetail.Controls.Add(CmbTextAlign)
+        TabPageDetail.Controls.Add(BtnMatchDetailPlus)
+        TabPageDetail.Controls.Add(BtnMatchDetailMinus)
+        TabPageDetail.Controls.Add(BtnMatchDetailR)
+        TabPageDetail.Location = New Point(4, 22)
+        TabPageDetail.Name = "TabPageDetail"
+        TabPageDetail.Padding = New Padding(2)
+        TabPageDetail.Size = New Size(214, 94)
+        TabPageDetail.TabIndex = 0
+        TabPageDetail.Text = "Match Detail"
+        ' 
+        ' TxtMatchDetail
+        ' 
+        TxtMatchDetail.Font = New Font("Segoe UI", 8F)
+        TxtMatchDetail.Location = New Point(2, 2)
+        TxtMatchDetail.Multiline = True
+        TxtMatchDetail.Name = "TxtMatchDetail"
+        TxtMatchDetail.ScrollBars = ScrollBars.Vertical
+        TxtMatchDetail.Size = New Size(169, 68)
+        TxtMatchDetail.TabIndex = 0
+        TxtMatchDetail.Text = "KATA Category Detail"
+        ' 
+        ' LblTextAlign
+        ' 
+        LblTextAlign.AutoSize = True
+        LblTextAlign.Font = New Font("Segoe UI", 8F)
+        LblTextAlign.Location = New Point(14, 73)
+        LblTextAlign.Name = "LblTextAlign"
+        LblTextAlign.Size = New Size(56, 13)
+        LblTextAlign.TabIndex = 18
+        LblTextAlign.Text = "Text Align"
+        ' 
+        ' CmbTextAlign
+        ' 
+        CmbTextAlign.DropDownStyle = ComboBoxStyle.DropDownList
+        CmbTextAlign.Font = New Font("Segoe UI", 8F)
+        CmbTextAlign.Items.AddRange(New Object() {"Center", "Left", "Right"})
+        CmbTextAlign.Location = New Point(79, 69)
+        CmbTextAlign.Name = "CmbTextAlign"
+        CmbTextAlign.Size = New Size(90, 21)
+        CmbTextAlign.TabIndex = 19
+        ' 
+        ' BtnMatchDetailPlus
+        ' 
+        BtnMatchDetailPlus.BackColor = Color.WhiteSmoke
+        BtnMatchDetailPlus.FlatAppearance.BorderColor = Color.LightGray
+        BtnMatchDetailPlus.FlatStyle = FlatStyle.Flat
+        BtnMatchDetailPlus.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        BtnMatchDetailPlus.Location = New Point(177, 63)
+        BtnMatchDetailPlus.Name = "BtnMatchDetailPlus"
+        BtnMatchDetailPlus.Size = New Size(30, 30)
+        BtnMatchDetailPlus.TabIndex = 17
+        BtnMatchDetailPlus.Text = "+"
+        BtnMatchDetailPlus.UseVisualStyleBackColor = False
+        ' 
+        ' BtnMatchDetailMinus
+        ' 
+        BtnMatchDetailMinus.BackColor = Color.WhiteSmoke
+        BtnMatchDetailMinus.FlatAppearance.BorderColor = Color.LightGray
+        BtnMatchDetailMinus.FlatStyle = FlatStyle.Flat
+        BtnMatchDetailMinus.Font = New Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        BtnMatchDetailMinus.Location = New Point(177, 32)
+        BtnMatchDetailMinus.Name = "BtnMatchDetailMinus"
+        BtnMatchDetailMinus.Size = New Size(30, 30)
+        BtnMatchDetailMinus.TabIndex = 16
+        BtnMatchDetailMinus.Text = "-"
+        BtnMatchDetailMinus.UseVisualStyleBackColor = False
+        ' 
+        ' BtnMatchDetailR
+        ' 
+        BtnMatchDetailR.BackColor = Color.WhiteSmoke
+        BtnMatchDetailR.FlatAppearance.BorderColor = Color.LightGray
+        BtnMatchDetailR.FlatStyle = FlatStyle.Flat
+        BtnMatchDetailR.Font = New Font("Segoe UI Emoji", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        BtnMatchDetailR.Location = New Point(177, 2)
+        BtnMatchDetailR.Name = "BtnMatchDetailR"
+        BtnMatchDetailR.Size = New Size(30, 30)
+        BtnMatchDetailR.TabIndex = 15
+        BtnMatchDetailR.Text = "R"
+        BtnMatchDetailR.UseVisualStyleBackColor = False
         ' 
         ' PnlLeftBar
         ' 
@@ -544,7 +631,7 @@ Partial Class KataMainControl
         BtnQRCode.BackColor = Color.White
         BtnQRCode.FlatAppearance.BorderColor = Color.LightGray
         BtnQRCode.FlatStyle = FlatStyle.Flat
-        BtnQRCode.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        BtnQRCode.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         BtnQRCode.ForeColor = Color.Black
         BtnQRCode.Location = New Point(5, 525)
         BtnQRCode.Name = "BtnQRCode"
@@ -569,7 +656,7 @@ Partial Class KataMainControl
         BtnJ7Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ7Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ7Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ7Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ7Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ7Scoring.ForeColor = Color.White
         BtnJ7Scoring.Location = New Point(0, 38)
         BtnJ7Scoring.Name = "BtnJ7Scoring"
@@ -583,7 +670,7 @@ Partial Class KataMainControl
         BtnJ7Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ7Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ7Login.FlatStyle = FlatStyle.Flat
-        BtnJ7Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ7Login.Font = New Font("Segoe UI", 7F)
         BtnJ7Login.ForeColor = Color.White
         BtnJ7Login.Location = New Point(0, 16)
         BtnJ7Login.Name = "BtnJ7Login"
@@ -594,7 +681,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ7
         ' 
-        LblJ7.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ7.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ7.ForeColor = Color.White
         LblJ7.Location = New Point(0, 0)
         LblJ7.Name = "LblJ7"
@@ -619,7 +706,7 @@ Partial Class KataMainControl
         BtnJ6Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ6Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ6Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ6Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ6Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ6Scoring.ForeColor = Color.White
         BtnJ6Scoring.Location = New Point(0, 38)
         BtnJ6Scoring.Name = "BtnJ6Scoring"
@@ -633,7 +720,7 @@ Partial Class KataMainControl
         BtnJ6Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ6Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ6Login.FlatStyle = FlatStyle.Flat
-        BtnJ6Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ6Login.Font = New Font("Segoe UI", 7F)
         BtnJ6Login.ForeColor = Color.White
         BtnJ6Login.Location = New Point(0, 16)
         BtnJ6Login.Name = "BtnJ6Login"
@@ -644,7 +731,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ6
         ' 
-        LblJ6.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ6.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ6.ForeColor = Color.White
         LblJ6.Location = New Point(0, 0)
         LblJ6.Name = "LblJ6"
@@ -669,7 +756,7 @@ Partial Class KataMainControl
         BtnJ5Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ5Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ5Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ5Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ5Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ5Scoring.ForeColor = Color.White
         BtnJ5Scoring.Location = New Point(0, 38)
         BtnJ5Scoring.Name = "BtnJ5Scoring"
@@ -683,7 +770,7 @@ Partial Class KataMainControl
         BtnJ5Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ5Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ5Login.FlatStyle = FlatStyle.Flat
-        BtnJ5Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ5Login.Font = New Font("Segoe UI", 7F)
         BtnJ5Login.ForeColor = Color.White
         BtnJ5Login.Location = New Point(0, 16)
         BtnJ5Login.Name = "BtnJ5Login"
@@ -694,7 +781,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ5
         ' 
-        LblJ5.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ5.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ5.ForeColor = Color.White
         LblJ5.Location = New Point(0, 0)
         LblJ5.Name = "LblJ5"
@@ -719,7 +806,7 @@ Partial Class KataMainControl
         BtnJ4Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ4Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ4Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ4Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ4Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ4Scoring.ForeColor = Color.White
         BtnJ4Scoring.Location = New Point(0, 38)
         BtnJ4Scoring.Name = "BtnJ4Scoring"
@@ -733,7 +820,7 @@ Partial Class KataMainControl
         BtnJ4Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ4Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ4Login.FlatStyle = FlatStyle.Flat
-        BtnJ4Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ4Login.Font = New Font("Segoe UI", 7F)
         BtnJ4Login.ForeColor = Color.White
         BtnJ4Login.Location = New Point(0, 16)
         BtnJ4Login.Name = "BtnJ4Login"
@@ -744,7 +831,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ4
         ' 
-        LblJ4.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ4.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ4.ForeColor = Color.White
         LblJ4.Location = New Point(0, 0)
         LblJ4.Name = "LblJ4"
@@ -769,7 +856,7 @@ Partial Class KataMainControl
         BtnJ3Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ3Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ3Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ3Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ3Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ3Scoring.ForeColor = Color.White
         BtnJ3Scoring.Location = New Point(0, 38)
         BtnJ3Scoring.Name = "BtnJ3Scoring"
@@ -783,7 +870,7 @@ Partial Class KataMainControl
         BtnJ3Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ3Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ3Login.FlatStyle = FlatStyle.Flat
-        BtnJ3Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ3Login.Font = New Font("Segoe UI", 7F)
         BtnJ3Login.ForeColor = Color.White
         BtnJ3Login.Location = New Point(0, 16)
         BtnJ3Login.Name = "BtnJ3Login"
@@ -794,7 +881,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ3
         ' 
-        LblJ3.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ3.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ3.ForeColor = Color.White
         LblJ3.Location = New Point(0, 0)
         LblJ3.Name = "LblJ3"
@@ -819,7 +906,7 @@ Partial Class KataMainControl
         BtnJ2Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ2Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ2Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ2Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ2Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ2Scoring.ForeColor = Color.White
         BtnJ2Scoring.Location = New Point(0, 38)
         BtnJ2Scoring.Name = "BtnJ2Scoring"
@@ -833,7 +920,7 @@ Partial Class KataMainControl
         BtnJ2Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ2Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ2Login.FlatStyle = FlatStyle.Flat
-        BtnJ2Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ2Login.Font = New Font("Segoe UI", 7F)
         BtnJ2Login.ForeColor = Color.White
         BtnJ2Login.Location = New Point(0, 16)
         BtnJ2Login.Name = "BtnJ2Login"
@@ -844,7 +931,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ2
         ' 
-        LblJ2.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ2.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ2.ForeColor = Color.White
         LblJ2.Location = New Point(0, 0)
         LblJ2.Name = "LblJ2"
@@ -869,7 +956,7 @@ Partial Class KataMainControl
         BtnJ1Scoring.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ1Scoring.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ1Scoring.FlatStyle = FlatStyle.Flat
-        BtnJ1Scoring.Font = New Font("Segoe UI", 7.0F)
+        BtnJ1Scoring.Font = New Font("Segoe UI", 7F)
         BtnJ1Scoring.ForeColor = Color.White
         BtnJ1Scoring.Location = New Point(0, 38)
         BtnJ1Scoring.Name = "BtnJ1Scoring"
@@ -883,7 +970,7 @@ Partial Class KataMainControl
         BtnJ1Login.BackColor = Color.FromArgb(CByte(50), CByte(55), CByte(80))
         BtnJ1Login.FlatAppearance.BorderColor = Color.FromArgb(CByte(80), CByte(85), CByte(110))
         BtnJ1Login.FlatStyle = FlatStyle.Flat
-        BtnJ1Login.Font = New Font("Segoe UI", 7.0F)
+        BtnJ1Login.Font = New Font("Segoe UI", 7F)
         BtnJ1Login.ForeColor = Color.White
         BtnJ1Login.Location = New Point(0, 16)
         BtnJ1Login.Name = "BtnJ1Login"
@@ -894,7 +981,7 @@ Partial Class KataMainControl
         ' 
         ' LblJ1
         ' 
-        LblJ1.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblJ1.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblJ1.ForeColor = Color.White
         LblJ1.Location = New Point(0, 0)
         LblJ1.Name = "LblJ1"
@@ -906,7 +993,7 @@ Partial Class KataMainControl
         ' LblJudgeStatusTitle
         ' 
         LblJudgeStatusTitle.BackColor = Color.Transparent
-        LblJudgeStatusTitle.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        LblJudgeStatusTitle.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         LblJudgeStatusTitle.ForeColor = Color.White
         LblJudgeStatusTitle.Location = New Point(0, 3)
         LblJudgeStatusTitle.Name = "LblJudgeStatusTitle"
@@ -949,7 +1036,7 @@ Partial Class KataMainControl
         BtnLoadNextMatch.BackColor = Color.FromArgb(CByte(255), CByte(204), CByte(0))
         BtnLoadNextMatch.FlatAppearance.BorderSize = 0
         BtnLoadNextMatch.FlatStyle = FlatStyle.Flat
-        BtnLoadNextMatch.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        BtnLoadNextMatch.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         BtnLoadNextMatch.Location = New Point(830, 4)
         BtnLoadNextMatch.Name = "BtnLoadNextMatch"
         BtnLoadNextMatch.Size = New Size(125, 30)
@@ -962,7 +1049,7 @@ Partial Class KataMainControl
         BtnSwapNextMatch.BackColor = Color.FromArgb(CByte(80), CByte(80), CByte(100))
         BtnSwapNextMatch.FlatAppearance.BorderColor = Color.Gray
         BtnSwapNextMatch.FlatStyle = FlatStyle.Flat
-        BtnSwapNextMatch.Font = New Font("Segoe UI", 9.0F)
+        BtnSwapNextMatch.Font = New Font("Segoe UI", 9F)
         BtnSwapNextMatch.ForeColor = Color.White
         BtnSwapNextMatch.Location = New Point(795, 6)
         BtnSwapNextMatch.Name = "BtnSwapNextMatch"
@@ -975,7 +1062,7 @@ Partial Class KataMainControl
         ' 
         TxtAoSearchDisplay.BackColor = Color.White
         TxtAoSearchDisplay.BorderStyle = BorderStyle.FixedSingle
-        TxtAoSearchDisplay.Font = New Font("Segoe UI", 9.0F)
+        TxtAoSearchDisplay.Font = New Font("Segoe UI", 9F)
         TxtAoSearchDisplay.Location = New Point(610, 8)
         TxtAoSearchDisplay.Name = "TxtAoSearchDisplay"
         TxtAoSearchDisplay.Size = New Size(180, 23)
@@ -986,7 +1073,7 @@ Partial Class KataMainControl
         BtnAoIconSearch.BackColor = Color.WhiteSmoke
         BtnAoIconSearch.FlatAppearance.BorderColor = Color.LightGray
         BtnAoIconSearch.FlatStyle = FlatStyle.Flat
-        BtnAoIconSearch.Font = New Font("Segoe UI", 8.0F)
+        BtnAoIconSearch.Font = New Font("Segoe UI", 8F)
         BtnAoIconSearch.Location = New Point(580, 6)
         BtnAoIconSearch.Name = "BtnAoIconSearch"
         BtnAoIconSearch.Size = New Size(28, 26)
@@ -998,7 +1085,7 @@ Partial Class KataMainControl
         ' 
         LblVS.AutoSize = True
         LblVS.BackColor = Color.FromArgb(CByte(255), CByte(204), CByte(0))
-        LblVS.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
+        LblVS.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
         LblVS.Location = New Point(545, 8)
         LblVS.Name = "LblVS"
         LblVS.Size = New Size(27, 20)
@@ -1010,7 +1097,7 @@ Partial Class KataMainControl
         BtnAkaIconSearch.BackColor = Color.WhiteSmoke
         BtnAkaIconSearch.FlatAppearance.BorderColor = Color.LightGray
         BtnAkaIconSearch.FlatStyle = FlatStyle.Flat
-        BtnAkaIconSearch.Font = New Font("Segoe UI", 8.0F)
+        BtnAkaIconSearch.Font = New Font("Segoe UI", 8F)
         BtnAkaIconSearch.Location = New Point(510, 6)
         BtnAkaIconSearch.Name = "BtnAkaIconSearch"
         BtnAkaIconSearch.Size = New Size(28, 26)
@@ -1022,7 +1109,7 @@ Partial Class KataMainControl
         ' 
         TxtAkaSearchDisplay.BackColor = Color.White
         TxtAkaSearchDisplay.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaSearchDisplay.Font = New Font("Segoe UI", 9.0F)
+        TxtAkaSearchDisplay.Font = New Font("Segoe UI", 9F)
         TxtAkaSearchDisplay.Location = New Point(325, 8)
         TxtAkaSearchDisplay.Name = "TxtAkaSearchDisplay"
         TxtAkaSearchDisplay.Size = New Size(180, 23)
@@ -1033,7 +1120,7 @@ Partial Class KataMainControl
         BtnNextMatch.BackColor = Color.FromArgb(CByte(255), CByte(204), CByte(0))
         BtnNextMatch.FlatAppearance.BorderSize = 0
         BtnNextMatch.FlatStyle = FlatStyle.Flat
-        BtnNextMatch.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        BtnNextMatch.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         BtnNextMatch.Location = New Point(220, 4)
         BtnNextMatch.Name = "BtnNextMatch"
         BtnNextMatch.Size = New Size(100, 30)
@@ -1125,7 +1212,7 @@ Partial Class KataMainControl
         BtnAudio.BackColor = Color.White
         BtnAudio.FlatAppearance.BorderColor = Color.LightGray
         BtnAudio.FlatStyle = FlatStyle.Flat
-        BtnAudio.Font = New Font("Segoe UI", 9.0F)
+        BtnAudio.Font = New Font("Segoe UI", 9F)
         BtnAudio.Location = New Point(575, 7)
         BtnAudio.Name = "BtnAudio"
         BtnAudio.Size = New Size(34, 30)
@@ -1138,7 +1225,7 @@ Partial Class KataMainControl
         BtnMonitor.BackColor = Color.White
         BtnMonitor.FlatAppearance.BorderColor = Color.LightGray
         BtnMonitor.FlatStyle = FlatStyle.Flat
-        BtnMonitor.Font = New Font("Segoe UI", 9.0F)
+        BtnMonitor.Font = New Font("Segoe UI", 9F)
         BtnMonitor.Location = New Point(534, 7)
         BtnMonitor.Name = "BtnMonitor"
         BtnMonitor.Size = New Size(34, 30)
@@ -1202,7 +1289,7 @@ Partial Class KataMainControl
         ' LblApiTimerSuffix
         ' 
         LblApiTimerSuffix.AutoSize = True
-        LblApiTimerSuffix.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblApiTimerSuffix.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblApiTimerSuffix.ForeColor = Color.Yellow
         LblApiTimerSuffix.Location = New Point(60, 21)
         LblApiTimerSuffix.Name = "LblApiTimerSuffix"
@@ -1212,7 +1299,7 @@ Partial Class KataMainControl
         ' 
         ' NumApiTimer
         ' 
-        NumApiTimer.Font = New Font("Segoe UI", 9.0F)
+        NumApiTimer.Font = New Font("Segoe UI", 9F)
         NumApiTimer.Location = New Point(10, 17)
         NumApiTimer.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
         NumApiTimer.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
@@ -1238,7 +1325,7 @@ Partial Class KataMainControl
         BtnEditServer.BackColor = Color.White
         BtnEditServer.FlatAppearance.BorderColor = Color.LightGray
         BtnEditServer.FlatStyle = FlatStyle.Flat
-        BtnEditServer.Font = New Font("Segoe UI", 8.0F)
+        BtnEditServer.Font = New Font("Segoe UI", 8F)
         BtnEditServer.Location = New Point(205, 605)
         BtnEditServer.Name = "BtnEditServer"
         BtnEditServer.Size = New Size(38, 24)
@@ -1287,11 +1374,6 @@ Partial Class KataMainControl
         PnlRightBar.Controls.Add(LblTatami)
         PnlRightBar.Controls.Add(BtnDetailScorePlus)
         PnlRightBar.Controls.Add(ChkDetailScore)
-        PnlRightBar.Controls.Add(CmbTextAlign)
-        PnlRightBar.Controls.Add(LblTextAlign)
-        PnlRightBar.Controls.Add(BtnMatchDetailPlus)
-        PnlRightBar.Controls.Add(BtnMatchDetailMinus)
-        PnlRightBar.Controls.Add(BtnMatchDetailR)
         PnlRightBar.Controls.Add(TabMatchDetail)
         PnlRightBar.Controls.Add(RbFlagSystem)
         PnlRightBar.Controls.Add(BtnManualOnline)
@@ -1333,7 +1415,7 @@ Partial Class KataMainControl
         ' 
         Rb7Judge.AutoSize = True
         Rb7Judge.Checked = True
-        Rb7Judge.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        Rb7Judge.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         Rb7Judge.ForeColor = Color.FromArgb(CByte(0), CByte(80), CByte(180))
         Rb7Judge.Location = New Point(73, 20)
         Rb7Judge.Name = "Rb7Judge"
@@ -1345,7 +1427,7 @@ Partial Class KataMainControl
         ' Rb5Judge
         ' 
         Rb5Judge.AutoSize = True
-        Rb5Judge.Font = New Font("Segoe UI", 8.0F)
+        Rb5Judge.Font = New Font("Segoe UI", 8F)
         Rb5Judge.Location = New Point(3, 20)
         Rb5Judge.Name = "Rb5Judge"
         Rb5Judge.Size = New Size(65, 17)
@@ -1355,7 +1437,7 @@ Partial Class KataMainControl
         ' Rb3Judge
         ' 
         Rb3Judge.AutoSize = True
-        Rb3Judge.Font = New Font("Segoe UI", 8.0F)
+        Rb3Judge.Font = New Font("Segoe UI", 8F)
         Rb3Judge.Location = New Point(143, 20)
         Rb3Judge.Name = "Rb3Judge"
         Rb3Judge.Size = New Size(65, 17)
@@ -1389,7 +1471,7 @@ Partial Class KataMainControl
         BtnStartTimer.BackColor = Color.WhiteSmoke
         BtnStartTimer.FlatAppearance.BorderColor = Color.LightGray
         BtnStartTimer.FlatStyle = FlatStyle.Flat
-        BtnStartTimer.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        BtnStartTimer.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         BtnStartTimer.ForeColor = Color.Black
         BtnStartTimer.Location = New Point(80, 595)
         BtnStartTimer.Name = "BtnStartTimer"
@@ -1403,7 +1485,7 @@ Partial Class KataMainControl
         BtnGearTimer.BackColor = Color.WhiteSmoke
         BtnGearTimer.FlatAppearance.BorderColor = Color.LightGray
         BtnGearTimer.FlatStyle = FlatStyle.Flat
-        BtnGearTimer.Font = New Font("Segoe UI", 9.0F)
+        BtnGearTimer.Font = New Font("Segoe UI", 9F)
         BtnGearTimer.Location = New Point(45, 595)
         BtnGearTimer.Name = "BtnGearTimer"
         BtnGearTimer.Size = New Size(28, 28)
@@ -1416,7 +1498,7 @@ Partial Class KataMainControl
         BtnEyeTimer.BackColor = Color.WhiteSmoke
         BtnEyeTimer.FlatAppearance.BorderColor = Color.LightGray
         BtnEyeTimer.FlatStyle = FlatStyle.Flat
-        BtnEyeTimer.Font = New Font("Segoe UI", 9.0F)
+        BtnEyeTimer.Font = New Font("Segoe UI", 9F)
         BtnEyeTimer.Location = New Point(10, 595)
         BtnEyeTimer.Name = "BtnEyeTimer"
         BtnEyeTimer.Size = New Size(28, 28)
@@ -1467,7 +1549,7 @@ Partial Class KataMainControl
         ' LblPerfColon
         ' 
         LblPerfColon.AutoSize = True
-        LblPerfColon.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblPerfColon.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblPerfColon.Location = New Point(124, 43)
         LblPerfColon.Name = "LblPerfColon"
         LblPerfColon.Size = New Size(10, 15)
@@ -1487,7 +1569,7 @@ Partial Class KataMainControl
         ' LblPerformance
         ' 
         LblPerformance.AutoSize = True
-        LblPerformance.Font = New Font("Segoe UI", 8.0F)
+        LblPerformance.Font = New Font("Segoe UI", 8F)
         LblPerformance.Location = New Point(6, 44)
         LblPerformance.Name = "LblPerformance"
         LblPerformance.Size = New Size(71, 13)
@@ -1507,7 +1589,7 @@ Partial Class KataMainControl
         ' LblWaitColon
         ' 
         LblWaitColon.AutoSize = True
-        LblWaitColon.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        LblWaitColon.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         LblWaitColon.Location = New Point(124, 18)
         LblWaitColon.Name = "LblWaitColon"
         LblWaitColon.Size = New Size(10, 15)
@@ -1526,7 +1608,7 @@ Partial Class KataMainControl
         ' LblWaiting
         ' 
         LblWaiting.AutoSize = True
-        LblWaiting.Font = New Font("Segoe UI", 8.0F)
+        LblWaiting.Font = New Font("Segoe UI", 8F)
         LblWaiting.Location = New Point(6, 19)
         LblWaiting.Name = "LblWaiting"
         LblWaiting.Size = New Size(48, 13)
@@ -1538,7 +1620,7 @@ Partial Class KataMainControl
         BtnStartScoreboard.BackColor = Color.FromArgb(CByte(120), CByte(250), CByte(180))
         BtnStartScoreboard.FlatAppearance.BorderColor = Color.LightGray
         BtnStartScoreboard.FlatStyle = FlatStyle.Flat
-        BtnStartScoreboard.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
+        BtnStartScoreboard.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
         BtnStartScoreboard.ForeColor = Color.Black
         BtnStartScoreboard.Location = New Point(45, 445)
         BtnStartScoreboard.Name = "BtnStartScoreboard"
@@ -1552,7 +1634,7 @@ Partial Class KataMainControl
         BtnScoreboardIcon.BackColor = Color.WhiteSmoke
         BtnScoreboardIcon.FlatAppearance.BorderColor = Color.LightGray
         BtnScoreboardIcon.FlatStyle = FlatStyle.Flat
-        BtnScoreboardIcon.Font = New Font("Segoe UI", 9.0F)
+        BtnScoreboardIcon.Font = New Font("Segoe UI", 9F)
         BtnScoreboardIcon.Location = New Point(10, 445)
         BtnScoreboardIcon.Name = "BtnScoreboardIcon"
         BtnScoreboardIcon.Size = New Size(30, 30)
@@ -1570,7 +1652,7 @@ Partial Class KataMainControl
         GrpScoreboardSelect.Controls.Add(RbAllComp)
         GrpScoreboardSelect.Controls.Add(RbComp1)
         GrpScoreboardSelect.Font = New Font("Segoe UI", 7.5F, FontStyle.Bold)
-        GrpScoreboardSelect.Location = New Point(10, 345)
+        GrpScoreboardSelect.Location = New Point(10, 352)
         GrpScoreboardSelect.Name = "GrpScoreboardSelect"
         GrpScoreboardSelect.Size = New Size(210, 90)
         GrpScoreboardSelect.TabIndex = 25
@@ -1580,7 +1662,7 @@ Partial Class KataMainControl
         BtnSelectPlayer.BackColor = Color.FromArgb(CByte(100), CByte(250), CByte(180))
         BtnSelectPlayer.FlatAppearance.BorderSize = 0
         BtnSelectPlayer.FlatStyle = FlatStyle.Flat
-        BtnSelectPlayer.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        BtnSelectPlayer.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         BtnSelectPlayer.ForeColor = Color.Black
         BtnSelectPlayer.Location = New Point(0, 0)
         BtnSelectPlayer.Name = "BtnSelectPlayer"
@@ -1591,7 +1673,7 @@ Partial Class KataMainControl
         ' 
         ' LblShortcutHint
         ' 
-        LblShortcutHint.Font = New Font("Segoe UI", 7.0F)
+        LblShortcutHint.Font = New Font("Segoe UI", 7F)
         LblShortcutHint.ForeColor = Color.Gray
         LblShortcutHint.Location = New Point(100, 60)
         LblShortcutHint.Name = "LblShortcutHint"
@@ -1603,7 +1685,7 @@ Partial Class KataMainControl
         ' RbComp2
         ' 
         RbComp2.AutoSize = True
-        RbComp2.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        RbComp2.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         RbComp2.ForeColor = Color.Navy
         RbComp2.Location = New Point(5, 60)
         RbComp2.Name = "RbComp2"
@@ -1614,7 +1696,7 @@ Partial Class KataMainControl
         ' RbAllComp
         ' 
         RbAllComp.AutoSize = True
-        RbAllComp.Font = New Font("Segoe UI", 8.0F)
+        RbAllComp.Font = New Font("Segoe UI", 8F)
         RbAllComp.Location = New Point(100, 40)
         RbAllComp.Name = "RbAllComp"
         RbAllComp.Size = New Size(99, 17)
@@ -1625,7 +1707,7 @@ Partial Class KataMainControl
         ' 
         RbComp1.AutoSize = True
         RbComp1.Checked = True
-        RbComp1.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        RbComp1.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         RbComp1.ForeColor = Color.Red
         RbComp1.Location = New Point(5, 40)
         RbComp1.Name = "RbComp1"
@@ -1638,8 +1720,8 @@ Partial Class KataMainControl
         ' 
         LblTimerDisplayMain.BackColor = Color.White
         LblTimerDisplayMain.BorderStyle = BorderStyle.FixedSingle
-        LblTimerDisplayMain.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
-        LblTimerDisplayMain.Location = New Point(120, 306)
+        LblTimerDisplayMain.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
+        LblTimerDisplayMain.Location = New Point(118, 317)
         LblTimerDisplayMain.Name = "LblTimerDisplayMain"
         LblTimerDisplayMain.Size = New Size(80, 30)
         LblTimerDisplayMain.TabIndex = 24
@@ -1648,8 +1730,8 @@ Partial Class KataMainControl
         ' 
         ' NumTatamiId
         ' 
-        NumTatamiId.Font = New Font("Segoe UI", 9.0F)
-        NumTatamiId.Location = New Point(60, 310)
+        NumTatamiId.Font = New Font("Segoe UI", 9F)
+        NumTatamiId.Location = New Point(60, 320)
         NumTatamiId.Maximum = New Decimal(New Integer() {20, 0, 0, 0})
         NumTatamiId.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         NumTatamiId.Name = "NumTatamiId"
@@ -1660,8 +1742,8 @@ Partial Class KataMainControl
         ' LblTatami
         ' 
         LblTatami.AutoSize = True
-        LblTatami.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
-        LblTatami.Location = New Point(10, 314)
+        LblTatami.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        LblTatami.Location = New Point(9, 324)
         LblTatami.Name = "LblTatami"
         LblTatami.Size = New Size(44, 15)
         LblTatami.TabIndex = 22
@@ -1672,9 +1754,9 @@ Partial Class KataMainControl
         BtnDetailScorePlus.BackColor = Color.LightGray
         BtnDetailScorePlus.FlatAppearance.BorderColor = Color.DarkGray
         BtnDetailScorePlus.FlatStyle = FlatStyle.Flat
-        BtnDetailScorePlus.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        BtnDetailScorePlus.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         BtnDetailScorePlus.ForeColor = Color.White
-        BtnDetailScorePlus.Location = New Point(190, 278)
+        BtnDetailScorePlus.Location = New Point(198, 304)
         BtnDetailScorePlus.Name = "BtnDetailScorePlus"
         BtnDetailScorePlus.Size = New Size(24, 22)
         BtnDetailScorePlus.TabIndex = 21
@@ -1688,109 +1770,28 @@ Partial Class KataMainControl
         ChkDetailScore.CheckState = CheckState.Checked
         ChkDetailScore.Font = New Font("Segoe UI", 7.5F)
         ChkDetailScore.ForeColor = Color.Gray
-        ChkDetailScore.Location = New Point(10, 280)
+        ChkDetailScore.Location = New Point(10, 300)
         ChkDetailScore.Name = "ChkDetailScore"
         ChkDetailScore.Size = New Size(143, 16)
         ChkDetailScore.TabIndex = 20
         ChkDetailScore.Text = "Detail Score on Scoreboard"
         ' 
-        ' CmbTextAlign
-        ' 
-        CmbTextAlign.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbTextAlign.Font = New Font("Segoe UI", 8.0F)
-        CmbTextAlign.Items.AddRange(New Object() {"Center", "Left", "Right"})
-        CmbTextAlign.Location = New Point(75, 252)
-        CmbTextAlign.Name = "CmbTextAlign"
-        CmbTextAlign.Size = New Size(90, 21)
-        CmbTextAlign.TabIndex = 19
-        ' 
-        ' LblTextAlign
-        ' 
-        LblTextAlign.AutoSize = True
-        LblTextAlign.Font = New Font("Segoe UI", 8.0F)
-        LblTextAlign.Location = New Point(10, 256)
-        LblTextAlign.Name = "LblTextAlign"
-        LblTextAlign.Size = New Size(56, 13)
-        LblTextAlign.TabIndex = 18
-        LblTextAlign.Text = "Text Align"
-        ' 
-        ' BtnMatchDetailPlus
-        ' 
-        BtnMatchDetailPlus.BackColor = Color.WhiteSmoke
-        BtnMatchDetailPlus.FlatAppearance.BorderColor = Color.LightGray
-        BtnMatchDetailPlus.FlatStyle = FlatStyle.Flat
-        BtnMatchDetailPlus.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
-        BtnMatchDetailPlus.Location = New Point(191, 242)
-        BtnMatchDetailPlus.Name = "BtnMatchDetailPlus"
-        BtnMatchDetailPlus.Size = New Size(30, 30)
-        BtnMatchDetailPlus.TabIndex = 17
-        BtnMatchDetailPlus.Text = "+"
-        BtnMatchDetailPlus.UseVisualStyleBackColor = False
-        ' 
-        ' BtnMatchDetailMinus
-        ' 
-        BtnMatchDetailMinus.BackColor = Color.WhiteSmoke
-        BtnMatchDetailMinus.FlatAppearance.BorderColor = Color.LightGray
-        BtnMatchDetailMinus.FlatStyle = FlatStyle.Flat
-        BtnMatchDetailMinus.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        BtnMatchDetailMinus.Location = New Point(191, 210)
-        BtnMatchDetailMinus.Name = "BtnMatchDetailMinus"
-        BtnMatchDetailMinus.Size = New Size(30, 30)
-        BtnMatchDetailMinus.TabIndex = 16
-        BtnMatchDetailMinus.Text = "-"
-        BtnMatchDetailMinus.UseVisualStyleBackColor = False
-        ' 
-        ' BtnMatchDetailR
-        ' 
-        BtnMatchDetailR.BackColor = Color.WhiteSmoke
-        BtnMatchDetailR.FlatAppearance.BorderColor = Color.LightGray
-        BtnMatchDetailR.FlatStyle = FlatStyle.Flat
-        BtnMatchDetailR.Font = New Font("Segoe UI Emoji", 9.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        BtnMatchDetailR.Location = New Point(191, 178)
-        BtnMatchDetailR.Name = "BtnMatchDetailR"
-        BtnMatchDetailR.Size = New Size(30, 30)
-        BtnMatchDetailR.TabIndex = 15
-        BtnMatchDetailR.Text = "R"
-        BtnMatchDetailR.UseVisualStyleBackColor = False
-        ' 
         ' TabMatchDetail
         ' 
         TabMatchDetail.Controls.Add(TabPageDetail)
         TabMatchDetail.Controls.Add(TabPageLogo)
-        TabMatchDetail.Font = New Font("Segoe UI", 8.0F)
-        TabMatchDetail.Location = New Point(10, 180)
+        TabMatchDetail.Font = New Font("Segoe UI", 8F)
+        TabMatchDetail.Location = New Point(4, 180)
         TabMatchDetail.Name = "TabMatchDetail"
         TabMatchDetail.SelectedIndex = 0
-        TabMatchDetail.Size = New Size(180, 70)
+        TabMatchDetail.Size = New Size(222, 120)
         TabMatchDetail.TabIndex = 14
-        ' 
-        ' TabPageDetail
-        ' 
-        TabPageDetail.Controls.Add(TxtMatchDetail)
-        TabPageDetail.Location = New Point(4, 22)
-        TabPageDetail.Name = "TabPageDetail"
-        TabPageDetail.Padding = New Padding(2)
-        TabPageDetail.Size = New Size(172, 44)
-        TabPageDetail.TabIndex = 0
-        TabPageDetail.Text = "Match Detail"
-        ' 
-        ' TxtMatchDetail
-        ' 
-        TxtMatchDetail.Dock = DockStyle.Fill
-        TxtMatchDetail.Font = New Font("Segoe UI", 8.0F)
-        TxtMatchDetail.Location = New Point(2, 2)
-        TxtMatchDetail.Multiline = True
-        TxtMatchDetail.Name = "TxtMatchDetail"
-        TxtMatchDetail.ScrollBars = ScrollBars.Vertical
-        TxtMatchDetail.Size = New Size(168, 40)
-        TxtMatchDetail.TabIndex = 0
-        TxtMatchDetail.Text = "KATA Category Detail"
         ' 
         ' TabPageLogo
         ' 
         TabPageLogo.Location = New Point(4, 22)
         TabPageLogo.Name = "TabPageLogo"
-        TabPageLogo.Size = New Size(172, 44)
+        TabPageLogo.Size = New Size(214, 94)
         TabPageLogo.TabIndex = 1
         TabPageLogo.Text = "Match Logo"
         ' 
@@ -1809,7 +1810,7 @@ Partial Class KataMainControl
         BtnManualOnline.BackColor = Color.WhiteSmoke
         BtnManualOnline.FlatAppearance.BorderColor = Color.LightGray
         BtnManualOnline.FlatStyle = FlatStyle.Flat
-        BtnManualOnline.Font = New Font("Segoe UI", 7.0F)
+        BtnManualOnline.Font = New Font("Segoe UI", 7F)
         BtnManualOnline.ForeColor = Color.FromArgb(CByte(0), CByte(120), CByte(120))
         BtnManualOnline.Location = New Point(135, 77)
         BtnManualOnline.Name = "BtnManualOnline"
@@ -1821,7 +1822,7 @@ Partial Class KataMainControl
         ' CmbMode
         ' 
         CmbMode.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbMode.Font = New Font("Segoe UI", 8.0F)
+        CmbMode.Font = New Font("Segoe UI", 8F)
         CmbMode.Items.AddRange(New Object() {"Online"})
         CmbMode.Location = New Point(50, 78)
         CmbMode.Name = "CmbMode"
@@ -1831,7 +1832,7 @@ Partial Class KataMainControl
         ' LblMode
         ' 
         LblMode.AutoSize = True
-        LblMode.Font = New Font("Segoe UI", 8.0F)
+        LblMode.Font = New Font("Segoe UI", 8F)
         LblMode.Location = New Point(10, 80)
         LblMode.Name = "LblMode"
         LblMode.Size = New Size(37, 13)
@@ -1841,7 +1842,7 @@ Partial Class KataMainControl
         ' CmbRules
         ' 
         CmbRules.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbRules.Font = New Font("Segoe UI", 8.0F)
+        CmbRules.Font = New Font("Segoe UI", 8F)
         CmbRules.Items.AddRange(New Object() {"Score → Voting (2026)"})
         CmbRules.Location = New Point(50, 52)
         CmbRules.Name = "CmbRules"
@@ -1851,7 +1852,7 @@ Partial Class KataMainControl
         ' LblRules
         ' 
         LblRules.AutoSize = True
-        LblRules.Font = New Font("Segoe UI", 8.0F)
+        LblRules.Font = New Font("Segoe UI", 8F)
         LblRules.Location = New Point(10, 55)
         LblRules.Name = "LblRules"
         LblRules.Size = New Size(35, 13)
@@ -1915,7 +1916,7 @@ Partial Class KataMainControl
         ' 
         ' TotalScoreAO
         ' 
-        TotalScoreAO.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        TotalScoreAO.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         TotalScoreAO.Increment = New Decimal(New Integer() {0, 0, 0, 0})
         TotalScoreAO.Location = New Point(153, 519)
         TotalScoreAO.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
@@ -1927,7 +1928,7 @@ Partial Class KataMainControl
         ' 
         ' TotalScoreAKA
         ' 
-        TotalScoreAKA.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        TotalScoreAKA.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         TotalScoreAKA.Increment = New Decimal(New Integer() {0, 0, 0, 0})
         TotalScoreAKA.Location = New Point(4, 519)
         TotalScoreAKA.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
@@ -1943,7 +1944,7 @@ Partial Class KataMainControl
         BtnResetScoreAka.BackColor = Color.WhiteSmoke
         BtnResetScoreAka.FlatAppearance.BorderColor = Color.LightGray
         BtnResetScoreAka.FlatStyle = FlatStyle.Popup
-        BtnResetScoreAka.Font = New Font("Segoe UI", 10.0F)
+        BtnResetScoreAka.Font = New Font("Segoe UI", 10F)
         BtnResetScoreAka.Location = New Point(4, 596)
         BtnResetScoreAka.Name = "BtnResetScoreAka"
         BtnResetScoreAka.Size = New Size(140, 30)
@@ -1956,7 +1957,7 @@ Partial Class KataMainControl
         BtnResetScoreAo.BackColor = Color.WhiteSmoke
         BtnResetScoreAo.FlatAppearance.BorderColor = Color.LightGray
         BtnResetScoreAo.FlatStyle = FlatStyle.Popup
-        BtnResetScoreAo.Font = New Font("Segoe UI", 10.0F)
+        BtnResetScoreAo.Font = New Font("Segoe UI", 10F)
         BtnResetScoreAo.Location = New Point(153, 596)
         BtnResetScoreAo.Name = "BtnResetScoreAo"
         BtnResetScoreAo.Size = New Size(140, 30)
@@ -1964,440 +1965,196 @@ Partial Class KataMainControl
         BtnResetScoreAo.Text = "Reset Score"
         BtnResetScoreAo.UseVisualStyleBackColor = False
         ' 
-        ' PnlFlagInputsAka
-        ' 
-        PnlFlagInputsAka.Anchor = AnchorStyles.None
-        PnlFlagInputsAka.BackColor = Color.White
-        PnlFlagInputsAka.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka7)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka6)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka5)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka4)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka3)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka2)
-        PnlFlagInputsAka.Controls.Add(PnlFlagAka1)
-        PnlFlagInputsAka.Location = New Point(5, 45)
-        PnlFlagInputsAka.Name = "PnlFlagInputsAka"
-        PnlFlagInputsAka.Size = New Size(140, 425)
-        PnlFlagInputsAka.TabIndex = 20
-        PnlFlagInputsAka.Visible = False
-        ' 
-        ' PnlFlagInputsAo
-        ' 
-        PnlFlagInputsAo.Anchor = AnchorStyles.None
-        PnlFlagInputsAo.BackColor = Color.White
-        PnlFlagInputsAo.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo1)
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo2)
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo3)
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo4)
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo5)
-        PnlFlagInputsAo.Controls.Add(Me.PnlFlagAo6)
-        PnlFlagInputsAo.Controls.Add(PnlFlagAo7)
-        PnlFlagInputsAo.Location = New Point(154, 45)
-        PnlFlagInputsAo.Name = "PnlFlagInputsAo"
-        PnlFlagInputsAo.Size = New Size(140, 425)
-        PnlFlagInputsAo.TabIndex = 21
-        PnlFlagInputsAo.Visible = False
-        ' 
-        ' PnlFlagAo6
-        ' 
-        Me.PnlFlagAo6.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo6.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo6.Controls.Add(Label1)
-        Me.PnlFlagAo6.Controls.Add(Label2)
-        Me.PnlFlagAo6.Cursor = Cursors.Hand
-        Me.PnlFlagAo6.Location = New Point(10, 67)
-        Me.PnlFlagAo6.Name = "PnlFlagAo6"
-        Me.PnlFlagAo6.Size = New Size(120, 51)
-        Me.PnlFlagAo6.TabIndex = 21
-        ' 
-        ' Label1
-        ' 
-        Label1.AutoSize = True
-        Label1.Enabled = False
-        Label1.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label1.ForeColor = Color.Blue
-        Label1.Location = New Point(77, 3)
-        Label1.Name = "Label1"
-        Label1.Size = New Size(38, 40)
-        Label1.TabIndex = 20
-        Label1.Text = "⚑"
-        ' 
-        ' Label2
-        ' 
-        Label2.Enabled = False
-        Label2.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label2.Location = New Point(7, 5)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(64, 39)
-        Label2.TabIndex = 0
-        Label2.Text = "6"
-        Label2.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAo7
-        ' 
-        PnlFlagAo7.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAo7.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAo7.Controls.Add(PicFlagAo7)
-        PnlFlagAo7.Controls.Add(LblFlagAo7)
-        PnlFlagAo7.Cursor = Cursors.Hand
-        PnlFlagAo7.Location = New Point(10, 10)
-        PnlFlagAo7.Name = "PnlFlagAo7"
-        PnlFlagAo7.Size = New Size(120, 51)
-        PnlFlagAo7.TabIndex = 17
-        ' 
-        ' PicFlagAo7
-        ' 
-        PicFlagAo7.AutoSize = True
-        PicFlagAo7.Enabled = False
-        PicFlagAo7.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        PicFlagAo7.ForeColor = Color.Blue
-        PicFlagAo7.Location = New Point(77, 3)
-        PicFlagAo7.Name = "PicFlagAo7"
-        PicFlagAo7.Size = New Size(38, 40)
-        PicFlagAo7.TabIndex = 20
-        PicFlagAo7.Text = "⚑"
-        ' 
-        ' LblFlagAo7
-        ' 
-        LblFlagAo7.Enabled = False
-        LblFlagAo7.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        LblFlagAo7.Location = New Point(7, 5)
-        LblFlagAo7.Name = "LblFlagAo7"
-        LblFlagAo7.Size = New Size(64, 39)
-        LblFlagAo7.TabIndex = 0
-        LblFlagAo7.Text = "7"
-        LblFlagAo7.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' LblTotalScoreAkaTitle
-        ' 
-        LblTotalScoreAkaTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
-        LblTotalScoreAkaTitle.BorderStyle = BorderStyle.FixedSingle
-        LblTotalScoreAkaTitle.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
-        LblTotalScoreAkaTitle.ForeColor = Color.Black
-        LblTotalScoreAkaTitle.Location = New Point(4, 486)
-        LblTotalScoreAkaTitle.Name = "LblTotalScoreAkaTitle"
-        LblTotalScoreAkaTitle.Size = New Size(140, 30)
-        LblTotalScoreAkaTitle.TabIndex = 0
-        LblTotalScoreAkaTitle.Text = "Total Score"
-        LblTotalScoreAkaTitle.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' LblTotalScoreAoTitle
-        ' 
-        LblTotalScoreAoTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
-        LblTotalScoreAoTitle.BorderStyle = BorderStyle.FixedSingle
-        LblTotalScoreAoTitle.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
-        LblTotalScoreAoTitle.ForeColor = Color.Black
-        LblTotalScoreAoTitle.Location = New Point(153, 486)
-        LblTotalScoreAoTitle.Name = "LblTotalScoreAoTitle"
-        LblTotalScoreAoTitle.Size = New Size(140, 30)
-        LblTotalScoreAoTitle.TabIndex = 0
-        LblTotalScoreAoTitle.Text = "Total Score"
-        LblTotalScoreAoTitle.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' LblJudgeScoreTitle
-        ' 
-        LblJudgeScoreTitle.Dock = DockStyle.Top
-        LblJudgeScoreTitle.Font = New Font("Segoe UI", 13.0F, FontStyle.Bold)
-        LblJudgeScoreTitle.Location = New Point(0, 0)
-        LblJudgeScoreTitle.Name = "LblJudgeScoreTitle"
-        LblJudgeScoreTitle.Size = New Size(299, 35)
-        LblJudgeScoreTitle.TabIndex = 0
-        LblJudgeScoreTitle.Text = "Judge Score"
-        LblJudgeScoreTitle.TextAlign = ContentAlignment.BottomCenter
-        ' 
-        ' PnlAo
-        ' 
-        PnlAo.BackColor = Color.White
-        PnlAo.BorderStyle = BorderStyle.FixedSingle
-        PnlAo.Controls.Add(LblAoWinnerStatus)
-        PnlAo.Controls.Add(PicAoAvatar)
-        PnlAo.Controls.Add(PicAoCircle)
-        PnlAo.Controls.Add(BtnKikenAo)
-        PnlAo.Controls.Add(LblAoDisqualification)
-        PnlAo.Controls.Add(CmbAoKata)
-        PnlAo.Controls.Add(LblAoKata)
-        PnlAo.Controls.Add(TxtAoTeam2)
-        PnlAo.Controls.Add(TxtAoTeam1)
-        PnlAo.Controls.Add(BtnAoSearch)
-        PnlAo.Controls.Add(BtnAoSwap)
-        PnlAo.Controls.Add(LblAoTeam)
-        PnlAo.Controls.Add(TxtAoNameMain)
-        PnlAo.Controls.Add(BtnAoExtraIcon)
-        PnlAo.Controls.Add(BtnAoUpdateInfo)
-        PnlAo.Controls.Add(LblAoName)
-        PnlAo.Controls.Add(LblAoHeader)
-        PnlAo.Dock = DockStyle.Right
-        PnlAo.Location = New Point(634, 0)
-        PnlAo.Name = "PnlAo"
-        PnlAo.Size = New Size(335, 636)
-        PnlAo.TabIndex = 1
-        ' 
-        ' LblAoWinnerStatus
-        ' 
-        LblAoWinnerStatus.AutoSize = True
-        LblAoWinnerStatus.Font = New Font("Segoe UI", 8.0F)
-        LblAoWinnerStatus.ForeColor = Color.Gray
-        LblAoWinnerStatus.Location = New Point(15, 330)
-        LblAoWinnerStatus.Name = "LblAoWinnerStatus"
-        LblAoWinnerStatus.Size = New Size(92, 13)
-        LblAoWinnerStatus.TabIndex = 16
-        LblAoWinnerStatus.Text = "Show Winner  ▶"
-        ' 
-        ' PicAoAvatar
-        ' 
-        PicAoAvatar.BackColor = Color.White
-        PicAoAvatar.BorderStyle = BorderStyle.FixedSingle
-        PicAoAvatar.Location = New Point(85, 250)
-        PicAoAvatar.Name = "PicAoAvatar"
-        PicAoAvatar.Size = New Size(60, 60)
-        PicAoAvatar.SizeMode = PictureBoxSizeMode.Zoom
-        PicAoAvatar.TabIndex = 15
-        PicAoAvatar.TabStop = False
-        ' 
-        ' PicAoCircle
-        ' 
-        PicAoCircle.BackColor = Color.White
-        PicAoCircle.BorderStyle = BorderStyle.FixedSingle
-        PicAoCircle.Location = New Point(15, 250)
-        PicAoCircle.Name = "PicAoCircle"
-        PicAoCircle.Size = New Size(60, 60)
-        PicAoCircle.SizeMode = PictureBoxSizeMode.Zoom
-        PicAoCircle.TabIndex = 14
-        PicAoCircle.TabStop = False
-        ' 
-        ' BtnKikenAo
-        ' 
-        BtnKikenAo.BackColor = Color.White
-        BtnKikenAo.FlatAppearance.BorderColor = Color.LightGray
-        BtnKikenAo.FlatStyle = FlatStyle.Flat
-        BtnKikenAo.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
-        BtnKikenAo.ForeColor = Color.Black
-        BtnKikenAo.Location = New Point(230, 270)
-        BtnKikenAo.Name = "BtnKikenAo"
-        BtnKikenAo.Size = New Size(80, 26)
-        BtnKikenAo.TabIndex = 13
-        BtnKikenAo.Text = "Kiken"
-        BtnKikenAo.UseVisualStyleBackColor = False
-        ' 
-        ' LblAoDisqualification
-        ' 
-        LblAoDisqualification.AutoSize = True
-        LblAoDisqualification.Font = New Font("Segoe UI", 7.5F)
-        LblAoDisqualification.Location = New Point(239, 250)
-        LblAoDisqualification.Name = "LblAoDisqualification"
-        LblAoDisqualification.Size = New Size(71, 12)
-        LblAoDisqualification.TabIndex = 12
-        LblAoDisqualification.Text = "Disqualification"
-        ' 
-        ' CmbAoKata
-        ' 
-        CmbAoKata.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbAoKata.Font = New Font("Segoe UI", 9.0F)
-        CmbAoKata.Location = New Point(15, 210)
-        CmbAoKata.Name = "CmbAoKata"
-        CmbAoKata.Size = New Size(295, 23)
-        CmbAoKata.TabIndex = 11
-        ' 
-        ' LblAoKata
-        ' 
-        LblAoKata.AutoSize = True
-        LblAoKata.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
-        LblAoKata.Location = New Point(15, 190)
-        LblAoKata.Name = "LblAoKata"
-        LblAoKata.Size = New Size(36, 15)
-        LblAoKata.TabIndex = 10
-        LblAoKata.Text = "KATA"
-        ' 
-        ' TxtAoTeam2
-        ' 
-        TxtAoTeam2.BorderStyle = BorderStyle.FixedSingle
-        TxtAoTeam2.Font = New Font("Segoe UI", 9.0F)
-        TxtAoTeam2.Location = New Point(15, 155)
-        TxtAoTeam2.Name = "TxtAoTeam2"
-        TxtAoTeam2.Size = New Size(295, 23)
-        TxtAoTeam2.TabIndex = 9
-        ' 
-        ' TxtAoTeam1
-        ' 
-        TxtAoTeam1.BorderStyle = BorderStyle.FixedSingle
-        TxtAoTeam1.Font = New Font("Segoe UI", 9.0F)
-        TxtAoTeam1.Location = New Point(15, 125)
-        TxtAoTeam1.Name = "TxtAoTeam1"
-        TxtAoTeam1.Size = New Size(295, 23)
-        TxtAoTeam1.TabIndex = 8
-        ' 
-        ' BtnAoSearch
-        ' 
-        BtnAoSearch.BackColor = Color.WhiteSmoke
-        BtnAoSearch.FlatAppearance.BorderColor = Color.LightGray
-        BtnAoSearch.FlatStyle = FlatStyle.Flat
-        BtnAoSearch.Font = New Font("Segoe UI", 8.5F)
-        BtnAoSearch.Location = New Point(270, 96)
-        BtnAoSearch.Name = "BtnAoSearch"
-        BtnAoSearch.Size = New Size(40, 24)
-        BtnAoSearch.TabIndex = 7
-        BtnAoSearch.Text = "🔍"
-        BtnAoSearch.UseVisualStyleBackColor = False
-        ' 
-        ' BtnAoSwap
-        ' 
-        BtnAoSwap.BackColor = Color.WhiteSmoke
-        BtnAoSwap.FlatAppearance.BorderColor = Color.LightGray
-        BtnAoSwap.FlatStyle = FlatStyle.Flat
-        BtnAoSwap.Font = New Font("Segoe UI", 9.0F)
-        BtnAoSwap.Location = New Point(230, 96)
-        BtnAoSwap.Name = "BtnAoSwap"
-        BtnAoSwap.Size = New Size(30, 24)
-        BtnAoSwap.TabIndex = 6
-        BtnAoSwap.Text = "⇅"
-        BtnAoSwap.UseVisualStyleBackColor = False
-        ' 
-        ' LblAoTeam
-        ' 
-        LblAoTeam.AutoSize = True
-        LblAoTeam.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
-        LblAoTeam.Location = New Point(15, 100)
-        LblAoTeam.Name = "LblAoTeam"
-        LblAoTeam.Size = New Size(95, 13)
-        LblAoTeam.TabIndex = 5
-        LblAoTeam.Text = "Team | Team Info"
-        ' 
-        ' TxtAoNameMain
-        ' 
-        TxtAoNameMain.BorderStyle = BorderStyle.FixedSingle
-        TxtAoNameMain.Font = New Font("Segoe UI", 9.0F)
-        TxtAoNameMain.Location = New Point(15, 65)
-        TxtAoNameMain.Name = "TxtAoNameMain"
-        TxtAoNameMain.Size = New Size(295, 23)
-        TxtAoNameMain.TabIndex = 4
-        ' 
-        ' BtnAoExtraIcon
-        ' 
-        BtnAoExtraIcon.BackColor = Color.WhiteSmoke
-        BtnAoExtraIcon.FlatAppearance.BorderColor = Color.LightGray
-        BtnAoExtraIcon.FlatStyle = FlatStyle.Flat
-        BtnAoExtraIcon.Font = New Font("Segoe UI", 9.0F)
-        BtnAoExtraIcon.Location = New Point(280, 36)
-        BtnAoExtraIcon.Name = "BtnAoExtraIcon"
-        BtnAoExtraIcon.Size = New Size(30, 24)
-        BtnAoExtraIcon.TabIndex = 3
-        BtnAoExtraIcon.Text = "👤"
-        BtnAoExtraIcon.UseVisualStyleBackColor = False
-        ' 
-        ' BtnAoUpdateInfo
-        ' 
-        BtnAoUpdateInfo.BackColor = Color.WhiteSmoke
-        BtnAoUpdateInfo.FlatAppearance.BorderColor = Color.LightGray
-        BtnAoUpdateInfo.FlatStyle = FlatStyle.Flat
-        BtnAoUpdateInfo.Font = New Font("Segoe UI", 7.5F)
-        BtnAoUpdateInfo.Location = New Point(150, 36)
-        BtnAoUpdateInfo.Name = "BtnAoUpdateInfo"
-        BtnAoUpdateInfo.Size = New Size(120, 24)
-        BtnAoUpdateInfo.TabIndex = 2
-        BtnAoUpdateInfo.Text = "⬆ Update Info"
-        BtnAoUpdateInfo.UseVisualStyleBackColor = False
-        ' 
-        ' LblAoName
-        ' 
-        LblAoName.AutoSize = True
-        LblAoName.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
-        LblAoName.Location = New Point(15, 40)
-        LblAoName.Name = "LblAoName"
-        LblAoName.Size = New Size(40, 15)
-        LblAoName.TabIndex = 1
-        LblAoName.Text = "Name"
-        ' 
-        ' LblAoHeader
-        ' 
-        LblAoHeader.BackColor = Color.FromArgb(CByte(30), CByte(120), CByte(250))
-        LblAoHeader.Dock = DockStyle.Top
-        LblAoHeader.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        LblAoHeader.ForeColor = Color.White
-        LblAoHeader.Location = New Point(0, 0)
-        LblAoHeader.Name = "LblAoHeader"
-        LblAoHeader.Size = New Size(333, 30)
-        LblAoHeader.TabIndex = 0
-        LblAoHeader.Text = "AO"
-        LblAoHeader.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlAka
-        ' 
-        PnlAka.BackColor = Color.White
-        PnlAka.BorderStyle = BorderStyle.FixedSingle
-        PnlAka.Controls.Add(LblAkaWinnerStatus)
-        PnlAka.Controls.Add(PicAkaAvatar)
-        PnlAka.Controls.Add(PicAkaCircle)
-        PnlAka.Controls.Add(BtnKikenAka)
-        PnlAka.Controls.Add(LblAkaDisqualification)
-        PnlAka.Controls.Add(CmbAkaKata)
-        PnlAka.Controls.Add(LblAkaKata)
-        PnlAka.Controls.Add(TxtAkaTeam2)
-        PnlAka.Controls.Add(TxtAkaTeam1)
-        PnlAka.Controls.Add(BtnAkaSearch)
-        PnlAka.Controls.Add(BtnAkaSwap)
-        PnlAka.Controls.Add(LblAkaTeam)
-        PnlAka.Controls.Add(TxtAkaNameMain)
-        PnlAka.Controls.Add(BtnEditServer)
-        PnlAka.Controls.Add(BtnAkaExtraIcon)
-        PnlAka.Controls.Add(LblServer)
-        PnlAka.Controls.Add(CmbServer)
-        PnlAka.Controls.Add(BtnAkaUpdateInfo)
-        PnlAka.Controls.Add(LblAkaName)
-        PnlAka.Controls.Add(LblAkaHeader)
-        PnlAka.Dock = DockStyle.Left
-        PnlAka.Location = New Point(0, 0)
-        PnlAka.Name = "PnlAka"
-        PnlAka.Size = New Size(335, 636)
-        PnlAka.TabIndex = 0
-        ' 
-        ' LblAkaWinnerStatus
-        ' 
-        LblAkaWinnerStatus.AutoSize = True
-        LblAkaWinnerStatus.Font = New Font("Segoe UI", 8.0F)
-        LblAkaWinnerStatus.ForeColor = Color.Gray
-        LblAkaWinnerStatus.Location = New Point(218, 330)
-        LblAkaWinnerStatus.Name = "LblAkaWinnerStatus"
-        LblAkaWinnerStatus.Size = New Size(92, 13)
-        LblAkaWinnerStatus.TabIndex = 16
-        LblAkaWinnerStatus.Text = "Show Winner  ▶"
-        ' 
-        ' PicAkaAvatar
-        ' 
-        PicAkaAvatar.BackColor = Color.White
-        PicAkaAvatar.BorderStyle = BorderStyle.FixedSingle
-        PicAkaAvatar.Location = New Point(250, 250)
-        PicAkaAvatar.Name = "PicAkaAvatar"
-        PicAkaAvatar.Size = New Size(60, 60)
-        PicAkaAvatar.SizeMode = PictureBoxSizeMode.Zoom
-        PicAkaAvatar.TabIndex = 15
-        PicAkaAvatar.TabStop = False
-        ' 
-        ' PicAkaCircle
-        ' 
-        PicAkaCircle.BackColor = Color.White
-        PicAkaCircle.BorderStyle = BorderStyle.FixedSingle
-        PicAkaCircle.Location = New Point(180, 250)
-        PicAkaCircle.Name = "PicAkaCircle"
-        PicAkaCircle.Size = New Size(60, 60)
-        PicAkaCircle.SizeMode = PictureBoxSizeMode.Zoom
-        PicAkaCircle.TabIndex = 14
-        PicAkaCircle.TabStop = False
-        ' 
-        ' BtnKikenAka
-        ' 
-        BtnKikenAka.BackColor = Color.White
-        BtnKikenAka.FlatAppearance.BorderColor = Color.LightGray
-        BtnKikenAka.FlatStyle = FlatStyle.Flat
-        BtnKikenAka.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
-        BtnKikenAka.ForeColor = Color.Black
-        BtnKikenAka.Location = New Point(15, 270)
-        BtnKikenAka.Name = "BtnKikenAka"
-        BtnKikenAka.Size = New Size(80, 30)
-        BtnKikenAka.TabIndex = 13
-        BtnKikenAka.Text = "Kiken"
-        BtnKikenAka.UseVisualStyleBackColor = False
+        ' PnlPointInputsAo
+        ' 
+        PnlPointInputsAo.BackColor = Color.White
+        PnlPointInputsAo.BorderStyle = BorderStyle.FixedSingle
+        PnlPointInputsAo.Controls.Add(NumAoJ7)
+        PnlPointInputsAo.Controls.Add(LblAoJ7)
+        PnlPointInputsAo.Controls.Add(NumAoJ6)
+        PnlPointInputsAo.Controls.Add(LblAoJ6)
+        PnlPointInputsAo.Controls.Add(NumAoJ5)
+        PnlPointInputsAo.Controls.Add(LblAoJ5)
+        PnlPointInputsAo.Controls.Add(NumAoJ4)
+        PnlPointInputsAo.Controls.Add(LblAoJ4)
+        PnlPointInputsAo.Controls.Add(NumAoJ3)
+        PnlPointInputsAo.Controls.Add(LblAoJ3)
+        PnlPointInputsAo.Controls.Add(NumAoJ2)
+        PnlPointInputsAo.Controls.Add(LblAoJ2)
+        PnlPointInputsAo.Controls.Add(NumAoJ1)
+        PnlPointInputsAo.Controls.Add(LblAoJ1)
+        PnlPointInputsAo.Location = New Point(153, 45)
+        PnlPointInputsAo.Name = "PnlPointInputsAo"
+        PnlPointInputsAo.Size = New Size(140, 345)
+        PnlPointInputsAo.TabIndex = 2
+        ' 
+        ' NumAoJ7
+        ' 
+        NumAoJ7.DecimalPlaces = 1
+        NumAoJ7.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ7.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ7.Location = New Point(10, 280)
+        NumAoJ7.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ7.Name = "NumAoJ7"
+        NumAoJ7.Size = New Size(75, 35)
+        NumAoJ7.TabIndex = 12
+        NumAoJ7.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ7
+        ' 
+        LblAoJ7.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ7.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ7.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ7.Location = New Point(90, 280)
+        LblAoJ7.Name = "LblAoJ7"
+        LblAoJ7.Size = New Size(40, 35)
+        LblAoJ7.TabIndex = 13
+        LblAoJ7.Text = "J7"
+        LblAoJ7.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ6
+        ' 
+        NumAoJ6.DecimalPlaces = 1
+        NumAoJ6.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ6.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ6.Location = New Point(10, 235)
+        NumAoJ6.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ6.Name = "NumAoJ6"
+        NumAoJ6.Size = New Size(75, 35)
+        NumAoJ6.TabIndex = 10
+        NumAoJ6.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ6
+        ' 
+        LblAoJ6.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ6.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ6.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ6.Location = New Point(90, 235)
+        LblAoJ6.Name = "LblAoJ6"
+        LblAoJ6.Size = New Size(40, 35)
+        LblAoJ6.TabIndex = 11
+        LblAoJ6.Text = "J6"
+        LblAoJ6.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ5
+        ' 
+        NumAoJ5.DecimalPlaces = 1
+        NumAoJ5.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ5.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ5.Location = New Point(10, 190)
+        NumAoJ5.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ5.Name = "NumAoJ5"
+        NumAoJ5.Size = New Size(75, 35)
+        NumAoJ5.TabIndex = 8
+        NumAoJ5.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ5
+        ' 
+        LblAoJ5.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ5.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ5.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ5.Location = New Point(90, 190)
+        LblAoJ5.Name = "LblAoJ5"
+        LblAoJ5.Size = New Size(40, 35)
+        LblAoJ5.TabIndex = 9
+        LblAoJ5.Text = "J5"
+        LblAoJ5.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ4
+        ' 
+        NumAoJ4.DecimalPlaces = 1
+        NumAoJ4.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ4.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ4.Location = New Point(10, 145)
+        NumAoJ4.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ4.Name = "NumAoJ4"
+        NumAoJ4.Size = New Size(75, 35)
+        NumAoJ4.TabIndex = 6
+        NumAoJ4.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ4
+        ' 
+        LblAoJ4.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ4.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ4.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ4.Location = New Point(90, 145)
+        LblAoJ4.Name = "LblAoJ4"
+        LblAoJ4.Size = New Size(40, 35)
+        LblAoJ4.TabIndex = 7
+        LblAoJ4.Text = "J4"
+        LblAoJ4.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ3
+        ' 
+        NumAoJ3.DecimalPlaces = 1
+        NumAoJ3.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ3.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ3.Location = New Point(10, 100)
+        NumAoJ3.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ3.Name = "NumAoJ3"
+        NumAoJ3.Size = New Size(75, 35)
+        NumAoJ3.TabIndex = 4
+        NumAoJ3.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ3
+        ' 
+        LblAoJ3.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ3.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ3.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ3.Location = New Point(90, 100)
+        LblAoJ3.Name = "LblAoJ3"
+        LblAoJ3.Size = New Size(40, 35)
+        LblAoJ3.TabIndex = 5
+        LblAoJ3.Text = "J3"
+        LblAoJ3.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ2
+        ' 
+        NumAoJ2.DecimalPlaces = 1
+        NumAoJ2.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ2.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ2.Location = New Point(10, 55)
+        NumAoJ2.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ2.Name = "NumAoJ2"
+        NumAoJ2.Size = New Size(75, 35)
+        NumAoJ2.TabIndex = 2
+        NumAoJ2.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ2
+        ' 
+        LblAoJ2.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ2.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ2.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ2.Location = New Point(90, 55)
+        LblAoJ2.Name = "LblAoJ2"
+        LblAoJ2.Size = New Size(40, 35)
+        LblAoJ2.TabIndex = 3
+        LblAoJ2.Text = "J2"
+        LblAoJ2.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' NumAoJ1
+        ' 
+        NumAoJ1.DecimalPlaces = 1
+        NumAoJ1.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
+        NumAoJ1.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
+        NumAoJ1.Location = New Point(10, 10)
+        NumAoJ1.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        NumAoJ1.Name = "NumAoJ1"
+        NumAoJ1.Size = New Size(75, 35)
+        NumAoJ1.TabIndex = 0
+        NumAoJ1.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' LblAoJ1
+        ' 
+        LblAoJ1.BorderStyle = BorderStyle.FixedSingle
+        LblAoJ1.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
+        LblAoJ1.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
+        LblAoJ1.Location = New Point(90, 10)
+        LblAoJ1.Name = "LblAoJ1"
+        LblAoJ1.Size = New Size(40, 35)
+        LblAoJ1.TabIndex = 1
+        LblAoJ1.Text = "J1"
+        LblAoJ1.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' PnlPointInputsAka
         ' 
@@ -2595,211 +2352,910 @@ Partial Class KataMainControl
         LblAkaJ1.Text = "J1"
         LblAkaJ1.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' LblAkaDisqualification
+        ' PnlFlagInputsAka
         ' 
-        LblAkaDisqualification.AutoSize = True
-        LblAkaDisqualification.Font = New Font("Segoe UI", 7.5F)
-        LblAkaDisqualification.Location = New Point(15, 250)
-        LblAkaDisqualification.Name = "LblAkaDisqualification"
-        LblAkaDisqualification.Size = New Size(71, 12)
-        LblAkaDisqualification.TabIndex = 12
-        LblAkaDisqualification.Text = "Disqualification"
+        PnlFlagInputsAka.Anchor = AnchorStyles.None
+        PnlFlagInputsAka.BackColor = Color.White
+        PnlFlagInputsAka.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka7)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka6)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka5)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka4)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka3)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka2)
+        PnlFlagInputsAka.Controls.Add(PnlFlagAka1)
+        PnlFlagInputsAka.Location = New Point(5, 45)
+        PnlFlagInputsAka.Name = "PnlFlagInputsAka"
+        PnlFlagInputsAka.Size = New Size(140, 425)
+        PnlFlagInputsAka.TabIndex = 20
+        PnlFlagInputsAka.Visible = False
         ' 
-        ' PnlPointInputsAo
+        ' PnlFlagAka7
         ' 
-        PnlPointInputsAo.BackColor = Color.White
-        PnlPointInputsAo.BorderStyle = BorderStyle.FixedSingle
-        PnlPointInputsAo.Controls.Add(NumAoJ7)
-        PnlPointInputsAo.Controls.Add(LblAoJ7)
-        PnlPointInputsAo.Controls.Add(NumAoJ6)
-        PnlPointInputsAo.Controls.Add(LblAoJ6)
-        PnlPointInputsAo.Controls.Add(NumAoJ5)
-        PnlPointInputsAo.Controls.Add(LblAoJ5)
-        PnlPointInputsAo.Controls.Add(NumAoJ4)
-        PnlPointInputsAo.Controls.Add(LblAoJ4)
-        PnlPointInputsAo.Controls.Add(NumAoJ3)
-        PnlPointInputsAo.Controls.Add(LblAoJ3)
-        PnlPointInputsAo.Controls.Add(NumAoJ2)
-        PnlPointInputsAo.Controls.Add(LblAoJ2)
-        PnlPointInputsAo.Controls.Add(NumAoJ1)
-        PnlPointInputsAo.Controls.Add(LblAoJ1)
-        PnlPointInputsAo.Location = New Point(153, 45)
-        PnlPointInputsAo.Name = "PnlPointInputsAo"
-        PnlPointInputsAo.Size = New Size(140, 345)
-        PnlPointInputsAo.TabIndex = 2
+        PnlFlagAka7.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka7.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka7.Controls.Add(Label25)
+        PnlFlagAka7.Controls.Add(Label26)
+        PnlFlagAka7.Cursor = Cursors.Hand
+        PnlFlagAka7.Location = New Point(8, 10)
+        PnlFlagAka7.Name = "PnlFlagAka7"
+        PnlFlagAka7.RightToLeft = RightToLeft.No
+        PnlFlagAka7.Size = New Size(120, 51)
+        PnlFlagAka7.TabIndex = 27
         ' 
-        ' NumAoJ7
+        ' Label25
         ' 
-        NumAoJ7.DecimalPlaces = 1
-        NumAoJ7.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ7.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ7.Location = New Point(10, 280)
-        NumAoJ7.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ7.Name = "NumAoJ7"
-        NumAoJ7.Size = New Size(75, 35)
-        NumAoJ7.TabIndex = 12
-        NumAoJ7.TextAlign = HorizontalAlignment.Center
+        Label25.AutoSize = True
+        Label25.Enabled = False
+        Label25.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label25.ForeColor = Color.Red
+        Label25.Location = New Point(11, 4)
+        Label25.Name = "Label25"
+        Label25.Size = New Size(38, 40)
+        Label25.TabIndex = 20
+        Label25.Text = "⚑"
         ' 
-        ' LblAoJ7
+        ' Label26
         ' 
-        LblAoJ7.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ7.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ7.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ7.Location = New Point(90, 280)
-        LblAoJ7.Name = "LblAoJ7"
-        LblAoJ7.Size = New Size(40, 35)
-        LblAoJ7.TabIndex = 13
-        LblAoJ7.Text = "J7"
-        LblAoJ7.TextAlign = ContentAlignment.MiddleCenter
+        Label26.Enabled = False
+        Label26.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label26.Location = New Point(48, 6)
+        Label26.Name = "Label26"
+        Label26.Size = New Size(64, 39)
+        Label26.TabIndex = 0
+        Label26.Text = "7"
+        Label26.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' NumAoJ6
+        ' PnlFlagAka6
         ' 
-        NumAoJ6.DecimalPlaces = 1
-        NumAoJ6.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ6.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ6.Location = New Point(10, 235)
-        NumAoJ6.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ6.Name = "NumAoJ6"
-        NumAoJ6.Size = New Size(75, 35)
-        NumAoJ6.TabIndex = 10
-        NumAoJ6.TextAlign = HorizontalAlignment.Center
+        PnlFlagAka6.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka6.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka6.Controls.Add(Label23)
+        PnlFlagAka6.Controls.Add(Label24)
+        PnlFlagAka6.Cursor = Cursors.Hand
+        PnlFlagAka6.Location = New Point(8, 67)
+        PnlFlagAka6.Name = "PnlFlagAka6"
+        PnlFlagAka6.RightToLeft = RightToLeft.No
+        PnlFlagAka6.Size = New Size(120, 51)
+        PnlFlagAka6.TabIndex = 27
         ' 
-        ' LblAoJ6
+        ' Label23
         ' 
-        LblAoJ6.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ6.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ6.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ6.Location = New Point(90, 235)
-        LblAoJ6.Name = "LblAoJ6"
-        LblAoJ6.Size = New Size(40, 35)
-        LblAoJ6.TabIndex = 11
-        LblAoJ6.Text = "J6"
-        LblAoJ6.TextAlign = ContentAlignment.MiddleCenter
+        Label23.AutoSize = True
+        Label23.Enabled = False
+        Label23.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label23.ForeColor = Color.Red
+        Label23.Location = New Point(11, 4)
+        Label23.Name = "Label23"
+        Label23.Size = New Size(38, 40)
+        Label23.TabIndex = 20
+        Label23.Text = "⚑"
         ' 
-        ' NumAoJ5
+        ' Label24
         ' 
-        NumAoJ5.DecimalPlaces = 1
-        NumAoJ5.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ5.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ5.Location = New Point(10, 190)
-        NumAoJ5.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ5.Name = "NumAoJ5"
-        NumAoJ5.Size = New Size(75, 35)
-        NumAoJ5.TabIndex = 8
-        NumAoJ5.TextAlign = HorizontalAlignment.Center
+        Label24.Enabled = False
+        Label24.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label24.Location = New Point(48, 6)
+        Label24.Name = "Label24"
+        Label24.Size = New Size(64, 39)
+        Label24.TabIndex = 0
+        Label24.Text = "6"
+        Label24.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' LblAoJ5
+        ' PnlFlagAka5
         ' 
-        LblAoJ5.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ5.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ5.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ5.Location = New Point(90, 190)
-        LblAoJ5.Name = "LblAoJ5"
-        LblAoJ5.Size = New Size(40, 35)
-        LblAoJ5.TabIndex = 9
-        LblAoJ5.Text = "J5"
-        LblAoJ5.TextAlign = ContentAlignment.MiddleCenter
+        PnlFlagAka5.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka5.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka5.Controls.Add(Label21)
+        PnlFlagAka5.Controls.Add(Label22)
+        PnlFlagAka5.Cursor = Cursors.Hand
+        PnlFlagAka5.Location = New Point(8, 124)
+        PnlFlagAka5.Name = "PnlFlagAka5"
+        PnlFlagAka5.RightToLeft = RightToLeft.No
+        PnlFlagAka5.Size = New Size(120, 51)
+        PnlFlagAka5.TabIndex = 27
         ' 
-        ' NumAoJ4
+        ' Label21
         ' 
-        NumAoJ4.DecimalPlaces = 1
-        NumAoJ4.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ4.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ4.Location = New Point(10, 145)
-        NumAoJ4.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ4.Name = "NumAoJ4"
-        NumAoJ4.Size = New Size(75, 35)
-        NumAoJ4.TabIndex = 6
-        NumAoJ4.TextAlign = HorizontalAlignment.Center
+        Label21.AutoSize = True
+        Label21.Enabled = False
+        Label21.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label21.ForeColor = Color.Red
+        Label21.Location = New Point(11, 4)
+        Label21.Name = "Label21"
+        Label21.Size = New Size(38, 40)
+        Label21.TabIndex = 20
+        Label21.Text = "⚑"
         ' 
-        ' LblAoJ4
+        ' Label22
         ' 
-        LblAoJ4.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ4.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ4.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ4.Location = New Point(90, 145)
-        LblAoJ4.Name = "LblAoJ4"
-        LblAoJ4.Size = New Size(40, 35)
-        LblAoJ4.TabIndex = 7
-        LblAoJ4.Text = "J4"
-        LblAoJ4.TextAlign = ContentAlignment.MiddleCenter
+        Label22.Enabled = False
+        Label22.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label22.Location = New Point(48, 6)
+        Label22.Name = "Label22"
+        Label22.Size = New Size(64, 39)
+        Label22.TabIndex = 0
+        Label22.Text = "5"
+        Label22.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' NumAoJ3
+        ' PnlFlagAka4
         ' 
-        NumAoJ3.DecimalPlaces = 1
-        NumAoJ3.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ3.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ3.Location = New Point(10, 100)
-        NumAoJ3.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ3.Name = "NumAoJ3"
-        NumAoJ3.Size = New Size(75, 35)
-        NumAoJ3.TabIndex = 4
-        NumAoJ3.TextAlign = HorizontalAlignment.Center
+        PnlFlagAka4.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka4.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka4.Controls.Add(Label19)
+        PnlFlagAka4.Controls.Add(Label20)
+        PnlFlagAka4.Cursor = Cursors.Hand
+        PnlFlagAka4.Location = New Point(8, 181)
+        PnlFlagAka4.Name = "PnlFlagAka4"
+        PnlFlagAka4.RightToLeft = RightToLeft.No
+        PnlFlagAka4.Size = New Size(120, 51)
+        PnlFlagAka4.TabIndex = 27
         ' 
-        ' LblAoJ3
+        ' Label19
         ' 
-        LblAoJ3.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ3.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ3.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ3.Location = New Point(90, 100)
-        LblAoJ3.Name = "LblAoJ3"
-        LblAoJ3.Size = New Size(40, 35)
-        LblAoJ3.TabIndex = 5
-        LblAoJ3.Text = "J3"
-        LblAoJ3.TextAlign = ContentAlignment.MiddleCenter
+        Label19.AutoSize = True
+        Label19.Enabled = False
+        Label19.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label19.ForeColor = Color.Red
+        Label19.Location = New Point(11, 4)
+        Label19.Name = "Label19"
+        Label19.Size = New Size(38, 40)
+        Label19.TabIndex = 20
+        Label19.Text = "⚑"
         ' 
-        ' NumAoJ2
+        ' Label20
         ' 
-        NumAoJ2.DecimalPlaces = 1
-        NumAoJ2.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ2.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ2.Location = New Point(10, 55)
-        NumAoJ2.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ2.Name = "NumAoJ2"
-        NumAoJ2.Size = New Size(75, 35)
-        NumAoJ2.TabIndex = 2
-        NumAoJ2.TextAlign = HorizontalAlignment.Center
+        Label20.Enabled = False
+        Label20.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label20.Location = New Point(48, 6)
+        Label20.Name = "Label20"
+        Label20.Size = New Size(64, 39)
+        Label20.TabIndex = 0
+        Label20.Text = "4"
+        Label20.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' LblAoJ2
+        ' PnlFlagAka3
         ' 
-        LblAoJ2.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ2.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ2.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ2.Location = New Point(90, 55)
-        LblAoJ2.Name = "LblAoJ2"
-        LblAoJ2.Size = New Size(40, 35)
-        LblAoJ2.TabIndex = 3
-        LblAoJ2.Text = "J2"
-        LblAoJ2.TextAlign = ContentAlignment.MiddleCenter
+        PnlFlagAka3.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka3.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka3.Controls.Add(Label17)
+        PnlFlagAka3.Controls.Add(Label18)
+        PnlFlagAka3.Cursor = Cursors.Hand
+        PnlFlagAka3.Location = New Point(8, 238)
+        PnlFlagAka3.Name = "PnlFlagAka3"
+        PnlFlagAka3.RightToLeft = RightToLeft.No
+        PnlFlagAka3.Size = New Size(120, 51)
+        PnlFlagAka3.TabIndex = 27
         ' 
-        ' NumAoJ1
+        ' Label17
         ' 
-        NumAoJ1.DecimalPlaces = 1
-        NumAoJ1.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold)
-        NumAoJ1.Increment = New Decimal(New Integer() {1, 0, 0, 65536})
-        NumAoJ1.Location = New Point(10, 10)
-        NumAoJ1.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
-        NumAoJ1.Name = "NumAoJ1"
-        NumAoJ1.Size = New Size(75, 35)
-        NumAoJ1.TabIndex = 0
-        NumAoJ1.TextAlign = HorizontalAlignment.Center
+        Label17.AutoSize = True
+        Label17.Enabled = False
+        Label17.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label17.ForeColor = Color.Red
+        Label17.Location = New Point(11, 4)
+        Label17.Name = "Label17"
+        Label17.Size = New Size(38, 40)
+        Label17.TabIndex = 20
+        Label17.Text = "⚑"
         ' 
-        ' LblAoJ1
+        ' Label18
         ' 
-        LblAoJ1.BorderStyle = BorderStyle.FixedSingle
-        LblAoJ1.Font = New Font("Segoe UI", 11.25F, FontStyle.Bold)
-        LblAoJ1.ForeColor = Color.FromArgb(CByte(30), CByte(100), CByte(220))
-        LblAoJ1.Location = New Point(90, 10)
-        LblAoJ1.Name = "LblAoJ1"
-        LblAoJ1.Size = New Size(40, 35)
-        LblAoJ1.TabIndex = 1
-        LblAoJ1.Text = "J1"
-        LblAoJ1.TextAlign = ContentAlignment.MiddleCenter
+        Label18.Enabled = False
+        Label18.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label18.Location = New Point(48, 6)
+        Label18.Name = "Label18"
+        Label18.Size = New Size(64, 39)
+        Label18.TabIndex = 0
+        Label18.Text = "3"
+        Label18.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAka2
+        ' 
+        PnlFlagAka2.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka2.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka2.Controls.Add(Label15)
+        PnlFlagAka2.Controls.Add(Label16)
+        PnlFlagAka2.Cursor = Cursors.Hand
+        PnlFlagAka2.Location = New Point(8, 295)
+        PnlFlagAka2.Name = "PnlFlagAka2"
+        PnlFlagAka2.RightToLeft = RightToLeft.No
+        PnlFlagAka2.Size = New Size(120, 51)
+        PnlFlagAka2.TabIndex = 27
+        ' 
+        ' Label15
+        ' 
+        Label15.AutoSize = True
+        Label15.Enabled = False
+        Label15.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label15.ForeColor = Color.Red
+        Label15.Location = New Point(11, 4)
+        Label15.Name = "Label15"
+        Label15.Size = New Size(38, 40)
+        Label15.TabIndex = 20
+        Label15.Text = "⚑"
+        ' 
+        ' Label16
+        ' 
+        Label16.Enabled = False
+        Label16.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label16.Location = New Point(48, 6)
+        Label16.Name = "Label16"
+        Label16.Size = New Size(64, 39)
+        Label16.TabIndex = 0
+        Label16.Text = "2"
+        Label16.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAka1
+        ' 
+        PnlFlagAka1.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAka1.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAka1.Controls.Add(Label13)
+        PnlFlagAka1.Controls.Add(Label14)
+        PnlFlagAka1.Cursor = Cursors.Hand
+        PnlFlagAka1.Location = New Point(8, 352)
+        PnlFlagAka1.Name = "PnlFlagAka1"
+        PnlFlagAka1.RightToLeft = RightToLeft.No
+        PnlFlagAka1.Size = New Size(120, 51)
+        PnlFlagAka1.TabIndex = 26
+        ' 
+        ' Label13
+        ' 
+        Label13.AutoSize = True
+        Label13.Enabled = False
+        Label13.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label13.ForeColor = Color.Red
+        Label13.Location = New Point(11, 4)
+        Label13.Name = "Label13"
+        Label13.Size = New Size(38, 40)
+        Label13.TabIndex = 20
+        Label13.Text = "⚑"
+        ' 
+        ' Label14
+        ' 
+        Label14.Enabled = False
+        Label14.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label14.Location = New Point(48, 6)
+        Label14.Name = "Label14"
+        Label14.Size = New Size(64, 39)
+        Label14.TabIndex = 0
+        Label14.Text = "1"
+        Label14.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagInputsAo
+        ' 
+        PnlFlagInputsAo.Anchor = AnchorStyles.None
+        PnlFlagInputsAo.BackColor = Color.White
+        PnlFlagInputsAo.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo1)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo2)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo3)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo4)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo5)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo6)
+        PnlFlagInputsAo.Controls.Add(PnlFlagAo7)
+        PnlFlagInputsAo.Location = New Point(154, 45)
+        PnlFlagInputsAo.Name = "PnlFlagInputsAo"
+        PnlFlagInputsAo.Size = New Size(140, 425)
+        PnlFlagInputsAo.TabIndex = 21
+        PnlFlagInputsAo.Visible = False
+        ' 
+        ' PnlFlagAo1
+        ' 
+        PnlFlagAo1.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo1.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo1.Controls.Add(Label11)
+        PnlFlagAo1.Controls.Add(Label12)
+        PnlFlagAo1.Cursor = Cursors.Hand
+        PnlFlagAo1.Location = New Point(10, 352)
+        PnlFlagAo1.Name = "PnlFlagAo1"
+        PnlFlagAo1.Size = New Size(120, 51)
+        PnlFlagAo1.TabIndex = 25
+        ' 
+        ' Label11
+        ' 
+        Label11.AutoSize = True
+        Label11.Enabled = False
+        Label11.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label11.ForeColor = Color.Blue
+        Label11.Location = New Point(77, 3)
+        Label11.Name = "Label11"
+        Label11.Size = New Size(38, 40)
+        Label11.TabIndex = 20
+        Label11.Text = "⚑"
+        ' 
+        ' Label12
+        ' 
+        Label12.Enabled = False
+        Label12.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label12.Location = New Point(7, 5)
+        Label12.Name = "Label12"
+        Label12.Size = New Size(64, 39)
+        Label12.TabIndex = 0
+        Label12.Text = "1"
+        Label12.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo2
+        ' 
+        PnlFlagAo2.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo2.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo2.Controls.Add(Label9)
+        PnlFlagAo2.Controls.Add(Label10)
+        PnlFlagAo2.Cursor = Cursors.Hand
+        PnlFlagAo2.Location = New Point(10, 295)
+        PnlFlagAo2.Name = "PnlFlagAo2"
+        PnlFlagAo2.Size = New Size(120, 51)
+        PnlFlagAo2.TabIndex = 24
+        ' 
+        ' Label9
+        ' 
+        Label9.AutoSize = True
+        Label9.Enabled = False
+        Label9.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label9.ForeColor = Color.Blue
+        Label9.Location = New Point(77, 3)
+        Label9.Name = "Label9"
+        Label9.Size = New Size(38, 40)
+        Label9.TabIndex = 20
+        Label9.Text = "⚑"
+        ' 
+        ' Label10
+        ' 
+        Label10.Enabled = False
+        Label10.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label10.Location = New Point(7, 5)
+        Label10.Name = "Label10"
+        Label10.Size = New Size(64, 39)
+        Label10.TabIndex = 0
+        Label10.Text = "2"
+        Label10.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo3
+        ' 
+        PnlFlagAo3.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo3.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo3.Controls.Add(Label7)
+        PnlFlagAo3.Controls.Add(Label8)
+        PnlFlagAo3.Cursor = Cursors.Hand
+        PnlFlagAo3.Location = New Point(10, 238)
+        PnlFlagAo3.Name = "PnlFlagAo3"
+        PnlFlagAo3.Size = New Size(120, 51)
+        PnlFlagAo3.TabIndex = 23
+        ' 
+        ' Label7
+        ' 
+        Label7.AutoSize = True
+        Label7.Enabled = False
+        Label7.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label7.ForeColor = Color.Blue
+        Label7.Location = New Point(77, 3)
+        Label7.Name = "Label7"
+        Label7.Size = New Size(38, 40)
+        Label7.TabIndex = 20
+        Label7.Text = "⚑"
+        ' 
+        ' Label8
+        ' 
+        Label8.Enabled = False
+        Label8.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label8.Location = New Point(7, 5)
+        Label8.Name = "Label8"
+        Label8.Size = New Size(64, 39)
+        Label8.TabIndex = 0
+        Label8.Text = "3"
+        Label8.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo4
+        ' 
+        PnlFlagAo4.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo4.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo4.Controls.Add(Label5)
+        PnlFlagAo4.Controls.Add(Label6)
+        PnlFlagAo4.Cursor = Cursors.Hand
+        PnlFlagAo4.Location = New Point(10, 181)
+        PnlFlagAo4.Name = "PnlFlagAo4"
+        PnlFlagAo4.Size = New Size(120, 51)
+        PnlFlagAo4.TabIndex = 23
+        ' 
+        ' Label5
+        ' 
+        Label5.AutoSize = True
+        Label5.Enabled = False
+        Label5.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label5.ForeColor = Color.Blue
+        Label5.Location = New Point(77, 3)
+        Label5.Name = "Label5"
+        Label5.Size = New Size(38, 40)
+        Label5.TabIndex = 20
+        Label5.Text = "⚑"
+        ' 
+        ' Label6
+        ' 
+        Label6.Enabled = False
+        Label6.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label6.Location = New Point(7, 5)
+        Label6.Name = "Label6"
+        Label6.Size = New Size(64, 39)
+        Label6.TabIndex = 0
+        Label6.Text = "4"
+        Label6.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo5
+        ' 
+        PnlFlagAo5.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo5.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo5.Controls.Add(Label3)
+        PnlFlagAo5.Controls.Add(Label4)
+        PnlFlagAo5.Cursor = Cursors.Hand
+        PnlFlagAo5.Location = New Point(10, 124)
+        PnlFlagAo5.Name = "PnlFlagAo5"
+        PnlFlagAo5.Size = New Size(120, 51)
+        PnlFlagAo5.TabIndex = 22
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Enabled = False
+        Label3.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label3.ForeColor = Color.Blue
+        Label3.Location = New Point(77, 3)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(38, 40)
+        Label3.TabIndex = 20
+        Label3.Text = "⚑"
+        ' 
+        ' Label4
+        ' 
+        Label4.Enabled = False
+        Label4.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label4.Location = New Point(7, 5)
+        Label4.Name = "Label4"
+        Label4.Size = New Size(64, 39)
+        Label4.TabIndex = 0
+        Label4.Text = "5"
+        Label4.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo6
+        ' 
+        PnlFlagAo6.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo6.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo6.Controls.Add(Label1)
+        PnlFlagAo6.Controls.Add(Label2)
+        PnlFlagAo6.Cursor = Cursors.Hand
+        PnlFlagAo6.Location = New Point(10, 67)
+        PnlFlagAo6.Name = "PnlFlagAo6"
+        PnlFlagAo6.Size = New Size(120, 51)
+        PnlFlagAo6.TabIndex = 21
+        ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Enabled = False
+        Label1.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        Label1.ForeColor = Color.Blue
+        Label1.Location = New Point(77, 3)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(38, 40)
+        Label1.TabIndex = 20
+        Label1.Text = "⚑"
+        ' 
+        ' Label2
+        ' 
+        Label2.Enabled = False
+        Label2.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label2.Location = New Point(7, 5)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(64, 39)
+        Label2.TabIndex = 0
+        Label2.Text = "6"
+        Label2.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlFlagAo7
+        ' 
+        PnlFlagAo7.BackgroundImageLayout = ImageLayout.None
+        PnlFlagAo7.BorderStyle = BorderStyle.FixedSingle
+        PnlFlagAo7.Controls.Add(PicFlagAo7)
+        PnlFlagAo7.Controls.Add(LblFlagAo7)
+        PnlFlagAo7.Cursor = Cursors.Hand
+        PnlFlagAo7.Location = New Point(10, 10)
+        PnlFlagAo7.Name = "PnlFlagAo7"
+        PnlFlagAo7.Size = New Size(120, 51)
+        PnlFlagAo7.TabIndex = 17
+        ' 
+        ' PicFlagAo7
+        ' 
+        PicFlagAo7.AutoSize = True
+        PicFlagAo7.Enabled = False
+        PicFlagAo7.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        PicFlagAo7.ForeColor = Color.Blue
+        PicFlagAo7.Location = New Point(77, 3)
+        PicFlagAo7.Name = "PicFlagAo7"
+        PicFlagAo7.Size = New Size(38, 40)
+        PicFlagAo7.TabIndex = 20
+        PicFlagAo7.Text = "⚑"
+        ' 
+        ' LblFlagAo7
+        ' 
+        LblFlagAo7.Enabled = False
+        LblFlagAo7.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        LblFlagAo7.Location = New Point(7, 5)
+        LblFlagAo7.Name = "LblFlagAo7"
+        LblFlagAo7.Size = New Size(64, 39)
+        LblFlagAo7.TabIndex = 0
+        LblFlagAo7.Text = "7"
+        LblFlagAo7.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblTotalScoreAkaTitle
+        ' 
+        LblTotalScoreAkaTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
+        LblTotalScoreAkaTitle.BorderStyle = BorderStyle.FixedSingle
+        LblTotalScoreAkaTitle.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
+        LblTotalScoreAkaTitle.ForeColor = Color.Black
+        LblTotalScoreAkaTitle.Location = New Point(4, 486)
+        LblTotalScoreAkaTitle.Name = "LblTotalScoreAkaTitle"
+        LblTotalScoreAkaTitle.Size = New Size(140, 30)
+        LblTotalScoreAkaTitle.TabIndex = 0
+        LblTotalScoreAkaTitle.Text = "Total Score"
+        LblTotalScoreAkaTitle.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblTotalScoreAoTitle
+        ' 
+        LblTotalScoreAoTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
+        LblTotalScoreAoTitle.BorderStyle = BorderStyle.FixedSingle
+        LblTotalScoreAoTitle.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
+        LblTotalScoreAoTitle.ForeColor = Color.Black
+        LblTotalScoreAoTitle.Location = New Point(153, 486)
+        LblTotalScoreAoTitle.Name = "LblTotalScoreAoTitle"
+        LblTotalScoreAoTitle.Size = New Size(140, 30)
+        LblTotalScoreAoTitle.TabIndex = 0
+        LblTotalScoreAoTitle.Text = "Total Score"
+        LblTotalScoreAoTitle.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblJudgeScoreTitle
+        ' 
+        LblJudgeScoreTitle.Dock = DockStyle.Top
+        LblJudgeScoreTitle.Font = New Font("Segoe UI", 13F, FontStyle.Bold)
+        LblJudgeScoreTitle.Location = New Point(0, 0)
+        LblJudgeScoreTitle.Name = "LblJudgeScoreTitle"
+        LblJudgeScoreTitle.Size = New Size(299, 35)
+        LblJudgeScoreTitle.TabIndex = 0
+        LblJudgeScoreTitle.Text = "Judge Score"
+        LblJudgeScoreTitle.TextAlign = ContentAlignment.BottomCenter
+        ' 
+        ' PnlAo
+        ' 
+        PnlAo.BackColor = Color.White
+        PnlAo.BorderStyle = BorderStyle.FixedSingle
+        PnlAo.Controls.Add(LblAoWinner)
+        PnlAo.Controls.Add(LblAoWinnerStatus)
+        PnlAo.Controls.Add(PicAoAvatar)
+        PnlAo.Controls.Add(PicAoCircle)
+        PnlAo.Controls.Add(BtnKikenAo)
+        PnlAo.Controls.Add(BtnDiskualifikasiAo)
+        PnlAo.Controls.Add(CmbAoKata)
+        PnlAo.Controls.Add(LblAoKata)
+        PnlAo.Controls.Add(TxtAoTeam2)
+        PnlAo.Controls.Add(TxtAoTeam1)
+        PnlAo.Controls.Add(BtnAoSearch)
+        PnlAo.Controls.Add(BtnAoSwap)
+        PnlAo.Controls.Add(LblAoTeam)
+        PnlAo.Controls.Add(TxtAoNameMain)
+        PnlAo.Controls.Add(BtnAoExtraIcon)
+        PnlAo.Controls.Add(BtnAoUpdateInfo)
+        PnlAo.Controls.Add(LblAoName)
+        PnlAo.Controls.Add(LblAoHeader)
+        PnlAo.Dock = DockStyle.Right
+        PnlAo.Location = New Point(634, 0)
+        PnlAo.Name = "PnlAo"
+        PnlAo.Size = New Size(335, 636)
+        PnlAo.TabIndex = 1
+        ' 
+        ' LblAoWinner
+        ' 
+        LblAoWinner.BackColor = Color.Orange
+        LblAoWinner.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblAoWinner.ForeColor = SystemColors.ButtonFace
+        LblAoWinner.Location = New Point(214, -1)
+        LblAoWinner.Name = "LblAoWinner"
+        LblAoWinner.Size = New Size(120, 31)
+        LblAoWinner.TabIndex = 17
+        LblAoWinner.Text = "WINNER"
+        LblAoWinner.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblAoWinnerStatus
+        ' 
+        LblAoWinnerStatus.AutoSize = True
+        LblAoWinnerStatus.Font = New Font("Segoe UI", 8F)
+        LblAoWinnerStatus.ForeColor = Color.Gray
+        LblAoWinnerStatus.Location = New Point(15, 345)
+        LblAoWinnerStatus.Name = "LblAoWinnerStatus"
+        LblAoWinnerStatus.Size = New Size(92, 13)
+        LblAoWinnerStatus.TabIndex = 16
+        LblAoWinnerStatus.Text = "Show Winner  ▶"
+        ' 
+        ' PicAoAvatar
+        ' 
+        PicAoAvatar.BackColor = Color.White
+        PicAoAvatar.BorderStyle = BorderStyle.FixedSingle
+        PicAoAvatar.Location = New Point(85, 250)
+        PicAoAvatar.Name = "PicAoAvatar"
+        PicAoAvatar.Size = New Size(60, 60)
+        PicAoAvatar.SizeMode = PictureBoxSizeMode.Zoom
+        PicAoAvatar.TabIndex = 15
+        PicAoAvatar.TabStop = False
+        ' 
+        ' PicAoCircle
+        ' 
+        PicAoCircle.BackColor = Color.White
+        PicAoCircle.BorderStyle = BorderStyle.FixedSingle
+        PicAoCircle.Location = New Point(15, 250)
+        PicAoCircle.Name = "PicAoCircle"
+        PicAoCircle.Size = New Size(60, 60)
+        PicAoCircle.SizeMode = PictureBoxSizeMode.Zoom
+        PicAoCircle.TabIndex = 14
+        PicAoCircle.TabStop = False
+        ' 
+        ' BtnKikenAo
+        ' 
+        BtnKikenAo.BackColor = Color.White
+        BtnKikenAo.FlatAppearance.BorderColor = Color.LightGray
+        BtnKikenAo.FlatStyle = FlatStyle.Flat
+        BtnKikenAo.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
+        BtnKikenAo.ForeColor = Color.Black
+        BtnKikenAo.Location = New Point(230, 283)
+        BtnKikenAo.Name = "BtnKikenAo"
+        BtnKikenAo.Size = New Size(80, 26)
+        BtnKikenAo.TabIndex = 13
+        BtnKikenAo.Text = "Kiken"
+        BtnKikenAo.UseVisualStyleBackColor = False
+        ' 
+        ' BtnDiskualifikasiAo
+        ' 
+        BtnDiskualifikasiAo.AutoSize = True
+        BtnDiskualifikasiAo.BorderStyle = BorderStyle.FixedSingle
+        BtnDiskualifikasiAo.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        BtnDiskualifikasiAo.Location = New Point(212, 261)
+        BtnDiskualifikasiAo.Name = "BtnDiskualifikasiAo"
+        BtnDiskualifikasiAo.Size = New Size(98, 19)
+        BtnDiskualifikasiAo.TabIndex = 12
+        BtnDiskualifikasiAo.Text = "Disqualification"
+        ' 
+        ' CmbAoKata
+        ' 
+        CmbAoKata.DropDownStyle = ComboBoxStyle.DropDownList
+        CmbAoKata.Font = New Font("Segoe UI", 9F)
+        CmbAoKata.Location = New Point(15, 210)
+        CmbAoKata.Name = "CmbAoKata"
+        CmbAoKata.Size = New Size(295, 23)
+        CmbAoKata.TabIndex = 11
+        ' 
+        ' LblAoKata
+        ' 
+        LblAoKata.AutoSize = True
+        LblAoKata.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
+        LblAoKata.Location = New Point(15, 190)
+        LblAoKata.Name = "LblAoKata"
+        LblAoKata.Size = New Size(36, 15)
+        LblAoKata.TabIndex = 10
+        LblAoKata.Text = "KATA"
+        ' 
+        ' TxtAoTeam2
+        ' 
+        TxtAoTeam2.BorderStyle = BorderStyle.FixedSingle
+        TxtAoTeam2.Font = New Font("Segoe UI", 9F)
+        TxtAoTeam2.Location = New Point(15, 155)
+        TxtAoTeam2.Name = "TxtAoTeam2"
+        TxtAoTeam2.Size = New Size(295, 23)
+        TxtAoTeam2.TabIndex = 9
+        ' 
+        ' TxtAoTeam1
+        ' 
+        TxtAoTeam1.BorderStyle = BorderStyle.FixedSingle
+        TxtAoTeam1.Font = New Font("Segoe UI", 9F)
+        TxtAoTeam1.Location = New Point(15, 125)
+        TxtAoTeam1.Name = "TxtAoTeam1"
+        TxtAoTeam1.Size = New Size(295, 23)
+        TxtAoTeam1.TabIndex = 8
+        ' 
+        ' BtnAoSearch
+        ' 
+        BtnAoSearch.BackColor = Color.WhiteSmoke
+        BtnAoSearch.FlatAppearance.BorderColor = Color.LightGray
+        BtnAoSearch.FlatStyle = FlatStyle.Flat
+        BtnAoSearch.Font = New Font("Segoe UI", 8.5F)
+        BtnAoSearch.Location = New Point(270, 96)
+        BtnAoSearch.Name = "BtnAoSearch"
+        BtnAoSearch.Size = New Size(40, 24)
+        BtnAoSearch.TabIndex = 7
+        BtnAoSearch.Text = "🔍"
+        BtnAoSearch.UseVisualStyleBackColor = False
+        ' 
+        ' BtnAoSwap
+        ' 
+        BtnAoSwap.BackColor = Color.WhiteSmoke
+        BtnAoSwap.FlatAppearance.BorderColor = Color.LightGray
+        BtnAoSwap.FlatStyle = FlatStyle.Flat
+        BtnAoSwap.Font = New Font("Segoe UI", 9F)
+        BtnAoSwap.Location = New Point(230, 96)
+        BtnAoSwap.Name = "BtnAoSwap"
+        BtnAoSwap.Size = New Size(30, 24)
+        BtnAoSwap.TabIndex = 6
+        BtnAoSwap.Text = "⇅"
+        BtnAoSwap.UseVisualStyleBackColor = False
+        ' 
+        ' LblAoTeam
+        ' 
+        LblAoTeam.AutoSize = True
+        LblAoTeam.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
+        LblAoTeam.Location = New Point(15, 100)
+        LblAoTeam.Name = "LblAoTeam"
+        LblAoTeam.Size = New Size(95, 13)
+        LblAoTeam.TabIndex = 5
+        LblAoTeam.Text = "Team | Team Info"
+        ' 
+        ' TxtAoNameMain
+        ' 
+        TxtAoNameMain.BorderStyle = BorderStyle.FixedSingle
+        TxtAoNameMain.Font = New Font("Segoe UI", 9F)
+        TxtAoNameMain.Location = New Point(15, 65)
+        TxtAoNameMain.Name = "TxtAoNameMain"
+        TxtAoNameMain.Size = New Size(295, 23)
+        TxtAoNameMain.TabIndex = 4
+        ' 
+        ' BtnAoExtraIcon
+        ' 
+        BtnAoExtraIcon.BackColor = Color.WhiteSmoke
+        BtnAoExtraIcon.FlatAppearance.BorderColor = Color.LightGray
+        BtnAoExtraIcon.FlatStyle = FlatStyle.Flat
+        BtnAoExtraIcon.Font = New Font("Segoe UI", 9F)
+        BtnAoExtraIcon.Location = New Point(280, 36)
+        BtnAoExtraIcon.Name = "BtnAoExtraIcon"
+        BtnAoExtraIcon.Size = New Size(30, 24)
+        BtnAoExtraIcon.TabIndex = 3
+        BtnAoExtraIcon.Text = "👤"
+        BtnAoExtraIcon.UseVisualStyleBackColor = False
+        ' 
+        ' BtnAoUpdateInfo
+        ' 
+        BtnAoUpdateInfo.BackColor = Color.WhiteSmoke
+        BtnAoUpdateInfo.FlatAppearance.BorderColor = Color.LightGray
+        BtnAoUpdateInfo.FlatStyle = FlatStyle.Flat
+        BtnAoUpdateInfo.Font = New Font("Segoe UI", 7.5F)
+        BtnAoUpdateInfo.Location = New Point(150, 36)
+        BtnAoUpdateInfo.Name = "BtnAoUpdateInfo"
+        BtnAoUpdateInfo.Size = New Size(120, 24)
+        BtnAoUpdateInfo.TabIndex = 2
+        BtnAoUpdateInfo.Text = "⬆ Update Info"
+        BtnAoUpdateInfo.UseVisualStyleBackColor = False
+        ' 
+        ' LblAoName
+        ' 
+        LblAoName.AutoSize = True
+        LblAoName.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
+        LblAoName.Location = New Point(15, 40)
+        LblAoName.Name = "LblAoName"
+        LblAoName.Size = New Size(40, 15)
+        LblAoName.TabIndex = 1
+        LblAoName.Text = "Name"
+        ' 
+        ' LblAoHeader
+        ' 
+        LblAoHeader.BackColor = Color.FromArgb(CByte(30), CByte(120), CByte(250))
+        LblAoHeader.Dock = DockStyle.Top
+        LblAoHeader.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        LblAoHeader.ForeColor = Color.White
+        LblAoHeader.Location = New Point(0, 0)
+        LblAoHeader.Name = "LblAoHeader"
+        LblAoHeader.Size = New Size(333, 30)
+        LblAoHeader.TabIndex = 0
+        LblAoHeader.Text = "AO"
+        LblAoHeader.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' PnlAka
+        ' 
+        PnlAka.BackColor = Color.White
+        PnlAka.BorderStyle = BorderStyle.FixedSingle
+        PnlAka.Controls.Add(LblAkaWinner)
+        PnlAka.Controls.Add(LblAkaWinnerStatus)
+        PnlAka.Controls.Add(PicAkaAvatar)
+        PnlAka.Controls.Add(PicAkaCircle)
+        PnlAka.Controls.Add(BtnKikenAka)
+        PnlAka.Controls.Add(BtnDiskualifikasiAka)
+        PnlAka.Controls.Add(CmbAkaKata)
+        PnlAka.Controls.Add(LblAkaKata)
+        PnlAka.Controls.Add(TxtAkaTeam2)
+        PnlAka.Controls.Add(TxtAkaTeam1)
+        PnlAka.Controls.Add(BtnAkaSearch)
+        PnlAka.Controls.Add(BtnAkaSwap)
+        PnlAka.Controls.Add(LblAkaTeam)
+        PnlAka.Controls.Add(TxtAkaNameMain)
+        PnlAka.Controls.Add(BtnEditServer)
+        PnlAka.Controls.Add(BtnAkaExtraIcon)
+        PnlAka.Controls.Add(LblServer)
+        PnlAka.Controls.Add(CmbServer)
+        PnlAka.Controls.Add(BtnAkaUpdateInfo)
+        PnlAka.Controls.Add(LblAkaName)
+        PnlAka.Controls.Add(LblAkaHeader)
+        PnlAka.Dock = DockStyle.Left
+        PnlAka.Location = New Point(0, 0)
+        PnlAka.Name = "PnlAka"
+        PnlAka.Size = New Size(335, 636)
+        PnlAka.TabIndex = 0
+        ' 
+        ' LblAkaWinner
+        ' 
+        LblAkaWinner.BackColor = Color.Orange
+        LblAkaWinner.Font = New Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblAkaWinner.ForeColor = SystemColors.ButtonFace
+        LblAkaWinner.Location = New Point(-1, -1)
+        LblAkaWinner.Name = "LblAkaWinner"
+        LblAkaWinner.Size = New Size(120, 31)
+        LblAkaWinner.TabIndex = 18
+        LblAkaWinner.Text = "WINNER"
+        LblAkaWinner.TextAlign = ContentAlignment.MiddleCenter
+        ' 
+        ' LblAkaWinnerStatus
+        ' 
+        LblAkaWinnerStatus.AutoSize = True
+        LblAkaWinnerStatus.Font = New Font("Segoe UI", 8F)
+        LblAkaWinnerStatus.ForeColor = Color.Gray
+        LblAkaWinnerStatus.Location = New Point(218, 345)
+        LblAkaWinnerStatus.Name = "LblAkaWinnerStatus"
+        LblAkaWinnerStatus.Size = New Size(92, 13)
+        LblAkaWinnerStatus.TabIndex = 16
+        LblAkaWinnerStatus.Text = "Show Winner  ▶"
+        ' 
+        ' PicAkaAvatar
+        ' 
+        PicAkaAvatar.BackColor = Color.White
+        PicAkaAvatar.BorderStyle = BorderStyle.FixedSingle
+        PicAkaAvatar.Location = New Point(250, 250)
+        PicAkaAvatar.Name = "PicAkaAvatar"
+        PicAkaAvatar.Size = New Size(60, 60)
+        PicAkaAvatar.SizeMode = PictureBoxSizeMode.Zoom
+        PicAkaAvatar.TabIndex = 15
+        PicAkaAvatar.TabStop = False
+        ' 
+        ' PicAkaCircle
+        ' 
+        PicAkaCircle.BackColor = Color.White
+        PicAkaCircle.BorderStyle = BorderStyle.FixedSingle
+        PicAkaCircle.Location = New Point(180, 250)
+        PicAkaCircle.Name = "PicAkaCircle"
+        PicAkaCircle.Size = New Size(60, 60)
+        PicAkaCircle.SizeMode = PictureBoxSizeMode.Zoom
+        PicAkaCircle.TabIndex = 14
+        PicAkaCircle.TabStop = False
+        ' 
+        ' BtnKikenAka
+        ' 
+        BtnKikenAka.BackColor = Color.White
+        BtnKikenAka.FlatAppearance.BorderColor = Color.LightGray
+        BtnKikenAka.FlatStyle = FlatStyle.Flat
+        BtnKikenAka.Font = New Font("Segoe UI", 8.5F, FontStyle.Bold)
+        BtnKikenAka.ForeColor = Color.Black
+        BtnKikenAka.Location = New Point(15, 275)
+        BtnKikenAka.Name = "BtnKikenAka"
+        BtnKikenAka.Size = New Size(80, 30)
+        BtnKikenAka.TabIndex = 13
+        BtnKikenAka.Text = "Kiken"
+        BtnKikenAka.UseVisualStyleBackColor = False
+        ' 
+        ' BtnDiskualifikasiAka
+        ' 
+        BtnDiskualifikasiAka.AutoSize = True
+        BtnDiskualifikasiAka.BorderStyle = BorderStyle.FixedSingle
+        BtnDiskualifikasiAka.Font = New Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        BtnDiskualifikasiAka.Location = New Point(15, 250)
+        BtnDiskualifikasiAka.Name = "BtnDiskualifikasiAka"
+        BtnDiskualifikasiAka.Size = New Size(98, 19)
+        BtnDiskualifikasiAka.TabIndex = 12
+        BtnDiskualifikasiAka.Text = "Disqualification"
         ' 
         ' CmbAkaKata
         ' 
         CmbAkaKata.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbAkaKata.Font = New Font("Segoe UI", 9.0F)
+        CmbAkaKata.Font = New Font("Segoe UI", 9F)
         CmbAkaKata.Location = New Point(15, 210)
         CmbAkaKata.Name = "CmbAkaKata"
         CmbAkaKata.Size = New Size(295, 23)
@@ -2818,7 +3274,7 @@ Partial Class KataMainControl
         ' TxtAkaTeam2
         ' 
         TxtAkaTeam2.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaTeam2.Font = New Font("Segoe UI", 9.0F)
+        TxtAkaTeam2.Font = New Font("Segoe UI", 9F)
         TxtAkaTeam2.Location = New Point(15, 155)
         TxtAkaTeam2.Name = "TxtAkaTeam2"
         TxtAkaTeam2.Size = New Size(295, 23)
@@ -2827,7 +3283,7 @@ Partial Class KataMainControl
         ' TxtAkaTeam1
         ' 
         TxtAkaTeam1.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaTeam1.Font = New Font("Segoe UI", 9.0F)
+        TxtAkaTeam1.Font = New Font("Segoe UI", 9F)
         TxtAkaTeam1.Location = New Point(15, 125)
         TxtAkaTeam1.Name = "TxtAkaTeam1"
         TxtAkaTeam1.Size = New Size(295, 23)
@@ -2851,7 +3307,7 @@ Partial Class KataMainControl
         BtnAkaSwap.BackColor = Color.WhiteSmoke
         BtnAkaSwap.FlatAppearance.BorderColor = Color.LightGray
         BtnAkaSwap.FlatStyle = FlatStyle.Flat
-        BtnAkaSwap.Font = New Font("Segoe UI", 9.0F)
+        BtnAkaSwap.Font = New Font("Segoe UI", 9F)
         BtnAkaSwap.Location = New Point(230, 96)
         BtnAkaSwap.Name = "BtnAkaSwap"
         BtnAkaSwap.Size = New Size(30, 24)
@@ -2862,7 +3318,7 @@ Partial Class KataMainControl
         ' LblAkaTeam
         ' 
         LblAkaTeam.AutoSize = True
-        LblAkaTeam.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
+        LblAkaTeam.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
         LblAkaTeam.Location = New Point(15, 100)
         LblAkaTeam.Name = "LblAkaTeam"
         LblAkaTeam.Size = New Size(95, 13)
@@ -2872,7 +3328,7 @@ Partial Class KataMainControl
         ' TxtAkaNameMain
         ' 
         TxtAkaNameMain.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaNameMain.Font = New Font("Segoe UI", 9.0F)
+        TxtAkaNameMain.Font = New Font("Segoe UI", 9F)
         TxtAkaNameMain.Location = New Point(15, 65)
         TxtAkaNameMain.Name = "TxtAkaNameMain"
         TxtAkaNameMain.Size = New Size(295, 23)
@@ -2883,7 +3339,7 @@ Partial Class KataMainControl
         BtnAkaExtraIcon.BackColor = Color.WhiteSmoke
         BtnAkaExtraIcon.FlatAppearance.BorderColor = Color.LightGray
         BtnAkaExtraIcon.FlatStyle = FlatStyle.Flat
-        BtnAkaExtraIcon.Font = New Font("Segoe UI", 9.0F)
+        BtnAkaExtraIcon.Font = New Font("Segoe UI", 9F)
         BtnAkaExtraIcon.Location = New Point(280, 36)
         BtnAkaExtraIcon.Name = "BtnAkaExtraIcon"
         BtnAkaExtraIcon.Size = New Size(30, 24)
@@ -2918,7 +3374,7 @@ Partial Class KataMainControl
         ' 
         LblAkaHeader.BackColor = Color.FromArgb(CByte(220), CByte(40), CByte(40))
         LblAkaHeader.Dock = DockStyle.Top
-        LblAkaHeader.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+        LblAkaHeader.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
         LblAkaHeader.ForeColor = Color.White
         LblAkaHeader.Location = New Point(0, 0)
         LblAkaHeader.Name = "LblAkaHeader"
@@ -2927,436 +3383,9 @@ Partial Class KataMainControl
         LblAkaHeader.Text = "AKA"
         LblAkaHeader.TextAlign = ContentAlignment.MiddleCenter
         ' 
-        ' PnlFlagAo5
-        ' 
-        Me.PnlFlagAo5.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo5.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo5.Controls.Add(Label3)
-        Me.PnlFlagAo5.Controls.Add(Label4)
-        Me.PnlFlagAo5.Cursor = Cursors.Hand
-        Me.PnlFlagAo5.Location = New Point(10, 124)
-        Me.PnlFlagAo5.Name = "PnlFlagAo5"
-        Me.PnlFlagAo5.Size = New Size(120, 51)
-        Me.PnlFlagAo5.TabIndex = 22
-        ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Enabled = False
-        Label3.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label3.ForeColor = Color.Blue
-        Label3.Location = New Point(77, 3)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(38, 40)
-        Label3.TabIndex = 20
-        Label3.Text = "⚑"
-        ' 
-        ' Label4
-        ' 
-        Label4.Enabled = False
-        Label4.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label4.Location = New Point(7, 5)
-        Label4.Name = "Label4"
-        Label4.Size = New Size(64, 39)
-        Label4.TabIndex = 0
-        Label4.Text = "5"
-        Label4.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAo4
-        ' 
-        Me.PnlFlagAo4.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo4.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo4.Controls.Add(Label5)
-        Me.PnlFlagAo4.Controls.Add(Label6)
-        Me.PnlFlagAo4.Cursor = Cursors.Hand
-        Me.PnlFlagAo4.Location = New Point(10, 181)
-        Me.PnlFlagAo4.Name = "PnlFlagAo4"
-        Me.PnlFlagAo4.Size = New Size(120, 51)
-        Me.PnlFlagAo4.TabIndex = 23
-        ' 
-        ' Label5
-        ' 
-        Label5.AutoSize = True
-        Label5.Enabled = False
-        Label5.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label5.ForeColor = Color.Blue
-        Label5.Location = New Point(77, 3)
-        Label5.Name = "Label5"
-        Label5.Size = New Size(38, 40)
-        Label5.TabIndex = 20
-        Label5.Text = "⚑"
-        ' 
-        ' Label6
-        ' 
-        Label6.Enabled = False
-        Label6.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label6.Location = New Point(7, 5)
-        Label6.Name = "Label6"
-        Label6.Size = New Size(64, 39)
-        Label6.TabIndex = 0
-        Label6.Text = "4"
-        Label6.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAo3
-        ' 
-        Me.PnlFlagAo3.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo3.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo3.Controls.Add(Label7)
-        Me.PnlFlagAo3.Controls.Add(Label8)
-        Me.PnlFlagAo3.Cursor = Cursors.Hand
-        Me.PnlFlagAo3.Location = New Point(10, 238)
-        Me.PnlFlagAo3.Name = "PnlFlagAo3"
-        Me.PnlFlagAo3.Size = New Size(120, 51)
-        Me.PnlFlagAo3.TabIndex = 23
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Enabled = False
-        Label7.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label7.ForeColor = Color.Blue
-        Label7.Location = New Point(77, 3)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(38, 40)
-        Label7.TabIndex = 20
-        Label7.Text = "⚑"
-        ' 
-        ' Label8
-        ' 
-        Label8.Enabled = False
-        Label8.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label8.Location = New Point(7, 5)
-        Label8.Name = "Label8"
-        Label8.Size = New Size(64, 39)
-        Label8.TabIndex = 0
-        Label8.Text = "3"
-        Label8.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAo2
-        ' 
-        Me.PnlFlagAo2.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo2.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo2.Controls.Add(Label9)
-        Me.PnlFlagAo2.Controls.Add(Label10)
-        Me.PnlFlagAo2.Cursor = Cursors.Hand
-        Me.PnlFlagAo2.Location = New Point(10, 295)
-        Me.PnlFlagAo2.Name = "PnlFlagAo2"
-        Me.PnlFlagAo2.Size = New Size(120, 51)
-        Me.PnlFlagAo2.TabIndex = 24
-        ' 
-        ' Label9
-        ' 
-        Label9.AutoSize = True
-        Label9.Enabled = False
-        Label9.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label9.ForeColor = Color.Blue
-        Label9.Location = New Point(77, 3)
-        Label9.Name = "Label9"
-        Label9.Size = New Size(38, 40)
-        Label9.TabIndex = 20
-        Label9.Text = "⚑"
-        ' 
-        ' Label10
-        ' 
-        Label10.Enabled = False
-        Label10.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label10.Location = New Point(7, 5)
-        Label10.Name = "Label10"
-        Label10.Size = New Size(64, 39)
-        Label10.TabIndex = 0
-        Label10.Text = "2"
-        Label10.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAo1
-        ' 
-        Me.PnlFlagAo1.BackgroundImageLayout = ImageLayout.None
-        Me.PnlFlagAo1.BorderStyle = BorderStyle.FixedSingle
-        Me.PnlFlagAo1.Controls.Add(Label11)
-        Me.PnlFlagAo1.Controls.Add(Label12)
-        Me.PnlFlagAo1.Cursor = Cursors.Hand
-        Me.PnlFlagAo1.Location = New Point(10, 352)
-        Me.PnlFlagAo1.Name = "PnlFlagAo1"
-        Me.PnlFlagAo1.Size = New Size(120, 51)
-        Me.PnlFlagAo1.TabIndex = 25
-        ' 
-        ' Label11
-        ' 
-        Label11.AutoSize = True
-        Label11.Enabled = False
-        Label11.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label11.ForeColor = Color.Blue
-        Label11.Location = New Point(77, 3)
-        Label11.Name = "Label11"
-        Label11.Size = New Size(38, 40)
-        Label11.TabIndex = 20
-        Label11.Text = "⚑"
-        ' 
-        ' Label12
-        ' 
-        Label12.Enabled = False
-        Label12.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label12.Location = New Point(7, 5)
-        Label12.Name = "Label12"
-        Label12.Size = New Size(64, 39)
-        Label12.TabIndex = 0
-        Label12.Text = "1"
-        Label12.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka1
-        ' 
-        PnlFlagAka1.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka1.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka1.Controls.Add(Label13)
-        PnlFlagAka1.Controls.Add(Label14)
-        PnlFlagAka1.Cursor = Cursors.Hand
-        PnlFlagAka1.Location = New Point(8, 352)
-        PnlFlagAka1.Name = "PnlFlagAka1"
-        PnlFlagAka1.RightToLeft = RightToLeft.No
-        PnlFlagAka1.Size = New Size(120, 51)
-        PnlFlagAka1.TabIndex = 26
-        ' 
-        ' Label13
-        ' 
-        Label13.AutoSize = True
-        Label13.Enabled = False
-        Label13.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label13.ForeColor = Color.Red
-        Label13.Location = New Point(11, 4)
-        Label13.Name = "Label13"
-        Label13.Size = New Size(38, 40)
-        Label13.TabIndex = 20
-        Label13.Text = "⚑"
-        ' 
-        ' Label14
-        ' 
-        Label14.Enabled = False
-        Label14.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label14.Location = New Point(48, 6)
-        Label14.Name = "Label14"
-        Label14.Size = New Size(64, 39)
-        Label14.TabIndex = 0
-        Label14.Text = "1"
-        Label14.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka2
-        ' 
-        PnlFlagAka2.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka2.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka2.Controls.Add(Label15)
-        PnlFlagAka2.Controls.Add(Label16)
-        PnlFlagAka2.Cursor = Cursors.Hand
-        PnlFlagAka2.Location = New Point(8, 295)
-        PnlFlagAka2.Name = "PnlFlagAka2"
-        PnlFlagAka2.RightToLeft = RightToLeft.No
-        PnlFlagAka2.Size = New Size(120, 51)
-        PnlFlagAka2.TabIndex = 27
-        ' 
-        ' Label15
-        ' 
-        Label15.AutoSize = True
-        Label15.Enabled = False
-        Label15.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label15.ForeColor = Color.Red
-        Label15.Location = New Point(11, 4)
-        Label15.Name = "Label15"
-        Label15.Size = New Size(38, 40)
-        Label15.TabIndex = 20
-        Label15.Text = "⚑"
-        ' 
-        ' Label16
-        ' 
-        Label16.Enabled = False
-        Label16.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label16.Location = New Point(48, 6)
-        Label16.Name = "Label16"
-        Label16.Size = New Size(64, 39)
-        Label16.TabIndex = 0
-        Label16.Text = "2"
-        Label16.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka3
-        ' 
-        PnlFlagAka3.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka3.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka3.Controls.Add(Label17)
-        PnlFlagAka3.Controls.Add(Label18)
-        PnlFlagAka3.Cursor = Cursors.Hand
-        PnlFlagAka3.Location = New Point(8, 238)
-        PnlFlagAka3.Name = "PnlFlagAka3"
-        PnlFlagAka3.RightToLeft = RightToLeft.No
-        PnlFlagAka3.Size = New Size(120, 51)
-        PnlFlagAka3.TabIndex = 27
-        ' 
-        ' Label17
-        ' 
-        Label17.AutoSize = True
-        Label17.Enabled = False
-        Label17.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label17.ForeColor = Color.Red
-        Label17.Location = New Point(11, 4)
-        Label17.Name = "Label17"
-        Label17.Size = New Size(38, 40)
-        Label17.TabIndex = 20
-        Label17.Text = "⚑"
-        ' 
-        ' Label18
-        ' 
-        Label18.Enabled = False
-        Label18.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label18.Location = New Point(48, 6)
-        Label18.Name = "Label18"
-        Label18.Size = New Size(64, 39)
-        Label18.TabIndex = 0
-        Label18.Text = "3"
-        Label18.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka4
-        ' 
-        PnlFlagAka4.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka4.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka4.Controls.Add(Label19)
-        PnlFlagAka4.Controls.Add(Label20)
-        PnlFlagAka4.Cursor = Cursors.Hand
-        PnlFlagAka4.Location = New Point(8, 181)
-        PnlFlagAka4.Name = "PnlFlagAka4"
-        PnlFlagAka4.RightToLeft = RightToLeft.No
-        PnlFlagAka4.Size = New Size(120, 51)
-        PnlFlagAka4.TabIndex = 27
-        ' 
-        ' Label19
-        ' 
-        Label19.AutoSize = True
-        Label19.Enabled = False
-        Label19.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label19.ForeColor = Color.Red
-        Label19.Location = New Point(11, 4)
-        Label19.Name = "Label19"
-        Label19.Size = New Size(38, 40)
-        Label19.TabIndex = 20
-        Label19.Text = "⚑"
-        ' 
-        ' Label20
-        ' 
-        Label20.Enabled = False
-        Label20.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label20.Location = New Point(48, 6)
-        Label20.Name = "Label20"
-        Label20.Size = New Size(64, 39)
-        Label20.TabIndex = 0
-        Label20.Text = "4"
-        Label20.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka5
-        ' 
-        PnlFlagAka5.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka5.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka5.Controls.Add(Label21)
-        PnlFlagAka5.Controls.Add(Label22)
-        PnlFlagAka5.Cursor = Cursors.Hand
-        PnlFlagAka5.Location = New Point(8, 124)
-        PnlFlagAka5.Name = "PnlFlagAka5"
-        PnlFlagAka5.RightToLeft = RightToLeft.No
-        PnlFlagAka5.Size = New Size(120, 51)
-        PnlFlagAka5.TabIndex = 27
-        ' 
-        ' Label21
-        ' 
-        Label21.AutoSize = True
-        Label21.Enabled = False
-        Label21.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label21.ForeColor = Color.Red
-        Label21.Location = New Point(11, 4)
-        Label21.Name = "Label21"
-        Label21.Size = New Size(38, 40)
-        Label21.TabIndex = 20
-        Label21.Text = "⚑"
-        ' 
-        ' Label22
-        ' 
-        Label22.Enabled = False
-        Label22.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label22.Location = New Point(48, 6)
-        Label22.Name = "Label22"
-        Label22.Size = New Size(64, 39)
-        Label22.TabIndex = 0
-        Label22.Text = "5"
-        Label22.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka6
-        ' 
-        PnlFlagAka6.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka6.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka6.Controls.Add(Label23)
-        PnlFlagAka6.Controls.Add(Label24)
-        PnlFlagAka6.Cursor = Cursors.Hand
-        PnlFlagAka6.Location = New Point(8, 67)
-        PnlFlagAka6.Name = "PnlFlagAka6"
-        PnlFlagAka6.RightToLeft = RightToLeft.No
-        PnlFlagAka6.Size = New Size(120, 51)
-        PnlFlagAka6.TabIndex = 27
-        ' 
-        ' Label23
-        ' 
-        Label23.AutoSize = True
-        Label23.Enabled = False
-        Label23.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label23.ForeColor = Color.Red
-        Label23.Location = New Point(11, 4)
-        Label23.Name = "Label23"
-        Label23.Size = New Size(38, 40)
-        Label23.TabIndex = 20
-        Label23.Text = "⚑"
-        ' 
-        ' Label24
-        ' 
-        Label24.Enabled = False
-        Label24.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label24.Location = New Point(48, 6)
-        Label24.Name = "Label24"
-        Label24.Size = New Size(64, 39)
-        Label24.TabIndex = 0
-        Label24.Text = "6"
-        Label24.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' PnlFlagAka7
-        ' 
-        PnlFlagAka7.BackgroundImageLayout = ImageLayout.None
-        PnlFlagAka7.BorderStyle = BorderStyle.FixedSingle
-        PnlFlagAka7.Controls.Add(Label25)
-        PnlFlagAka7.Controls.Add(Label26)
-        PnlFlagAka7.Cursor = Cursors.Hand
-        PnlFlagAka7.Location = New Point(8, 10)
-        PnlFlagAka7.Name = "PnlFlagAka7"
-        PnlFlagAka7.RightToLeft = RightToLeft.No
-        PnlFlagAka7.Size = New Size(120, 51)
-        PnlFlagAka7.TabIndex = 27
-        ' 
-        ' Label25
-        ' 
-        Label25.AutoSize = True
-        Label25.Enabled = False
-        Label25.Font = New Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        Label25.ForeColor = Color.Red
-        Label25.Location = New Point(11, 4)
-        Label25.Name = "Label25"
-        Label25.Size = New Size(38, 40)
-        Label25.TabIndex = 20
-        Label25.Text = "⚑"
-        ' 
-        ' Label26
-        ' 
-        Label26.Enabled = False
-        Label26.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label26.Location = New Point(48, 6)
-        Label26.Name = "Label26"
-        Label26.Size = New Size(64, 39)
-        Label26.TabIndex = 0
-        Label26.Text = "7"
-        Label26.TextAlign = ContentAlignment.MiddleCenter
-        ' 
         ' KataMainControl
         ' 
-        AutoScaleDimensions = New SizeF(7.0F, 15.0F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1264, 721)
         Controls.Add(PnlMainWorkspace)
@@ -3364,11 +3393,13 @@ Partial Class KataMainControl
         Controls.Add(PnlFooter)
         Controls.Add(PnlLeftBar)
         Controls.Add(PnlTopBar)
-        Font = New Font("Segoe UI", 9.0F)
+        Font = New Font("Segoe UI", 9F)
         MinimumSize = New Size(1200, 680)
         Name = "KataMainControl"
         StartPosition = FormStartPosition.CenterScreen
         Text = "KATA Main Control"
+        TabPageDetail.ResumeLayout(False)
+        TabPageDetail.PerformLayout()
         PnlLeftBar.ResumeLayout(False)
         PnlLeftBar.PerformLayout()
         PnlJ7.ResumeLayout(False)
@@ -3397,16 +3428,54 @@ Partial Class KataMainControl
         GrpScoreboardSelect.PerformLayout()
         CType(NumTatamiId, ComponentModel.ISupportInitialize).EndInit()
         TabMatchDetail.ResumeLayout(False)
-        TabPageDetail.ResumeLayout(False)
-        TabPageDetail.PerformLayout()
         PnlMainWorkspace.ResumeLayout(False)
         PnlCenterScore.ResumeLayout(False)
         CType(TotalScoreAO, ComponentModel.ISupportInitialize).EndInit()
         CType(TotalScoreAKA, ComponentModel.ISupportInitialize).EndInit()
+        PnlPointInputsAo.ResumeLayout(False)
+        CType(NumAoJ7, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ6, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ5, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ4, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ3, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ2, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAoJ1, ComponentModel.ISupportInitialize).EndInit()
+        PnlPointInputsAka.ResumeLayout(False)
+        CType(NumAkaJ7, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ6, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ5, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ4, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ3, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ2, ComponentModel.ISupportInitialize).EndInit()
+        CType(NumAkaJ1, ComponentModel.ISupportInitialize).EndInit()
         PnlFlagInputsAka.ResumeLayout(False)
+        PnlFlagAka7.ResumeLayout(False)
+        PnlFlagAka7.PerformLayout()
+        PnlFlagAka6.ResumeLayout(False)
+        PnlFlagAka6.PerformLayout()
+        PnlFlagAka5.ResumeLayout(False)
+        PnlFlagAka5.PerformLayout()
+        PnlFlagAka4.ResumeLayout(False)
+        PnlFlagAka4.PerformLayout()
+        PnlFlagAka3.ResumeLayout(False)
+        PnlFlagAka3.PerformLayout()
+        PnlFlagAka2.ResumeLayout(False)
+        PnlFlagAka2.PerformLayout()
+        PnlFlagAka1.ResumeLayout(False)
+        PnlFlagAka1.PerformLayout()
         PnlFlagInputsAo.ResumeLayout(False)
-        Me.PnlFlagAo6.ResumeLayout(False)
-        Me.PnlFlagAo6.PerformLayout()
+        PnlFlagAo1.ResumeLayout(False)
+        PnlFlagAo1.PerformLayout()
+        PnlFlagAo2.ResumeLayout(False)
+        PnlFlagAo2.PerformLayout()
+        PnlFlagAo3.ResumeLayout(False)
+        PnlFlagAo3.PerformLayout()
+        PnlFlagAo4.ResumeLayout(False)
+        PnlFlagAo4.PerformLayout()
+        PnlFlagAo5.ResumeLayout(False)
+        PnlFlagAo5.PerformLayout()
+        PnlFlagAo6.ResumeLayout(False)
+        PnlFlagAo6.PerformLayout()
         PnlFlagAo7.ResumeLayout(False)
         PnlFlagAo7.PerformLayout()
         PnlAo.ResumeLayout(False)
@@ -3417,46 +3486,6 @@ Partial Class KataMainControl
         PnlAka.PerformLayout()
         CType(PicAkaAvatar, ComponentModel.ISupportInitialize).EndInit()
         CType(PicAkaCircle, ComponentModel.ISupportInitialize).EndInit()
-        PnlPointInputsAka.ResumeLayout(False)
-        CType(NumAkaJ7, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ6, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ5, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ4, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ3, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ2, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAkaJ1, ComponentModel.ISupportInitialize).EndInit()
-        PnlPointInputsAo.ResumeLayout(False)
-        CType(NumAoJ7, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ6, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ5, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ4, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ3, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ2, ComponentModel.ISupportInitialize).EndInit()
-        CType(NumAoJ1, ComponentModel.ISupportInitialize).EndInit()
-        Me.PnlFlagAo5.ResumeLayout(False)
-        Me.PnlFlagAo5.PerformLayout()
-        Me.PnlFlagAo4.ResumeLayout(False)
-        Me.PnlFlagAo4.PerformLayout()
-        Me.PnlFlagAo3.ResumeLayout(False)
-        Me.PnlFlagAo3.PerformLayout()
-        Me.PnlFlagAo2.ResumeLayout(False)
-        Me.PnlFlagAo2.PerformLayout()
-        Me.PnlFlagAo1.ResumeLayout(False)
-        Me.PnlFlagAo1.PerformLayout()
-        PnlFlagAka1.ResumeLayout(False)
-        PnlFlagAka1.PerformLayout()
-        PnlFlagAka2.ResumeLayout(False)
-        PnlFlagAka2.PerformLayout()
-        PnlFlagAka3.ResumeLayout(False)
-        PnlFlagAka3.PerformLayout()
-        PnlFlagAka4.ResumeLayout(False)
-        PnlFlagAka4.PerformLayout()
-        PnlFlagAka5.ResumeLayout(False)
-        PnlFlagAka5.PerformLayout()
-        PnlFlagAka6.ResumeLayout(False)
-        PnlFlagAka6.PerformLayout()
-        PnlFlagAka7.ResumeLayout(False)
-        PnlFlagAka7.PerformLayout()
         ResumeLayout(False)
 
     End Sub
@@ -3513,5 +3542,8 @@ Partial Class KataMainControl
     Friend WithEvents PnlFlagAka2 As Panel
     Friend WithEvents Label15 As Label
     Friend WithEvents Label16 As Label
+    Friend WithEvents TxtMatchDetail As TextBox
+    Friend WithEvents LblAoWinner As Label
+    Friend WithEvents LblAkaWinner As Label
 
 End Class
