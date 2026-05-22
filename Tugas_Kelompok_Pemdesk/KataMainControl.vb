@@ -5,9 +5,10 @@
     ' ==============================================================================
     Private frmLogActivity As FormLogActivity = Nothing
 
-    Public Shared KataDetailFontName As String = "Microsoft Sans Serif"
-    Public Shared KataDetailIsBold As Boolean = True
-    Public Shared KataDetailColor As Color = Color.Yellow
+    ' (PERBAIKAN: Kata "Shared" dihapus agar tidak muncul error/warning hijau)
+    Public KataDetailFontName As String = "Microsoft Sans Serif"
+    Public KataDetailIsBold As Boolean = True
+    Public KataDetailColor As Color = Color.Yellow
 
     ' ==============================================================================
     ' 1. KONSTRUKTOR (INITIALIZATION)
@@ -21,7 +22,7 @@
     End Sub
 
     ' ==============================================================================
-    ' 2. FUNGSI HELPER UI & CUSTOM STYLE (MEMPERTAHANKAN KODE ASLI)
+    ' 2. FUNGSI HELPER UI & CUSTOM STYLE 
     ' ==============================================================================
 
     Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
@@ -33,28 +34,38 @@
                 LblJudgeStatusTitle.ForeColor = textColor
                 LblJudgeStatusTitle.Refresh()
             End If
-
         Catch ex As Exception
         End Try
     End Sub
 
     Private Sub CheckWinner(AkaScore As Integer, AoScore As Integer)
-        ' Menampilkan label WINNER berdasarkan skor tertinggi
+        ' Kondisi Awal / Reset (0 - 0) -> Sembunyikan (Hide) kedua label winner
+        If AkaScore = 0 AndAlso AoScore = 0 Then
+            LblAkaWinner.Visible = False
+            LblAoWinner.Visible = False
+            Exit Sub
+        End If
+
+        ' Logika Hide / Show secara default tanpa mengubah kosmetik warna/font
         If AkaScore > AoScore Then
-            LblAkaWinnerStatus.Text = "WINNER"
-            LblAoWinnerStatus.Text = ""
+            LblAkaWinner.Text = "WINNER"
+            LblAkaWinner.Visible = True
+            LblAoWinner.Visible = False
         ElseIf AoScore > AkaScore Then
-            LblAoWinnerStatus.Text = "WINNER"
-            LblAkaWinnerStatus.Text = ""
+            LblAkaWinner.Visible = False
+            LblAoWinner.Text = "WINNER"
+            LblAoWinner.Visible = True
         Else
-            LblAoWinnerStatus.Text = ""
-            LblAkaWinnerStatus.Text = ""
+            LblAkaWinner.Text = "DRAW"
+            LblAkaWinner.Visible = True
+            LblAoWinner.Text = "DRAW"
+            LblAoWinner.Visible = True
         End If
     End Sub
 
     Private Sub InitializeScoringUI()
         RbScoreType.Checked = True
-        Rb7Judge.Checked = True ' Menjamin 7 Judge sebagai default
+        Rb7Judge.Checked = True
 
         ToggleScoringMode()
         UpdateJudgeCountUI()
@@ -68,26 +79,22 @@
         Me.SuspendLayout()
         Try
             If RbScoreType.Checked Then
-                ' ── MODE SCORE (Angka) ──
                 PnlPointInputsAka.Visible = True
                 PnlPointInputsAo.Visible = True
                 PnlFlagInputsAka.Visible = False
                 PnlFlagInputsAo.Visible = False
 
-                ' Efek Visual Tombol Mode
                 RbScoreType.ForeColor = Color.FromArgb(0, 80, 180)
                 RbScoreType.Font = New Font(RbScoreType.Font, FontStyle.Bold)
                 RbFlagSystem.ForeColor = Color.Gray
                 RbFlagSystem.Font = New Font(RbFlagSystem.Font, FontStyle.Regular)
 
             ElseIf RbFlagSystem.Checked Then
-                ' ── MODE FLAG (Bendera) ──
                 PnlPointInputsAka.Visible = False
                 PnlPointInputsAo.Visible = False
                 PnlFlagInputsAka.Visible = True
                 PnlFlagInputsAo.Visible = True
 
-                ' Efek Visual Tombol Mode
                 RbScoreType.ForeColor = Color.Gray
                 RbScoreType.Font = New Font(RbScoreType.Font, FontStyle.Regular)
                 RbFlagSystem.ForeColor = Color.FromArgb(0, 80, 180)
@@ -105,7 +112,6 @@
             Dim showJ45 As Boolean = (totalJudge >= 5)
             Dim showJ67 As Boolean = (totalJudge = 7)
 
-            ' ── VISIBILITAS: PANEL SCORING (ANGKA) ──
             NumAkaJ4.Visible = showJ45 : LblAkaJ4.Visible = showJ45
             NumAkaJ5.Visible = showJ45 : LblAkaJ5.Visible = showJ45
             NumAkaJ6.Visible = showJ67 : LblAkaJ6.Visible = showJ67
@@ -116,17 +122,14 @@
             NumAoJ6.Visible = showJ67 : LblAoJ6.Visible = showJ67
             NumAoJ7.Visible = showJ67 : LblAoJ7.Visible = showJ67
 
-            ' ── VISIBILITAS: PANEL FLAG BENDERA ──
             PnlFlagAka4.Visible = showJ45 : PnlFlagAka5.Visible = showJ45
             PnlFlagAka6.Visible = showJ67 : PnlFlagAka7.Visible = showJ67
             PnlFlagAo4.Visible = showJ45 : PnlFlagAo5.Visible = showJ45
             PnlFlagAo6.Visible = showJ67 : PnlFlagAo7.Visible = showJ67
 
-            ' ── VISIBILITAS: LEFT BAR (STATUS LOGIN JURI) ──
             PnlJ4.Visible = showJ45 : PnlJ5.Visible = showJ45
             PnlJ6.Visible = showJ67 : PnlJ7.Visible = showJ67
 
-            ' ── RESET DATA JURI YANG DISEMBUNYIKAN ──
             If Not showJ45 Then
                 NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0
                 NumAoJ4.Value = 0 : NumAoJ5.Value = 0
@@ -136,7 +139,6 @@
                 NumAoJ6.Value = 0 : NumAoJ7.Value = 0
             End If
 
-            ' ── VISUAL FEEDBACK (Warna Radio Button Jumlah Juri) ──
             Rb3Judge.Font = New Font(Rb3Judge.Font, FontStyle.Regular)
             Rb5Judge.Font = New Font(Rb5Judge.Font, FontStyle.Regular)
             Rb7Judge.Font = New Font(Rb7Judge.Font, FontStyle.Regular)
@@ -170,13 +172,11 @@
     Private Sub HighlightFlag(pnl As Panel, isActive As Boolean, isAka As Boolean)
         If pnl Is Nothing Then Exit Sub
 
-        Dim flagColor As Color = If(isAka, Color.Red, Color.Blue)
-        Dim activeBackColor As Color = If(isAka, Color.FromArgb(255, 215, 215), Color.FromArgb(215, 230, 255))
+        Dim flagColor = If(isAka, Color.Red, Color.Blue)
+        Dim activeBackColor = If(isAka, Color.FromArgb(255, 215, 215), Color.FromArgb(215, 230, 255))
 
-        ' Merubah warna Background panel jika aktif
         pnl.BackColor = If(isActive, activeBackColor, Color.White)
 
-        ' Memastikan teks & Ikon mempertahankan warna defaultnya
         For Each ctrl As Control In pnl.Controls
             If TypeOf ctrl Is Label Then
                 ctrl.Visible = True
@@ -190,7 +190,6 @@
     End Sub
 
     Private Sub ProcessFlagVisuals(akaScore As Integer, aoScore As Integer)
-        ' Tim AKA
         HighlightFlag(PnlFlagAka1, akaScore >= 1, True)
         HighlightFlag(PnlFlagAka2, akaScore >= 2, True)
         HighlightFlag(PnlFlagAka3, akaScore >= 3, True)
@@ -199,7 +198,6 @@
         HighlightFlag(PnlFlagAka6, akaScore >= 6, True)
         HighlightFlag(PnlFlagAka7, akaScore >= 7, True)
 
-        ' Tim AO
         HighlightFlag(PnlFlagAo1, aoScore >= 1, False)
         HighlightFlag(PnlFlagAo2, aoScore >= 2, False)
         HighlightFlag(PnlFlagAo3, aoScore >= 3, False)
@@ -208,11 +206,9 @@
         HighlightFlag(PnlFlagAo6, aoScore >= 6, False)
         HighlightFlag(PnlFlagAo7, aoScore >= 7, False)
 
-        ' Update Angka Papan Skor
         TotalScoreAKA.Value = akaScore
         TotalScoreAO.Value = aoScore
 
-        ' Eksekusi Logika Pengecekan Pemenang Asli Milik Anda
         CheckWinner(akaScore, aoScore)
     End Sub
 
@@ -272,7 +268,6 @@
         frmLogActivity.BringToFront()
     End Sub
 
-    ' FITUR BARU: Otomatis Reset Saat Berpindah Mode Scoring
     Private Sub RbScoreType_CheckedChanged(sender As Object, e As EventArgs) Handles RbScoreType.CheckedChanged
         If RbScoreType.Checked Then
             ToggleScoringMode()
@@ -280,7 +275,6 @@
         End If
     End Sub
 
-    ' FITUR BARU: Otomatis Reset Saat Berpindah Mode Scoring
     Private Sub RbFlagSystem_CheckedChanged(sender As Object, e As EventArgs) Handles RbFlagSystem.CheckedChanged
         If RbFlagSystem.Checked Then
             ToggleScoringMode()
@@ -322,25 +316,80 @@
     ' ==============================================================================
 
     Private Sub ResetAllScores()
-        ' Kita buat reset ALL tanpa syarat If/Else. 
-        ' Jadi angka dan bendera dua-duanya dihapus bersih ke 0 tanpa peduli mode apa yang sedang aktif!
-
-        ' 1. Reset visual bendera
         ProcessFlagVisuals(0, 0)
 
-        ' 2. Reset angka Numeric Up/Down
         NumAkaJ1.Value = 0 : NumAkaJ2.Value = 0 : NumAkaJ3.Value = 0
         NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0 : NumAkaJ6.Value = 0 : NumAkaJ7.Value = 0
 
         NumAoJ1.Value = 0 : NumAoJ2.Value = 0 : NumAoJ3.Value = 0
         NumAoJ4.Value = 0 : NumAoJ5.Value = 0 : NumAoJ6.Value = 0 : NumAoJ7.Value = 0
 
-        ' 3. Reset total papan bawah
         TotalScoreAKA.Value = 0
         TotalScoreAO.Value = 0
 
-        ' 4. Hapus tulisan WINNER
+        ResetPenaltyLabels()
         CheckWinner(0, 0)
+    End Sub
+
+    ' ==============================================================================
+    ' 8. LOGIKA PENALTI (KIKEN & DISKUALIFIKASI) - SUPPORT LABEL/BUTTON
+    ' ==============================================================================
+
+    Private Sub ResetPenaltyLabels()
+        ' Tetap pakai nama yang ada di properties UI lu
+        BtnKikenAka.BackColor = SystemColors.Control
+        BtnDiskualifikasiAka.BackColor = SystemColors.Control
+        BtnKikenAo.BackColor = SystemColors.Control
+        BtnDiskualifikasiAo.BackColor = SystemColors.Control
+    End Sub
+
+    ' Pakai "As Control" supaya mau nerima Label ataupun Button tanpa error convert
+    Private Sub ApplyPenaltyAndDeclareWinner(clickedCtrl As Control, winningTeam As String)
+        ResetPenaltyLabels()
+        clickedCtrl.BackColor = Color.Yellow
+
+        If winningTeam = "AKA" Then
+            LblAkaWinner.Text = "WINNER"
+            LblAkaWinner.Visible = True
+            LblAoWinner.Visible = False
+        ElseIf winningTeam = "AO" Then
+            LblAoWinner.Text = "WINNER"
+            LblAoWinner.Visible = True
+            LblAkaWinner.Visible = False
+        End If
+    End Sub
+
+    Private Sub BtnKikenAka_Click(sender As Object, e As EventArgs) Handles BtnKikenAka.Click
+        ApplyPenaltyAndDeclareWinner(BtnKikenAka, "AO")
+    End Sub
+
+    Private Sub BtnDiskualifikasiAka_Click(sender As Object, e As EventArgs) Handles BtnDiskualifikasiAka.Click
+        ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAka, "AO")
+    End Sub
+
+    Private Sub BtnKikenAo_Click(sender As Object, e As EventArgs) Handles BtnKikenAo.Click
+        ApplyPenaltyAndDeclareWinner(BtnKikenAo, "AKA")
+    End Sub
+
+    Private Sub BtnDiskualifikasiAo_Click(sender As Object, e As EventArgs) Handles BtnDiskualifikasiAo.Click
+        ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
+    End Sub
+
+    Private Sub LblDiskualifikasiAo_Click(sender As Object, e As EventArgs) Handles BtnDiskualifikasiAo.Click
+        ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
+    End Sub
+
+    ' ==============================================================================
+    ' FUNGSI LAINNYA
+    ' ==============================================================================
+
+    Private Sub TxtMatchDetail_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDetail.TextChanged
+    End Sub
+
+    Private Sub LblTextAlign_Click(sender As Object, e As EventArgs) Handles LblTextAlign.Click
+    End Sub
+
+    Private Sub LblAoWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAoWinnerStatus.Click
     End Sub
 
 End Class
