@@ -11,6 +11,12 @@ Public Class FormQRGenerated
     Private Sub FormQRGenerated_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = "QR Generated"
 
+        ' Fix tinggi baris ListView agar semua 7 baris muat tanpa scrollbar
+        Dim imgList As New ImageList()
+        imgList.ImageSize = New Drawing.Size(1, 18)
+        lvQRValues.SmallImageList = imgList
+        lvQRValues.Scrollable = False
+
         lblTatamiIDValue.Text = tatamiID
         lblDefaultURL.Text = baseUrl
 
@@ -94,10 +100,7 @@ Public Class FormQRGenerated
             item.SubItems.Add(judgeUrls(i))
             lvQRValues.Items.Add(item)
         Next
-        If lvQRValues.Items.Count > 0 Then
-            lvQRValues.Items(0).BackColor = Color.Yellow
-            lvQRValues.Items(0).ForeColor = Color.Blue
-        End If
+
     End Sub
 
     Private Sub UpdateClock()

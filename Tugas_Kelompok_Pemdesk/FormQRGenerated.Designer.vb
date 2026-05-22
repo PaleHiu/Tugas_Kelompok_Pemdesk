@@ -426,7 +426,7 @@ Partial Class FormQRGenerated
         Me.pnlQRValues.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.pnlQRValues.Location = New System.Drawing.Point(8, 260)
         Me.pnlQRValues.Name = "pnlQRValues"
-        Me.pnlQRValues.Size = New System.Drawing.Size(294, 245)
+        Me.pnlQRValues.Size = New System.Drawing.Size(294, 175)
         Me.pnlQRValues.TabIndex = 4
 
         ' lblQRValueTitle
