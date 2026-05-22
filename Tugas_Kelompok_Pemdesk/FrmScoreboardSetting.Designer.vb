@@ -534,6 +534,23 @@ Partial Public Class FrmScoreboardSetting
                                           End If
                                       End If
 
+                                      Dim arrCbKDT = Me.Controls.Find("CboKataDetailFont", True)
+                                      Dim arrChkKDT = Me.Controls.Find("ChkKataDetailBold", True)
+                                      Dim arrClrKDT = Me.Controls.Find("PnlKataDetailColor", True)
+
+                                      If arrCbKDT.Length > 0 AndAlso arrChkKDT.Length > 0 AndAlso arrClrKDT.Length > 0 Then
+                                          KataMainControl.KataDetailFontName = arrCbKDT(0).Text
+                                          KataMainControl.KataDetailIsBold = DirectCast(arrChkKDT(0), CheckBox).Checked
+                                          KataMainControl.KataDetailColor = arrClrKDT(0).BackColor
+
+                                          If Dashboard.frmKataApp IsNot Nothing AndAlso Not Dashboard.frmKataApp.IsDisposed Then
+                                              Dashboard.frmKataApp.ApplyKataMatchDetailStyle(
+                                                  KataMainControl.KataDetailFontName,
+                                                  KataMainControl.KataDetailIsBold,
+                                                  KataMainControl.KataDetailColor)
+                                          End If
+                                      End If
+
                                       MessageBox.Show("Pengaturan berhasil disimpan dan diterapkan!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
                                       Me.Close()
                                   End Sub
@@ -689,9 +706,9 @@ Partial Public Class FrmScoreboardSetting
 
         ' 4. KATA Match Detail
         Dim gpKataDetail As New GroupBox() : gpKataDetail.Text = "KATA Match Detail" : gpKataDetail.Location = New Point(310, 310) : gpKataDetail.Size = New Size(280, 95)
-        Dim cbKDT = MakeCombo("Microsoft Sans Serif") : cbKDT.Location = New Point(70, 25) : cbKDT.Width = 160
-        Dim cpKDT = MakeColorPicker(Color.Yellow) : cpKDT.Location = New Point(70, 55)
-        Dim chkBDT As New CheckBox() : chkBDT.Text = "Bold" : chkBDT.Checked = True : chkBDT.Location = New Point(235, 58) : chkBDT.AutoSize = True
+        Dim cbKDT = MakeCombo("Microsoft Sans Serif") : cbKDT.Location = New Point(70, 25) : cbKDT.Width = 160 : cbKDT.Name = "CboKataDetailFont"
+        Dim cpKDT = MakeColorPicker(Color.Yellow) : cpKDT.Location = New Point(70, 55) : cpKDT.Name = "PnlKataDetailColor"
+        Dim chkBDT As New CheckBox() : chkBDT.Text = "Bold" : chkBDT.Checked = True : chkBDT.Location = New Point(235, 58) : chkBDT.AutoSize = True : chkBDT.Name = "ChkKataDetailBold"
         gpKataDetail.Controls.AddRange(New Control() {cbKDT, cpKDT, chkBDT})
 
         ' 5. KATA Timer
