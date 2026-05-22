@@ -65,7 +65,7 @@
     ' ==============================================================================
     ' 2. FUNGSI HELPER UI & CUSTOM STYLE 
     ' ==============================================================================
-    Private Sub CheckWinner(AkaScore As Integer, AoScore As Integer)
+    Private Sub CheckWinner(AkaScore As Decimal, AoScore As Decimal)
         ' Kondisi Awal / Reset (0 - 0) -> Sembunyikan (Hide) kedua label winner
         If AkaScore = 0 AndAlso AoScore = 0 Then
             LblAkaWinner.Visible = False
@@ -351,8 +351,8 @@
         NumAoJ1.Value = 0 : NumAoJ2.Value = 0 : NumAoJ3.Value = 0
         NumAoJ4.Value = 0 : NumAoJ5.Value = 0 : NumAoJ6.Value = 0 : NumAoJ7.Value = 0
 
-        TotalScoreAKA.Value = 0
-        TotalScoreAO.Value = 0
+        TotalScoreAKA.Value = 0.0D
+        TotalScoreAO.Value = 0.0D
 
         ResetPenaltyLabels()
         CheckWinner(0, 0)
@@ -493,6 +493,113 @@
 
         Catch ex As Exception
             MessageBox.Show("Gagal membuka menu QR Code: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' ==============================================================================
+    ' 9. LOGIKA KALKULASI SKOR OTOMATIS (SISTEM KATA WKF)
+    ' ==============================================================================
+    Private Sub CalculateWKFScore()
+        ' Jangan hitung jika sedang berada di Mode Bendera (Flag System)
+        If RbFlagSystem.Checked Then Exit Sub
+
+        Dim totalJudge As Integer = GetActiveJudgeCount()
+
+        ' 1. Ambil nilai juri AKA
+        Dim akaScores As New List(Of Double)()
+        akaScores.Add(Convert.ToDouble(NumAkaJ1.Value))
+        akaScores.Add(Convert.ToDouble(NumAkaJ2.Value))
+        akaScores.Add(Convert.ToDouble(NumAkaJ3.Value))
+        If totalJudge >= 5 Then
+            akaScores.Add(Convert.ToDouble(NumAkaJ4.Value))
+            akaScores.Add(Convert.ToDouble(NumAkaJ5.Value))
+        End If
+        If totalJudge = 7 Then
+            akaScores.Add(Convert.ToDouble(NumAkaJ6.Value))
+            akaScores.Add(Convert.ToDouble(NumAkaJ7.Value))
+        End If
+
+        ' Hitung Total AKA (Kurangi tertinggi & terendah jika juri > 3)
+        Dim akaTotal As Double = 0
+        If totalJudge > 3 Then
+            akaScores.Sort()
+            For i As Integer = 1 To akaScores.Count - 2
+                akaTotal += akaScores(i)
+            Next
+        Else
+            For Each score In akaScores
+                akaTotal += score
+            Next
+        End If
+        TotalScoreAKA.Value = Convert.ToDecimal(akaTotal)
+
+        ' 2. Ambil nilai juri AO
+        Dim aoScores As New List(Of Double)()
+        aoScores.Add(Convert.ToDouble(NumAoJ1.Value))
+        aoScores.Add(Convert.ToDouble(NumAoJ2.Value))
+        aoScores.Add(Convert.ToDouble(NumAoJ3.Value))
+        If totalJudge >= 5 Then
+            aoScores.Add(Convert.ToDouble(NumAoJ4.Value))
+            aoScores.Add(Convert.ToDouble(NumAoJ5.Value))
+        End If
+        If totalJudge = 7 Then
+            aoScores.Add(Convert.ToDouble(NumAoJ6.Value))
+            aoScores.Add(Convert.ToDouble(NumAoJ7.Value))
+        End If
+
+        ' Hitung Total AO (Kurangi tertinggi & terendah jika juri > 3)
+        Dim aoTotal As Double = 0
+        If totalJudge > 3 Then
+            aoScores.Sort()
+            For i As Integer = 1 To aoScores.Count - 2
+                aoTotal += aoScores(i)
+            Next
+        Else
+            For Each score In aoScores
+                aoTotal += score
+            Next
+        End If
+        TotalScoreAO.Value = Convert.ToDecimal(aoTotal)
+
+        ' 3. Tentukan Pemenang Langsung
+        CheckWinner(Convert.ToDecimal(akaTotal), Convert.ToDecimal(aoTotal))
+    End Sub
+
+    ' ==============================================================================
+    ' 10. EVENT HANDLERS: PICU HITUNG SETIAP KALI NILAI JURI BERUBAH
+    ' ==============================================================================
+    Private Sub JudgeScore_ValueChanged(sender As Object, e As EventArgs) Handles _
+        NumAkaJ1.ValueChanged, NumAkaJ2.ValueChanged, NumAkaJ3.ValueChanged, NumAkaJ4.ValueChanged, NumAkaJ5.ValueChanged, NumAkaJ6.ValueChanged, NumAkaJ7.ValueChanged,
+        NumAoJ1.ValueChanged, NumAoJ2.ValueChanged, NumAoJ3.ValueChanged, NumAoJ4.ValueChanged, NumAoJ5.ValueChanged, NumAoJ6.ValueChanged, NumAoJ7.ValueChanged
+
+        CalculateWKFScore()
+    End Sub
+
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Search Kompetitor AKA
+    Private Sub BtnAkaIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIconSearch.Click
+        Try
+            ' 1. Panggil form daftar kompetitor sesuai rancangan tim
+            Dim frmList As New ListofCompetitor()
+
+            ' 2. Tampilkan form sebagai Dialog agar fokus memilih atlet
+            frmList.ShowDialog(Me)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka daftar kompetitor: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Search Kompetitor AO
+    Private Sub BtnAoIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIconSearch.Click
+        Try
+            ' 1. Panggil form daftar kompetitor yang sama
+            Dim frmList As New ListofCompetitor()
+
+            ' 2. Tampilkan sebagai Dialog
+            frmList.ShowDialog(Me)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka daftar kompetitor: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 End Class
