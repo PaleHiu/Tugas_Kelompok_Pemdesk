@@ -2561,6 +2561,7 @@ Partial Class KataMainControl
         CType(PicAkaCircle, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
 
+
     End Sub
 
     Friend WithEvents TotalScoreAKA As NumericUpDown

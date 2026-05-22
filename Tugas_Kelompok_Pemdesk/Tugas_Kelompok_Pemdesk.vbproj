@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+    <PackageReference Include="ZXing.Net.Bindings.Kinect.V1" Version="0.16.11" />
   </ItemGroup>
 
   <ItemGroup>

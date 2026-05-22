@@ -75,4 +75,8 @@
     Private Sub LblAkaWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.Click
 
     End Sub
+    Private Sub BtnQRCode_Click(sender As Object, e As EventArgs) Handles BtnQRCode.Click
+        Dim frm As New FormQRGenerated()
+        frm.Show()
+    End Sub
 End Class
