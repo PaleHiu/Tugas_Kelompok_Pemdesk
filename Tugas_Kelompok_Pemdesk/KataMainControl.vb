@@ -1,188 +1,57 @@
 ﻿Public Class KataMainControl
-    Private PnlFlagSystem As New Panel()
 
-    Private AkaFlags(6) As Button
-    Private AoFlags(6) As Button
-
-    Private TotalJudge As Integer = 5
-    Private AkaScore As Integer = 0
-    Private AoScore As Integer = 0
-    Public Shared KataDetailFontName As String = "Microsoft Sans Serif"
-    Public Shared KataDetailIsBold As Boolean = True
-    Public Shared KataDetailColor As Color = Color.Yellow
-    Public Sub New()
-        InitializeComponent()
-
-        SetupFlagSystem()
-        SetupJudgeSelector()
-        UpdateJudgeDisplay()
-        ApplyKataMatchDetailStyle(KataDetailFontName, KataDetailIsBold, KataDetailColor)
-    End Sub
-
-    Private Sub UpdateJudgeDisplay()
-
-        For i As Integer = 0 To 6
-
-            If i < TotalJudge Then
-
-                AkaFlags(i).Visible = True
-                AoFlags(i).Visible = True
-
-            Else
-
-                AkaFlags(i).Visible = False
-                AoFlags(i).Visible = False
-
-            End If
-
-        Next
-
-    End Sub
-    Private Sub AkaFlag_Click(sender As Object, e As EventArgs)
-
-        Dim btn As Button = CType(sender, Button)
-
-        Dim selectedValue As Integer =
-        Integer.Parse(btn.Text.Replace("🚩", "").Trim())
-
-        AkaScore = selectedValue
-        AoScore = TotalJudge - AkaScore
-
-        UpdateFlagDisplay()
-
-    End Sub
-
-    Private Sub AoFlag_Click(sender As Object, e As EventArgs)
-
-        Dim btn As Button = CType(sender, Button)
-
-        Dim selectedValue As Integer =
-        Integer.Parse(btn.Text.Replace("🚩", "").Trim())
-
-        AoScore = selectedValue
-        AkaScore = TotalJudge - AoScore
-
-        UpdateFlagDisplay()
-
-    End Sub
-
-    Private Sub UpdateFlagDisplay()
-
-        TotalScoreAKA.Value = AkaScore
-        TotalScoreAO.Value = AoScore
-
-        ' RESET WARNA
-        For i As Integer = 0 To 6
-
-            AkaFlags(i).BackColor = Color.White
-            AoFlags(i).BackColor = Color.White
-
-        Next
-
-        ' AKTIFKAN FLAG AKA
-        For i As Integer = 0 To AkaScore - 1
-
-            AkaFlags(i).BackColor = Color.Red
-            AkaFlags(i).ForeColor = Color.White
-
-        Next
-
-        ' AKTIFKAN FLAG AO
-        For i As Integer = 0 To AoScore - 1
-
-            AoFlags(i).BackColor = Color.Blue
-            AoFlags(i).ForeColor = Color.White
-
-        Next
-
-        CheckWinner()
-
-    End Sub
-
-    Private Sub CheckWinner()
-
-        If AkaScore > AoScore Then
-
-            LblAkaWinnerStatus.Text = "WINNER"
-            LblAoWinnerStatus.Text = ""
-
-        ElseIf AoScore > AkaScore Then
-
-            LblAoWinnerStatus.Text = "WINNER"
-            LblAkaWinnerStatus.Text = ""
-
-        Else
-
-            LblAoWinnerStatus.Text = ""
-            LblAkaWinnerStatus.Text = ""
-
-        End If
-
-    End Sub
-
-    Private Sub BtnResetScoreAka_Click(sender As Object, e As EventArgs) Handles BtnResetScoreAka.Click
-
-        ResetFlagSystem()
-
-    End Sub
-
-    Private Sub BtnResetScoreAo_Click(sender As Object, e As EventArgs) Handles BtnResetScoreAo.Click
-
-        ResetFlagSystem()
-
-    End Sub
-
-    Private Sub ResetFlagSystem()
-
-        AkaScore = 0
-        AoScore = 0
-
-        TotalScoreAKA.Value = 0
-        TotalScoreAO.Value = 0
-
-        ' RESET SEMUA WARNA BUTTON
-        For i As Integer = 0 To 6
-
-            AkaFlags(i).BackColor = Color.White
-            AkaFlags(i).ForeColor = Color.Red
-
-            AoFlags(i).BackColor = Color.White
-            AoFlags(i).ForeColor = Color.Blue
-
-        Next
-
-        ' HAPUS STATUS WINNER
-        LblAkaWinnerStatus.Text = ""
-        LblAoWinnerStatus.Text = ""
-
-    End Sub
-    Private Sub PnlCenterScore_Paint(sender As Object, e As PaintEventArgs) Handles PnlCenterScore.Paint
-
-    End Sub
     ' ==============================================================================
     ' 0. DEKLARASI VARIABEL & PROPERTI GLOBAL
     ' ==============================================================================
     Private frmLogActivity As FormLogActivity = Nothing
 
+    Public Shared KataDetailFontName As String = "Microsoft Sans Serif"
+    Public Shared KataDetailIsBold As Boolean = True
+    Public Shared KataDetailColor As Color = Color.Yellow
+
     ' ==============================================================================
     ' 1. KONSTRUKTOR (INITIALIZATION)
     ' ==============================================================================
-
-    ''' <summary>
-    ''' Konstruktor utama untuk inisialisasi komponen Form dan UI Scoring.
-    ''' </summary>
     Public Sub New()
         InitializeComponent()
+
+        ' Memanggil inisialisasi awal
         InitializeScoringUI()
+        ApplyKataMatchDetailStyle(KataDetailFontName, KataDetailIsBold, KataDetailColor)
     End Sub
 
     ' ==============================================================================
-    ' 2. FUNGSI HELPER & KONFIGURASI UI (MANAJEMEN MODE & JURI)
+    ' 2. FUNGSI HELPER UI & CUSTOM STYLE (MEMPERTAHANKAN KODE ASLI)
     ' ==============================================================================
 
-    ''' <summary>
-    ''' Mengatur nilai default awal saat aplikasi pertama kali dimuat.
-    ''' </summary>
+    Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+
+            If LblJudgeStatusTitle IsNot Nothing Then
+                LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
+                LblJudgeStatusTitle.ForeColor = textColor
+                LblJudgeStatusTitle.Refresh()
+            End If
+
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub CheckWinner(AkaScore As Integer, AoScore As Integer)
+        ' Menampilkan label WINNER berdasarkan skor tertinggi
+        If AkaScore > AoScore Then
+            LblAkaWinnerStatus.Text = "WINNER"
+            LblAoWinnerStatus.Text = ""
+        ElseIf AoScore > AkaScore Then
+            LblAoWinnerStatus.Text = "WINNER"
+            LblAkaWinnerStatus.Text = ""
+        Else
+            LblAoWinnerStatus.Text = ""
+            LblAkaWinnerStatus.Text = ""
+        End If
+    End Sub
+
     Private Sub InitializeScoringUI()
         RbScoreType.Checked = True
         Rb7Judge.Checked = True ' Menjamin 7 Judge sebagai default
@@ -191,14 +60,15 @@
         UpdateJudgeCountUI()
     End Sub
 
-    ''' <summary>
-    ''' Mengatur visibilitas dan efek visual panel berdasarkan mode penilaian (Skor/Bendera).
-    ''' </summary>
+    ' ==============================================================================
+    ' 3. MANAJEMEN MODE (SCORE VS FLAG) & VISIBILITAS JURI
+    ' ==============================================================================
+
     Private Sub ToggleScoringMode()
         Me.SuspendLayout()
         Try
             If RbScoreType.Checked Then
-                ' ── MODE SCORE (Angka) ──────────────────────────────────
+                ' ── MODE SCORE (Angka) ──
                 PnlPointInputsAka.Visible = True
                 PnlPointInputsAo.Visible = True
                 PnlFlagInputsAka.Visible = False
@@ -211,7 +81,7 @@
                 RbFlagSystem.Font = New Font(RbFlagSystem.Font, FontStyle.Regular)
 
             ElseIf RbFlagSystem.Checked Then
-                ' ── MODE FLAG (Bendera) ─────────────────────────────────
+                ' ── MODE FLAG (Bendera) ──
                 PnlPointInputsAka.Visible = False
                 PnlPointInputsAo.Visible = False
                 PnlFlagInputsAka.Visible = True
@@ -228,20 +98,14 @@
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Mengatur visibilitas panel juri (3, 5, atau 7 juri) serta mereset data juri yang disembunyikan.
-    ''' </summary>
     Private Sub UpdateJudgeCountUI()
         Me.SuspendLayout()
         Try
-            Dim totalJudge As Integer = 7
-            If Rb3Judge.Checked Then totalJudge = 3
-            If Rb5Judge.Checked Then totalJudge = 5
-
+            Dim totalJudge As Integer = If(Rb3Judge.Checked, 3, If(Rb5Judge.Checked, 5, 7))
             Dim showJ45 As Boolean = (totalJudge >= 5)
             Dim showJ67 As Boolean = (totalJudge = 7)
 
-            ' ── VISIBILITAS: PANEL SCORING (ANGKA) ──────────────────────────────
+            ' ── VISIBILITAS: PANEL SCORING (ANGKA) ──
             NumAkaJ4.Visible = showJ45 : LblAkaJ4.Visible = showJ45
             NumAkaJ5.Visible = showJ45 : LblAkaJ5.Visible = showJ45
             NumAkaJ6.Visible = showJ67 : LblAkaJ6.Visible = showJ67
@@ -252,24 +116,17 @@
             NumAoJ6.Visible = showJ67 : LblAoJ6.Visible = showJ67
             NumAoJ7.Visible = showJ67 : LblAoJ7.Visible = showJ67
 
-            ' ── VISIBILITAS: PANEL FLAG BENDERA ──────────────────────────────────
-            PnlFlagAka4.Visible = showJ45
-            PnlFlagAka5.Visible = showJ45
-            PnlFlagAka6.Visible = showJ67
-            PnlFlagAka7.Visible = showJ67
+            ' ── VISIBILITAS: PANEL FLAG BENDERA ──
+            PnlFlagAka4.Visible = showJ45 : PnlFlagAka5.Visible = showJ45
+            PnlFlagAka6.Visible = showJ67 : PnlFlagAka7.Visible = showJ67
+            PnlFlagAo4.Visible = showJ45 : PnlFlagAo5.Visible = showJ45
+            PnlFlagAo6.Visible = showJ67 : PnlFlagAo7.Visible = showJ67
 
-            PnlFlagAo4.Visible = showJ45
-            PnlFlagAo5.Visible = showJ45
-            PnlFlagAo6.Visible = showJ67
-            PnlFlagAo7.Visible = showJ67
+            ' ── VISIBILITAS: LEFT BAR (STATUS LOGIN JURI) ──
+            PnlJ4.Visible = showJ45 : PnlJ5.Visible = showJ45
+            PnlJ6.Visible = showJ67 : PnlJ7.Visible = showJ67
 
-            ' ── VISIBILITAS: LEFT BAR (STATUS LOGIN JURI) ────────────────────────
-            PnlJ4.Visible = showJ45
-            PnlJ5.Visible = showJ45
-            PnlJ6.Visible = showJ67
-            PnlJ7.Visible = showJ67
-
-            ' ── RESET DATA JURI YANG DISEMBUNYIKAN ───────────────────────────────
+            ' ── RESET DATA JURI YANG DISEMBUNYIKAN ──
             If Not showJ45 Then
                 NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0
                 NumAoJ4.Value = 0 : NumAoJ5.Value = 0
@@ -279,7 +136,7 @@
                 NumAoJ6.Value = 0 : NumAoJ7.Value = 0
             End If
 
-            ' ── VISUAL FEEDBACK (Warna Radio Button Jumlah Juri) ─────────────────
+            ' ── VISUAL FEEDBACK (Warna Radio Button Jumlah Juri) ──
             Rb3Judge.Font = New Font(Rb3Judge.Font, FontStyle.Regular)
             Rb5Judge.Font = New Font(Rb5Judge.Font, FontStyle.Regular)
             Rb7Judge.Font = New Font(Rb7Judge.Font, FontStyle.Regular)
@@ -300,58 +157,40 @@
         End Try
     End Sub
 
-    ' ==============================================================================
-    ' 3. LOGIKA SISTEM BENDERA (FLAG SYSTEM ENGINE)
-    ' ==============================================================================
-
-    ''' <summary>
-    ''' Mendapatkan total jumlah juri yang saat ini sedang aktif dipilih.
-    ''' </summary>
     Private Function GetActiveJudgeCount() As Integer
         If Rb3Judge.Checked Then Return 3
         If Rb5Judge.Checked Then Return 5
         Return 7
     End Function
 
-    ''' <summary>
-    ''' Mengatur efek visual panel bendera juri. Warna teks dan bendera dipertahankan asli (Default),
-    ''' hanya warna background yang berubah menjadi warna pudar tim saat aktif agar tetap kontras.
-    ''' </summary>
+    ' ==============================================================================
+    ' 4. LOGIKA VISUAL SISTEM BENDERA PADA PANEL UI
+    ' ==============================================================================
+
     Private Sub HighlightFlag(pnl As Panel, isActive As Boolean, isAka As Boolean)
         If pnl Is Nothing Then Exit Sub
 
-        ' 1. Definisikan Spektrum Warna Default Komponen
         Dim flagColor As Color = If(isAka, Color.Red, Color.Blue)
-
-        ' Warna Background dibuat pudar/soft saat aktif agar tulisan di dalamnya tetap kontras tinggi
         Dim activeBackColor As Color = If(isAka, Color.FromArgb(255, 215, 215), Color.FromArgb(215, 230, 255))
-        Dim inactiveBackColor As Color = Color.White
 
-        ' 2. Atur Warna Background Panel
-        If isActive Then
-            pnl.BackColor = activeBackColor
-        Else
-            pnl.BackColor = inactiveBackColor
-        End If
+        ' Merubah warna Background panel jika aktif
+        pnl.BackColor = If(isActive, activeBackColor, Color.White)
 
-        ' 3. Atur Konten Label di Dalam Panel (Tetap Menggunakan Warna Default)
+        ' Memastikan teks & Ikon mempertahankan warna defaultnya
         For Each ctrl As Control In pnl.Controls
             If TypeOf ctrl Is Label Then
                 ctrl.Visible = True
                 If ctrl.Text = "⚑" Then
-                    ctrl.ForeColor = flagColor ' Selalu warna tim asli (Merah / Biru)
+                    ctrl.ForeColor = flagColor
                 Else
-                    ctrl.ForeColor = Color.Black ' Angka skor tetap hitam untuk legibilitas maksimal
+                    ctrl.ForeColor = Color.Black
                 End If
             End If
         Next
     End Sub
 
-    ''' <summary>
-    ''' Memproses perubahan seluruh visual bendera juri (1-7) untuk tim AKA dan AO sekaligus memperbarui total skor.
-    ''' </summary>
     Private Sub ProcessFlagVisuals(akaScore As Integer, aoScore As Integer)
-        ' Tim AKA (Sisi Merah)
+        ' Tim AKA
         HighlightFlag(PnlFlagAka1, akaScore >= 1, True)
         HighlightFlag(PnlFlagAka2, akaScore >= 2, True)
         HighlightFlag(PnlFlagAka3, akaScore >= 3, True)
@@ -360,7 +199,7 @@
         HighlightFlag(PnlFlagAka6, akaScore >= 6, True)
         HighlightFlag(PnlFlagAka7, akaScore >= 7, True)
 
-        ' Tim AO (Sisi Biru)
+        ' Tim AO
         HighlightFlag(PnlFlagAo1, aoScore >= 1, False)
         HighlightFlag(PnlFlagAo2, aoScore >= 2, False)
         HighlightFlag(PnlFlagAo3, aoScore >= 3, False)
@@ -369,27 +208,24 @@
         HighlightFlag(PnlFlagAo6, aoScore >= 6, False)
         HighlightFlag(PnlFlagAo7, aoScore >= 7, False)
 
-        ' Sinkronisasi Nilai ke Output Numeric Kontrol
+        ' Update Angka Papan Skor
         TotalScoreAKA.Value = akaScore
         TotalScoreAO.Value = aoScore
+
+        ' Eksekusi Logika Pengecekan Pemenang Asli Milik Anda
+        CheckWinner(akaScore, aoScore)
     End Sub
 
     ' ==============================================================================
-    ' 4. EVENT HANDLERS: INTERAKSI INPUT & KLIK KOMPONEN UI
+    ' 5. EVENT HANDLERS: KLIK PANEL BENDERA
     ' ==============================================================================
 
-    ''' <summary>
-    ''' Event handler saat panel bendera tim AKA diklik oleh pengguna.
-    ''' </summary>
     Private Sub FlagAka_PanelClick(sender As Object, e As EventArgs) Handles PnlFlagAka1.Click, PnlFlagAka2.Click, PnlFlagAka3.Click, PnlFlagAka4.Click, PnlFlagAka5.Click, PnlFlagAka6.Click, PnlFlagAka7.Click
         Dim clickedPanel = CType(sender, Panel)
         Dim score As Integer = 0
 
-        ' Ekstraksi nilai skor angka dari komponen label di dalam panel (Menggunakan TryParse agar aman dari crash)
         For Each ctrl As Control In clickedPanel.Controls
-            If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then
-                Integer.TryParse(ctrl.Text, score)
-            End If
+            If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then Integer.TryParse(ctrl.Text, score)
         Next
 
         Dim currentAkaScore As Integer = TotalScoreAKA.Value
@@ -397,7 +233,6 @@
 
         If score > total Then Exit Sub
 
-        ' Mekanisme toggle reset jika skor yang sama diklik ulang, atau kalkulasi otomatis sistem Zero-Sum
         If score = currentAkaScore Then
             ProcessFlagVisuals(0, 0)
         Else
@@ -405,18 +240,12 @@
         End If
     End Sub
 
-    ''' <summary>
-    ''' Event handler saat panel bendera tim AO diklik oleh pengguna.
-    ''' </summary>
     Private Sub FlagAo_PanelClick(sender As Object, e As EventArgs) Handles PnlFlagAo1.Click, PnlFlagAo2.Click, PnlFlagAo3.Click, PnlFlagAo4.Click, PnlFlagAo5.Click, PnlFlagAo6.Click, PnlFlagAo7.Click
         Dim clickedPanel = CType(sender, Panel)
         Dim score As Integer = 0
 
-        ' Ekstraksi nilai skor angka dari komponen label di dalam panel (Menggunakan TryParse agar aman dari crash)
         For Each ctrl As Control In clickedPanel.Controls
-            If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then
-                Integer.TryParse(ctrl.Text, score)
-            End If
+            If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then Integer.TryParse(ctrl.Text, score)
         Next
 
         Dim currentAoScore As Integer = TotalScoreAO.Value
@@ -424,7 +253,6 @@
 
         If score > total Then Exit Sub
 
-        ' Mekanisme toggle reset jika skor yang sama diklik ulang, atau kalkulasi otomatis sistem Zero-Sum
         If score = currentAoScore Then
             ProcessFlagVisuals(0, 0)
         Else
@@ -432,288 +260,87 @@
         End If
     End Sub
 
-    ''' <summary>
-    ''' Menangani pemanggilan Form Log Aktivitas secara tunggal (Singleton-lite).
-    ''' </summary>
+    ' ==============================================================================
+    ' 6. EVENT HANDLERS: INTERAKSI TOMBOL LAINNYA
+    ' ==============================================================================
+
     Private Sub BtnLogActivity_Click(sender As Object, e As EventArgs) Handles BtnLogActivity.Click
         If frmLogActivity Is Nothing OrElse frmLogActivity.IsDisposed Then
             frmLogActivity = New FormLogActivity()
         End If
-
         frmLogActivity.Show()
         frmLogActivity.BringToFront()
     End Sub
 
-    ''' <summary>
-    ''' Event handler perubahan pilihan ke Mode Score (Angka).
-    ''' </summary>
+    ' FITUR BARU: Otomatis Reset Saat Berpindah Mode Scoring
     Private Sub RbScoreType_CheckedChanged(sender As Object, e As EventArgs) Handles RbScoreType.CheckedChanged
-        If RbScoreType.Checked Then ToggleScoringMode()
+        If RbScoreType.Checked Then
+            ToggleScoringMode()
+            ResetAllScores()
+        End If
     End Sub
 
-    ''' <summary>
-    ''' Event handler perubahan pilihan ke Mode Flag (Bendera).
-    ''' </summary>
+    ' FITUR BARU: Otomatis Reset Saat Berpindah Mode Scoring
     Private Sub RbFlagSystem_CheckedChanged(sender As Object, e As EventArgs) Handles RbFlagSystem.CheckedChanged
-        If RbFlagSystem.Checked Then ToggleScoringMode()
+        If RbFlagSystem.Checked Then
+            ToggleScoringMode()
+            ResetAllScores()
+        End If
     End Sub
 
-    ''' <summary>
-    ''' Event ketika opsi total juri diubah menjadi 3 orang.
-    ''' </summary>
     Private Sub Rb3Judge_CheckedChanged(sender As Object, e As EventArgs) Handles Rb3Judge.CheckedChanged
         If Rb3Judge.Checked Then
-            ResetScoresOnly()
+            ResetAllScores()
             UpdateJudgeCountUI()
         End If
     End Sub
 
-    ''' <summary>
-    ''' Event ketika opsi total juri diubah menjadi 5 orang.
-    ''' </summary>
     Private Sub Rb5Judge_CheckedChanged(sender As Object, e As EventArgs) Handles Rb5Judge.CheckedChanged
         If Rb5Judge.Checked Then
-            ResetScoresOnly()
+            ResetAllScores()
             UpdateJudgeCountUI()
         End If
     End Sub
 
-    ''' <summary>
-    ''' Event ketika opsi total juri diubah menjadi 7 orang.
-    ''' </summary>
     Private Sub Rb7Judge_CheckedChanged(sender As Object, e As EventArgs) Handles Rb7Judge.CheckedChanged
         If Rb7Judge.Checked Then
-            ResetScoresOnly()
+            ResetAllScores()
             UpdateJudgeCountUI()
         End If
     End Sub
 
-    ' ==============================================================================
-    ' 5. MASTER RESET DATA & SCORE MANAJEMEN
-    ' ==============================================================================
-
-    ''' <summary>
-    ''' Menangani tombol reset skor untuk tim AKA.
-    ''' </summary>
     Private Sub BtnResetScoreAka_Click(sender As Object, e As EventArgs) Handles BtnResetScoreAka.Click
-        If RbFlagSystem.Checked Then
-            ProcessFlagVisuals(0, 0)
-        Else
-            NumAkaJ1.Value = 0 : NumAkaJ2.Value = 0 : NumAkaJ3.Value = 0
-            NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0 : NumAkaJ6.Value = 0 : NumAkaJ7.Value = 0
-            TotalScoreAKA.Value = 0
-        End If
+        ResetAllScores()
     End Sub
 
-    ''' <summary>
-    ''' Menangani tombol reset skor untuk tim AO.
-    ''' </summary>
     Private Sub BtnResetScoreAo_Click(sender As Object, e As EventArgs) Handles BtnResetScoreAo.Click
-        If RbFlagSystem.Checked Then
-            ProcessFlagVisuals(0, 0)
-        Else
-            NumAoJ1.Value = 0 : NumAoJ2.Value = 0 : NumAoJ3.Value = 0
-            NumAoJ4.Value = 0 : NumAoJ5.Value = 0 : NumAoJ6.Value = 0 : NumAoJ7.Value = 0
-            TotalScoreAO.Value = 0
-        End If
+        ResetAllScores()
     End Sub
 
-    ''' <summary>
-    ''' Fungsi utilitas internal untuk membersihkan seluruh nilai input juri secara serentak.
-    ''' </summary>
-    Private Sub ResetScoresOnly()
-        If RbFlagSystem.Checked Then
-            ProcessFlagVisuals(0, 0)
-        Else
-            NumAkaJ1.Value = 0 : NumAkaJ2.Value = 0 : NumAkaJ3.Value = 0
-            NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0 : NumAkaJ6.Value = 0 : NumAkaJ7.Value = 0
+    ' ==============================================================================
+    ' 7. MASTER RESET DATA SCORING
+    ' ==============================================================================
 
-            NumAoJ1.Value = 0 : NumAoJ2.Value = 0 : NumAoJ3.Value = 0
-            NumAoJ4.Value = 0 : NumAoJ5.Value = 0 : NumAoJ6.Value = 0 : NumAoJ7.Value = 0
+    Private Sub ResetAllScores()
+        ' Kita buat reset ALL tanpa syarat If/Else. 
+        ' Jadi angka dan bendera dua-duanya dihapus bersih ke 0 tanpa peduli mode apa yang sedang aktif!
 
-            TotalScoreAKA.Value = 0
-            TotalScoreAO.Value = 0
-        End If
+        ' 1. Reset visual bendera
+        ProcessFlagVisuals(0, 0)
+
+        ' 2. Reset angka Numeric Up/Down
+        NumAkaJ1.Value = 0 : NumAkaJ2.Value = 0 : NumAkaJ3.Value = 0
+        NumAkaJ4.Value = 0 : NumAkaJ5.Value = 0 : NumAkaJ6.Value = 0 : NumAkaJ7.Value = 0
+
+        NumAoJ1.Value = 0 : NumAoJ2.Value = 0 : NumAoJ3.Value = 0
+        NumAoJ4.Value = 0 : NumAoJ5.Value = 0 : NumAoJ6.Value = 0 : NumAoJ7.Value = 0
+
+        ' 3. Reset total papan bawah
+        TotalScoreAKA.Value = 0
+        TotalScoreAO.Value = 0
+
+        ' 4. Hapus tulisan WINNER
+        CheckWinner(0, 0)
     End Sub
 
-    Private Sub SetupFlagSystem()
-
-        PnlFlagSystem.Controls.Clear()
-
-        PnlFlagSystem.Size = New Size(250, 280)
-        PnlFlagSystem.Location = New Point(175, 40)
-        PnlFlagSystem.BackColor = Color.Transparent
-        PnlFlagSystem.Visible = False
-
-        ' ======================
-        ' FLAG AKA
-        ' ======================
-        For i As Integer = 0 To 6
-
-            AkaFlags(i) = New Button()
-
-            With AkaFlags(i)
-
-                .Size = New Size(90, 35)
-                .Location = New Point(10, 10 + (i * 45))
-
-                .BackColor = Color.White
-                .ForeColor = Color.Red
-
-                .FlatStyle = FlatStyle.Flat
-
-                .Font = New Font("Segoe UI", 11, FontStyle.Bold)
-
-                .Text = "🚩 " & (7 - i).ToString()
-
-            End With
-
-            PnlFlagSystem.Controls.Add(AkaFlags(i))
-            AddHandler AkaFlags(i).Click, AddressOf AkaFlag_Click
-
-        Next
-
-        ' ======================
-        ' FLAG AO
-        ' ======================
-        For i As Integer = 0 To 6
-
-            AoFlags(i) = New Button()
-
-            With AoFlags(i)
-
-                .Size = New Size(90, 35)
-                .Location = New Point(130, 10 + (i * 45))
-
-                .BackColor = Color.White
-                .ForeColor = Color.Blue
-
-                .FlatStyle = FlatStyle.Flat
-
-                .Font = New Font("Segoe UI", 11, FontStyle.Bold)
-
-                .Text = (7 - i).ToString() & " 🚩"
-
-            End With
-
-            PnlFlagSystem.Controls.Add(AoFlags(i))
-            AddHandler AoFlags(i).Click, AddressOf AoFlag_Click
-
-        Next
-
-        PnlCenterScore.Controls.Add(PnlFlagSystem)
-
-    End Sub
-
-    Private Sub SetupJudgeSelector()
-        ' RB 3 JUDGE
-        With Rb3Judge
-
-            .Text = "3 Judge"
-            .AutoSize = True
-
-        End With
-
-        ' RB 5 JUDGE
-        With Rb5Judge
-
-            .Text = "5 Judge"
-            .AutoSize = True
-            .Checked = True
-
-        End With
-
-        ' RB 7 JUDGE
-        With Rb7Judge
-
-            .Text = "7 Judge"
-            .AutoSize = True
-
-        End With
-
-        ' EVENT
-        AddHandler Rb3Judge.CheckedChanged, AddressOf Rb3Judge_CheckedChanged
-        AddHandler Rb5Judge.CheckedChanged, AddressOf Rb5Judge_CheckedChanged
-        AddHandler Rb7Judge.CheckedChanged, AddressOf Rb7Judge_CheckedChanged
-
-    End Sub
-
-    Private Sub RbFlagSystem_CheckedChanged(sender As Object, e As EventArgs) Handles RbFlagSystem.CheckedChanged
-
-        If RbFlagSystem.Checked Then
-
-            PnlPointInputsAka.Visible = False
-            PnlPointInputsAo.Visible = False
-
-            PnlFlagSystem.Visible = True
-
-        End If
-
-    End Sub
-
-    Private Sub RbScoreType_CheckedChanged(sender As Object, e As EventArgs) Handles RbScoreType.CheckedChanged
-
-        If RbScoreType.Checked Then
-
-            PnlPointInputsAka.Visible = True
-            PnlPointInputsAo.Visible = True
-
-            PnlFlagSystem.Visible = False
-
-        End If
-
-    End Sub
-
-    Private Sub Rb3Judge_CheckedChanged(sender As Object, e As EventArgs)
-
-        If Rb3Judge.Checked Then
-
-            TotalJudge = 3
-
-            ResetFlagSystem()
-            UpdateJudgeDisplay()
-
-        End If
-
-    End Sub
-
-    Private Sub Rb5Judge_CheckedChanged(sender As Object, e As EventArgs)
-
-        If Rb5Judge.Checked Then
-
-            TotalJudge = 5
-
-            ResetFlagSystem()
-            UpdateJudgeDisplay()
-
-        End If
-
-    End Sub
-
-    Private Sub Rb7Judge_CheckedChanged(sender As Object, e As EventArgs)
-
-        If Rb7Judge.Checked Then
-
-            TotalJudge = 7
-
-            ResetFlagSystem()
-            UpdateJudgeDisplay()
-
-        End If
-
-    End Sub
-
-    Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
-        Try
-            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
-
-            If LblJudgeStatusTitle IsNot Nothing Then
-                LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
-                LblJudgeStatusTitle.ForeColor = textColor
-                LblJudgeStatusTitle.Refresh()
-            End If
-
-        Catch ex As Exception
-        End Try
-    End Sub
 End Class
