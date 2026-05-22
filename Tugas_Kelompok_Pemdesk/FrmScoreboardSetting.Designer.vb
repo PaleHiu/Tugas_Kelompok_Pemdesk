@@ -699,24 +699,48 @@ Partial Public Class FrmScoreboardSetting
 
         ' 3. KATA Name
         Dim gpKataName As New GroupBox() : gpKataName.Text = "KATA Name" : gpKataName.Location = New Point(310, 205) : gpKataName.Size = New Size(280, 95)
-        Dim cbKNM = MakeCombo("Microsoft Sans Serif") : cbKNM.Location = New Point(70, 25) : cbKNM.Width = 160
-        Dim cpKNM = MakeColorPicker(Color.LightGreen) : cpKNM.Location = New Point(70, 55)
-        Dim chkBNM As New CheckBox() : chkBNM.Text = "Bold" : chkBNM.Checked = True : chkBNM.Location = New Point(235, 58) : chkBNM.AutoSize = True
-        gpKataName.Controls.AddRange(New Control() {cbKNM, cpKNM, chkBNM})
+
+        Dim lblFontName As New Label() : lblFontName.Text = "Font:" : lblFontName.Location = New Point(15, 28) : lblFontName.AutoSize = True
+        Dim cbKNM = MakeCombo("Microsoft Sans Serif") : cbKNM.Location = New Point(70, 25) : cbKNM.Width = 160 : cbKNM.Name = "CboKataNameFont"
+
+        Dim lblColorName As New Label() : lblColorName.Text = "Warna:" : lblColorName.Location = New Point(15, 58) : lblColorName.AutoSize = True
+        Dim cpKNM = MakeColorPicker(Color.LightGreen) : cpKNM.Location = New Point(70, 55) : cpKNM.Name = "PnlKataNameColor"
+
+        Dim chkBNM As New CheckBox() : chkBNM.Text = "Bold" : chkBNM.Checked = True : chkBNM.Location = New Point(235, 58) : chkBNM.AutoSize = True : chkBNM.Name = "ChkKataNameBold"
+
+        gpKataName.Controls.AddRange(New Control() {lblFontName, cbKNM, lblColorName, cpKNM, chkBNM})
+
 
         ' 4. KATA Match Detail
         Dim gpKataDetail As New GroupBox() : gpKataDetail.Text = "KATA Match Detail" : gpKataDetail.Location = New Point(310, 310) : gpKataDetail.Size = New Size(280, 95)
+
+        ' Label Keterangan Font & Warna untuk Detail Pertandingan KATA
+        Dim lblFontDetail As New Label() : lblFontDetail.Text = "Font:" : lblFontDetail.Location = New Point(15, 28) : lblFontDetail.AutoSize = True
         Dim cbKDT = MakeCombo("Microsoft Sans Serif") : cbKDT.Location = New Point(70, 25) : cbKDT.Width = 160 : cbKDT.Name = "CboKataDetailFont"
+
+        Dim lblColorDetail As New Label() : lblColorDetail.Text = "Warna:" : lblColorDetail.Location = New Point(15, 58) : lblColorDetail.AutoSize = True
         Dim cpKDT = MakeColorPicker(Color.Yellow) : cpKDT.Location = New Point(70, 55) : cpKDT.Name = "PnlKataDetailColor"
+
         Dim chkBDT As New CheckBox() : chkBDT.Text = "Bold" : chkBDT.Checked = True : chkBDT.Location = New Point(235, 58) : chkBDT.AutoSize = True : chkBDT.Name = "ChkKataDetailBold"
-        gpKataDetail.Controls.AddRange(New Control() {cbKDT, cpKDT, chkBDT})
+
+        ' Masukkan semua komponen beserta labelnya ke dalam GroupBox Detail
+        gpKataDetail.Controls.AddRange(New Control() {lblFontDetail, cbKDT, lblColorDetail, cpKDT, chkBDT})
+
 
         ' 5. KATA Timer
-        Dim gpKataTimer As New GroupBox() : gpKataTimer.Text = "KATA Timer" : gpKataTimer.Location = New Point(600, 205) : gpKataTimer.Size = New Size(300, 80)
-        Dim cpBC = MakeColorPicker(Color.Maroon) : cpBC.Location = New Point(10, 40)
-        Dim cpTC = MakeColorPicker(Color.White) : cpTC.Location = New Point(140, 40)
-        gpKataTimer.Controls.AddRange(New Control() {cpBC, cpTC})
+        Dim gpKataTimer As New GroupBox() : gpKataTimer.Text = "KATA Timer" : gpKataTimer.Location = New Point(605, 310) : gpKataTimer.Size = New Size(280, 95)
 
+        ' Label Keterangan Font & Warna untuk Timer KATA
+        Dim lblFontTimer As New Label() : lblFontTimer.Text = "Font:" : lblFontTimer.Location = New Point(15, 28) : lblFontTimer.AutoSize = True
+        Dim cbKTM = MakeCombo("Microsoft Sans Serif") : cbKTM.Location = New Point(70, 25) : cbKTM.Width = 160 : cbKTM.Name = "CboKataTimerFont"
+
+        Dim lblColorTimer As New Label() : lblColorTimer.Text = "Warna:" : lblColorTimer.Location = New Point(15, 58) : lblColorTimer.AutoSize = True
+        Dim cpKTM = MakeColorPicker(Color.Red) : cpKTM.Location = New Point(70, 55) : cpKTM.Name = "PnlKataTimerColor"
+
+        Dim chkBTM As New CheckBox() : chkBTM.Text = "Bold" : chkBTM.Checked = True : chkBTM.Location = New Point(235, 58) : chkBTM.AutoSize = True : chkBTM.Name = "ChkKataTimerBold"
+
+        ' Masukkan semua komponen beserta labelnya ke dalam GroupBox Timer
+        gpKataTimer.Controls.AddRange(New Control() {lblFontTimer, cbKTM, lblColorTimer, cpKTM, chkBTM})
         mainPanel.Controls.AddRange(New Control() {gpTop, gpScoreMode, gpKataName, gpKataDetail, gpKataTimer})
         Return mainPanel
     End Function

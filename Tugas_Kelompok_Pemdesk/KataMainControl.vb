@@ -5,10 +5,19 @@
     ' ==============================================================================
     Private frmLogActivity As FormLogActivity = Nothing
 
-    ' (PERBAIKAN: Kata "Shared" dihapus agar tidak muncul error/warning hijau)
-    Public KataDetailFontName As String = "Microsoft Sans Serif"
-    Public KataDetailIsBold As Boolean = True
-    Public KataDetailColor As Color = Color.Yellow
+    Public Shared KataNameFontName As String = "Microsoft Sans Serif"
+    Public Shared KataNameIsBold As Boolean = True
+    Public Shared KataNameColor As System.Drawing.Color = System.Drawing.Color.LightGreen
+
+    Public Shared KataDetailFontName As String = "Microsoft Sans Serif"
+    Public Shared KataDetailIsBold As Boolean = True
+    Public Shared KataDetailColor As System.Drawing.Color = System.Drawing.Color.Yellow
+
+    Public Shared KataTimerFontName As String = "Microsoft Sans Serif"
+    Public Shared KataTimerIsBold As Boolean = True
+    Public Shared KataTimerColor As System.Drawing.Color = System.Drawing.Color.Red
+    Private originalXCoords As New Dictionary(Of Control, Integer)
+    Private originalCenterWidth As Integer = 342
 
     ' ==============================================================================
     ' 1. KONSTRUKTOR (INITIALIZATION)
@@ -16,28 +25,46 @@
     Public Sub New()
         InitializeComponent()
 
-        ' Memanggil inisialisasi awal
         InitializeScoringUI()
         ApplyKataMatchDetailStyle(KataDetailFontName, KataDetailIsBold, KataDetailColor)
+
+        ' 1. MATIKAN SEMUA DOCKING BAWAAN
+        PnlAka.Dock = DockStyle.None
+        PnlAo.Dock = DockStyle.None
+        PnlCenterScore.Dock = DockStyle.None
+
+        ' 2. KUNCI PANEL AKA DAN AO DI PINGGIR, PANEL TENGAH SEBAGAI KARET
+        PnlAka.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left
+        PnlAo.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Right
+        PnlCenterScore.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+
+        ' 3. AMANKAN TOMBOL BAWAH
+        If BtnSettings IsNot Nothing Then BtnSettings.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+        If BtnShortcut IsNot Nothing Then BtnShortcut.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
+
+        ' 4. KUNCI MATI SUMBU Y DAN REKAM POSISI X ASLI
+        If PnlCenterScore IsNot Nothing Then
+            originalCenterWidth = PnlCenterScore.Width
+
+            ' Aktifkan Scrollbar jika layar ditarik terlalu sempit (Standar Aplikasi Profesional)
+            PnlCenterScore.AutoScroll = True
+
+            For Each ctrl As Control In PnlCenterScore.Controls
+                ' KUNCI MATI: Semua kotak dipaksa menempel ke atas. 
+                ' Mereka tidak akan pernah bisa melayang menimpa "JUDGE SCORE" atau didorong menimpa "DISQUALIFICATION" lagi!
+                ctrl.Anchor = AnchorStyles.Top Or AnchorStyles.Left
+
+                ' Rekam posisi X asli (hasil drag & drop-mu) ke dalam memori
+                originalXCoords(ctrl) = ctrl.Left
+            Next
+        End If
+
+        Me.MinimumSize = New Size(1400, 800)
     End Sub
 
     ' ==============================================================================
     ' 2. FUNGSI HELPER UI & CUSTOM STYLE 
     ' ==============================================================================
-
-    Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
-        Try
-            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
-
-            If LblJudgeStatusTitle IsNot Nothing Then
-                LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
-                LblJudgeStatusTitle.ForeColor = textColor
-                LblJudgeStatusTitle.Refresh()
-            End If
-        Catch ex As Exception
-        End Try
-    End Sub
-
     Private Sub CheckWinner(AkaScore As Integer, AoScore As Integer)
         ' Kondisi Awal / Reset (0 - 0) -> Sembunyikan (Hide) kedua label winner
         If AkaScore = 0 AndAlso AoScore = 0 Then
@@ -379,10 +406,6 @@
         ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
     End Sub
 
-    ' ==============================================================================
-    ' FUNGSI LAINNYA
-    ' ==============================================================================
-
     Private Sub TxtMatchDetail_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDetail.TextChanged
     End Sub
 
@@ -392,4 +415,84 @@
     Private Sub LblAoWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAoWinnerStatus.Click
     End Sub
 
+    Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+
+            ' Tes visual ke Judge Status
+            If LblJudgeStatusTitle IsNot Nothing Then
+                LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
+                LblJudgeStatusTitle.ForeColor = textColor
+                LblJudgeStatusTitle.Refresh()
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Public Sub ApplyKataNameStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Public Sub ApplyKataTimerStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
+        Try
+            Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Setting
+    Private Sub BtnSettingKata_Click(sender As Object, e As EventArgs) Handles BtnSettings.Click
+        Try
+            Dim frmSetting As New FrmScoreboardSetting()
+            frmSetting.ShowDialog(Me)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka menu Setting: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Shortcut
+    Private Sub BtnShortcutKata_Click(sender As Object, e As EventArgs) Handles BtnShortcut.Click
+        Try
+            Dim frmShortcut As New FormKeyboardShortcut()
+            frmShortcut.ShowDialog(Me)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka menu Shortcut: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+    Private Sub PnlCenterScore_Resize(sender As Object, e As EventArgs) Handles PnlCenterScore.Resize
+        If originalXCoords.Count > 0 AndAlso PnlCenterScore IsNot Nothing Then
+
+            Dim currentCenter As Integer = PnlCenterScore.Width \ 2
+            Dim originalCenter As Integer = originalCenterWidth \ 2
+
+            ' Geser semua kotak-kotak kecil secara serentak ke tengah layar
+            For Each ctrl As Control In PnlCenterScore.Controls
+                If originalXCoords.ContainsKey(ctrl) Then
+                    Dim originalX As Integer = originalXCoords(ctrl)
+                    Dim offsetFromCenter As Integer = originalX - originalCenter
+
+                    ' Hanya geser sumbu X (Kiri-Kanan). Sumbu Y (Atas-Bawah) dibiarkan aman!
+                    ctrl.Left = currentCenter + offsetFromCenter
+                End If
+            Next
+        End If
+    End Sub
+
+    Private Sub BtnQRCode_Click(sender As Object, e As EventArgs) Handles BtnQRCode.Click
+        Try
+            ' 1. Buat objek form QR Code yang baru
+            Dim frmQR As New FormQRGenerated()
+
+            ' 2. Tampilkan sebagai Dialog agar user fokus dan mencegah form terbuka ganda
+            frmQR.ShowDialog(Me)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka menu QR Code: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class
