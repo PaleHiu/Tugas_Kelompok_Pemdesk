@@ -16,10 +16,14 @@ Partial Public Class KumiteMainControl
     Public NextAkaName As String = ""
     Public NextAkaTeam As String = ""
     Public NextAkaInfo As String = ""
-
     Public NextAoName As String = ""
     Public NextAoTeam As String = ""
     Public NextAoInfo As String = ""
+    Private isAkaVrActive As Boolean = False
+    Private isAoVrActive As Boolean = False
+    Private isVrBumperActive As Boolean = False
+    Private isAkaSenshu As Boolean = False
+    Private isAoSenshu As Boolean = False
 
     ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
     Public Sub SetCompetitorData(nama As String, team As String, info As String)
@@ -1919,5 +1923,192 @@ Partial Public Class KumiteMainControl
 
     Private Sub BtnRemoveLogo_Click(sender As Object, e As EventArgs) Handles BtnRemoveLogo.Click
         PicPreviewLogo.Image = Nothing
+    End Sub
+
+    Private Sub BtnAkaVR_Click(sender As Object, e As EventArgs) Handles BtnAkaVR.Click
+        isAkaVrActive = Not isAkaVrActive
+
+        ' 2. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isAkaVrActive Then
+            btn.BackColor = AkaColor
+            btn.ForeColor = Color.White
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+
+        ' 3. Munculkan/sembunyikan di Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblVrAka.Visible = isAkaVrActive
+        End If
+    End Sub
+    Private Sub BtnAoVR_Click(sender As Object, e As EventArgs) Handles BtnAoVR.Click
+        isAoVrActive = Not isAoVrActive
+
+        ' 2. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isAoVrActive Then
+            btn.BackColor = AoColor
+            btn.ForeColor = Color.White
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+
+        ' 3. Munculkan/sembunyikan di Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblVrAo.Visible = isAoVrActive
+        End If
+    End Sub
+    Private Sub ShowVrRequestedSplash(teamName As String, teamColor As Color)
+        Dim targetScreen As Screen
+
+        ' 1. Cek ketersediaan monitor/proyektor
+        If Screen.AllScreens.Length > 1 Then
+            ' Jika ADA layar kedua (Extend Mode), targetkan ke proyektor
+            targetScreen = Screen.AllScreens(1)
+        Else
+            ' Jika TIDAK ADA layar kedua (sedang ngoding/testing di laptop), 
+            ' paksa targetkan ke layar utama laptop saja!
+            targetScreen = Screen.AllScreens(0)
+        End If
+
+        ' 2. Buat Form layar penuh
+        Dim splash As New Form()
+        splash.FormBorderStyle = FormBorderStyle.None
+        splash.BackColor = Color.Black
+        splash.StartPosition = FormStartPosition.Manual
+        splash.TopMost = True ' Selalu berada di paling depan
+
+        ' 3. Pindahkan form ke layar yang sudah ditentukan oleh mesin pengecek di atas
+        splash.Bounds = targetScreen.Bounds
+
+        ' 4. Buat teks peringatan raksasa di tengah layar
+        Dim lblPeringatan As New Label()
+        lblPeringatan.Text = teamName & " VIDEO REVIEW REQUESTED"
+        lblPeringatan.ForeColor = teamColor
+        lblPeringatan.Font = New Font("Segoe UI", 65, FontStyle.Bold)
+        lblPeringatan.Dock = DockStyle.Fill
+        lblPeringatan.TextAlign = ContentAlignment.MiddleCenter
+        splash.Controls.Add(lblPeringatan)
+
+        ' 5. Fitur Pintar: Klik di mana saja pada layar raksasa ini untuk menutupnya
+        AddHandler splash.Click, Sub() splash.Close()
+        AddHandler lblPeringatan.Click, Sub() splash.Close()
+
+        ' Tampilkan layarnya!
+        splash.Show()
+    End Sub
+
+    Private Sub UpdateSenshuUI()
+        ' 1. Ubah warna tombol di panel operator (KumiteMainControl)
+        If isAkaSenshu Then
+            BtnAkaSenshu.BackColor = AkaColor
+            BtnAkaSenshu.ForeColor = Color.White
+        Else
+            BtnAkaSenshu.BackColor = SystemColors.Control
+            BtnAkaSenshu.ForeColor = Color.Black
+        End If
+
+        If isAoSenshu Then
+            BtnAoSenshu.BackColor = AoColor
+            BtnAoSenshu.ForeColor = Color.White
+        Else
+            BtnAoSenshu.BackColor = SystemColors.Control
+            BtnAoSenshu.ForeColor = Color.Black
+        End If
+
+        ' 2. Munculkan/Sembunyikan Label "S" kuning di Layar Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblSenshuAka.Visible = isAkaSenshu
+            frmScoreboard.LblSenshuAo.Visible = isAoSenshu
+        End If
+    End Sub
+
+    Private Sub BtnAkaSenshu_Click(sender As Object, e As EventArgs) Handles BtnAkaSenshu.Click
+        isAkaSenshu = Not isAkaSenshu
+
+        ' LOGIKA KUNCI: Jika Senshu AKA menyala, Senshu AO otomatis DIMATIKAN!
+        If isAkaSenshu Then
+            isAoSenshu = False
+        End If
+
+        ' Panggil mesin update
+        UpdateSenshuUI()
+    End Sub
+
+    Private Sub BtnAoSenshu_Click(sender As Object, e As EventArgs) Handles BtnAoSenshu.Click
+        isAoSenshu = Not isAoSenshu
+        ' LOGIKA KUNCI: Jika Senshu AO menyala, Senshu AKA otomatis DIMATIKAN!
+        If isAoSenshu Then
+            isAkaSenshu = False
+        End If
+        ' Panggil mesin update
+        UpdateSenshuUI()
+    End Sub
+
+    Private Sub AKAVR_Click(sender As Object, e As EventArgs) Handles AKAVR.Click
+        If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
+            MessageBox.Show("Scoreboard belum dinyalakan!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        ' 2. Balikkan status saklar Tirai (Bumper)
+        isVrBumperActive = Not isVrBumperActive
+
+        ' 3. Kirim perintah ke layar Scoreboard untuk menurunkan "Tirai Hitam"
+        frmScoreboard.LblVrBumper.Visible = isVrBumperActive
+
+        ' 4. Ubah warna teks tirai sesuai tim yang meminta VR (AKA = Merah)
+        frmScoreboard.LblVrBumper.ForeColor = AkaColor
+
+        ' 5. Bawa Tirai ke lapisan paling depan (menutupi segalanya)
+        frmScoreboard.LblVrBumper.BringToFront()
+
+        ' 6. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isVrBumperActive Then
+            btn.BackColor = AkaColor
+            btn.ForeColor = Color.White
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub AOVR_Click(sender As Object, e As EventArgs) Handles AOVR.Click
+        If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
+            MessageBox.Show("Scoreboard belum dinyalakan!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        ' 2. Balikkan status saklar Tirai (Bumper)
+        isVrBumperActive = Not isVrBumperActive
+
+        ' 3. Kirim perintah ke layar Scoreboard untuk menurunkan "Tirai Hitam"
+        frmScoreboard.LblVrBumper.Visible = isVrBumperActive
+
+        ' 4. Ubah warna teks tirai sesuai tim yang meminta VR (AO = Biru)
+        frmScoreboard.LblVrBumper.ForeColor = AoColor
+
+        ' 5. Bawa Tirai ke lapisan paling depan
+        frmScoreboard.LblVrBumper.BringToFront()
+
+        ' 6. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isVrBumperActive Then
+            btn.BackColor = AoColor
+            btn.ForeColor = Color.White
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
     End Sub
 End Class

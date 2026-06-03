@@ -23,12 +23,14 @@ Partial Class ScoreBoard
         LblAkaName = New Label()
         LblAkaInfo = New Label()
         PnlAkaScore = New Panel()
+        LblSenshuAka = New Label()
         LblAkaScore = New Label()
         LblAoDotsTop = New Label()
         LblAoDotsBot = New Label()
         LblAoName = New Label()
         LblAoInfo = New Label()
         PnlAoScore = New Panel()
+        LblSenshuAo = New Label()
         LblAoScore = New Label()
         PnlPenaltyBar = New Panel()
         LblPenaltyTitle = New Label()
@@ -50,6 +52,9 @@ Partial Class ScoreBoard
         LblTimerMain = New Label()
         LblTimerMilli = New Label()
         LblMatchDesc = New Label()
+        LblVrAka = New Label()
+        LblVrAo = New Label()
+        LblVrBumper = New Label()
         PnlAkaScore.SuspendLayout()
         PnlAoScore.SuspendLayout()
         PnlPenaltyBar.SuspendLayout()
@@ -66,7 +71,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAkaDotsTop
         ' 
-        LblAkaDotsTop.Font = New Font("Consolas", 24F, FontStyle.Bold)
+        LblAkaDotsTop.Font = New Font("Consolas", 24.0F, FontStyle.Bold)
         LblAkaDotsTop.ForeColor = Color.Gold
         LblAkaDotsTop.Location = New Point(50, 62)
         LblAkaDotsTop.Name = "LblAkaDotsTop"
@@ -77,7 +82,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAkaDotsBot
         ' 
-        LblAkaDotsBot.Font = New Font("Consolas", 18F, FontStyle.Bold)
+        LblAkaDotsBot.Font = New Font("Consolas", 18.0F, FontStyle.Bold)
         LblAkaDotsBot.ForeColor = Color.White
         LblAkaDotsBot.Location = New Point(50, 112)
         LblAkaDotsBot.Name = "LblAkaDotsBot"
@@ -88,7 +93,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAkaName
         ' 
-        LblAkaName.Font = New Font("Segoe UI", 48F, FontStyle.Bold)
+        LblAkaName.Font = New Font("Segoe UI", 48.0F, FontStyle.Bold)
         LblAkaName.ForeColor = Color.White
         LblAkaName.Location = New Point(162, 162)
         LblAkaName.Name = "LblAkaName"
@@ -99,7 +104,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAkaInfo
         ' 
-        LblAkaInfo.Font = New Font("Segoe UI", 16F, FontStyle.Bold)
+        LblAkaInfo.Font = New Font("Segoe UI", 16.0F, FontStyle.Bold)
         LblAkaInfo.ForeColor = Color.White
         LblAkaInfo.Location = New Point(171, 274)
         LblAkaInfo.Name = "LblAkaInfo"
@@ -111,6 +116,7 @@ Partial Class ScoreBoard
         ' PnlAkaScore
         ' 
         PnlAkaScore.BackColor = Color.FromArgb(CByte(180), CByte(25), CByte(40))
+        PnlAkaScore.Controls.Add(LblSenshuAka)
         PnlAkaScore.Controls.Add(LblAkaScore)
         PnlAkaScore.Location = New Point(230, 350)
         PnlAkaScore.Margin = New Padding(3, 4, 3, 4)
@@ -118,10 +124,22 @@ Partial Class ScoreBoard
         PnlAkaScore.Size = New Size(350, 275)
         PnlAkaScore.TabIndex = 2
         ' 
+        ' LblSenshuAka
+        ' 
+        LblSenshuAka.BackColor = Color.Yellow
+        LblSenshuAka.Font = New Font("Arial Rounded MT Bold", 24.0F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSenshuAka.Location = New Point(303, 229)
+        LblSenshuAka.Name = "LblSenshuAka"
+        LblSenshuAka.Size = New Size(47, 46)
+        LblSenshuAka.TabIndex = 1
+        LblSenshuAka.Text = "S"
+        LblSenshuAka.TextAlign = ContentAlignment.MiddleCenter
+        LblSenshuAka.Visible = False
+        ' 
         ' LblAkaScore
         ' 
         LblAkaScore.Dock = DockStyle.Fill
-        LblAkaScore.Font = New Font("Segoe UI", 120F, FontStyle.Bold)
+        LblAkaScore.Font = New Font("Segoe UI", 120.0F, FontStyle.Bold)
         LblAkaScore.ForeColor = Color.White
         LblAkaScore.Location = New Point(0, 0)
         LblAkaScore.Name = "LblAkaScore"
@@ -132,7 +150,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAoDotsTop
         ' 
-        LblAoDotsTop.Font = New Font("Consolas", 24F, FontStyle.Bold)
+        LblAoDotsTop.Font = New Font("Consolas", 24.0F, FontStyle.Bold)
         LblAoDotsTop.ForeColor = Color.Gold
         LblAoDotsTop.Location = New Point(730, 62)
         LblAoDotsTop.Name = "LblAoDotsTop"
@@ -143,7 +161,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAoDotsBot
         ' 
-        LblAoDotsBot.Font = New Font("Consolas", 18F, FontStyle.Bold)
+        LblAoDotsBot.Font = New Font("Consolas", 18.0F, FontStyle.Bold)
         LblAoDotsBot.ForeColor = Color.White
         LblAoDotsBot.Location = New Point(730, 112)
         LblAoDotsBot.Name = "LblAoDotsBot"
@@ -154,7 +172,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAoName
         ' 
-        LblAoName.Font = New Font("Segoe UI", 48F, FontStyle.Bold)
+        LblAoName.Font = New Font("Segoe UI", 48.0F, FontStyle.Bold)
         LblAoName.ForeColor = Color.White
         LblAoName.Location = New Point(639, 162)
         LblAoName.Name = "LblAoName"
@@ -165,7 +183,7 @@ Partial Class ScoreBoard
         ' 
         ' LblAoInfo
         ' 
-        LblAoInfo.Font = New Font("Segoe UI", 16F, FontStyle.Bold)
+        LblAoInfo.Font = New Font("Segoe UI", 16.0F, FontStyle.Bold)
         LblAoInfo.ForeColor = Color.White
         LblAoInfo.Location = New Point(623, 274)
         LblAoInfo.Name = "LblAoInfo"
@@ -177,6 +195,7 @@ Partial Class ScoreBoard
         ' PnlAoScore
         ' 
         PnlAoScore.BackColor = Color.FromArgb(CByte(25), CByte(110), CByte(200))
+        PnlAoScore.Controls.Add(LblSenshuAo)
         PnlAoScore.Controls.Add(LblAoScore)
         PnlAoScore.Location = New Point(700, 350)
         PnlAoScore.Margin = New Padding(3, 4, 3, 4)
@@ -184,10 +203,22 @@ Partial Class ScoreBoard
         PnlAoScore.Size = New Size(350, 275)
         PnlAoScore.TabIndex = 7
         ' 
+        ' LblSenshuAo
+        ' 
+        LblSenshuAo.BackColor = Color.Yellow
+        LblSenshuAo.Font = New Font("Arial Rounded MT Bold", 24.0F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSenshuAo.Location = New Point(303, 229)
+        LblSenshuAo.Name = "LblSenshuAo"
+        LblSenshuAo.Size = New Size(47, 46)
+        LblSenshuAo.TabIndex = 2
+        LblSenshuAo.Text = "S"
+        LblSenshuAo.TextAlign = ContentAlignment.MiddleCenter
+        LblSenshuAo.Visible = False
+        ' 
         ' LblAoScore
         ' 
         LblAoScore.Dock = DockStyle.Fill
-        LblAoScore.Font = New Font("Segoe UI", 120F, FontStyle.Bold)
+        LblAoScore.Font = New Font("Segoe UI", 120.0F, FontStyle.Bold)
         LblAoScore.ForeColor = Color.White
         LblAoScore.Location = New Point(0, 0)
         LblAoScore.Name = "LblAoScore"
@@ -218,7 +249,7 @@ Partial Class ScoreBoard
         ' 
         ' LblPenaltyTitle
         ' 
-        LblPenaltyTitle.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblPenaltyTitle.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblPenaltyTitle.ForeColor = Color.Gold
         LblPenaltyTitle.Location = New Point(540, 0)
         LblPenaltyTitle.Name = "LblPenaltyTitle"
@@ -230,7 +261,7 @@ Partial Class ScoreBoard
         ' LblAkaPen1
         ' 
         LblAkaPen1.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAkaPen1.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAkaPen1.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAkaPen1.ForeColor = Color.DarkGray
         LblAkaPen1.Location = New Point(10, 9)
         LblAkaPen1.Name = "LblAkaPen1"
@@ -242,7 +273,7 @@ Partial Class ScoreBoard
         ' LblAkaPen2
         ' 
         LblAkaPen2.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAkaPen2.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAkaPen2.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAkaPen2.ForeColor = Color.DarkGray
         LblAkaPen2.Location = New Point(95, 9)
         LblAkaPen2.Name = "LblAkaPen2"
@@ -254,7 +285,7 @@ Partial Class ScoreBoard
         ' LblAkaPen3
         ' 
         LblAkaPen3.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAkaPen3.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAkaPen3.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAkaPen3.ForeColor = Color.DarkGray
         LblAkaPen3.Location = New Point(180, 9)
         LblAkaPen3.Name = "LblAkaPen3"
@@ -266,7 +297,7 @@ Partial Class ScoreBoard
         ' LblAkaPen4
         ' 
         LblAkaPen4.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAkaPen4.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAkaPen4.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAkaPen4.ForeColor = Color.DarkGray
         LblAkaPen4.Location = New Point(265, 9)
         LblAkaPen4.Name = "LblAkaPen4"
@@ -278,7 +309,7 @@ Partial Class ScoreBoard
         ' LblAkaPen5
         ' 
         LblAkaPen5.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAkaPen5.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAkaPen5.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAkaPen5.ForeColor = Color.DarkGray
         LblAkaPen5.Location = New Point(350, 9)
         LblAkaPen5.Name = "LblAkaPen5"
@@ -290,7 +321,7 @@ Partial Class ScoreBoard
         ' LblAoPen1
         ' 
         LblAoPen1.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAoPen1.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAoPen1.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAoPen1.ForeColor = Color.DarkGray
         LblAoPen1.Location = New Point(1190, 9)
         LblAoPen1.Name = "LblAoPen1"
@@ -302,7 +333,7 @@ Partial Class ScoreBoard
         ' LblAoPen2
         ' 
         LblAoPen2.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAoPen2.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAoPen2.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAoPen2.ForeColor = Color.DarkGray
         LblAoPen2.Location = New Point(1105, 9)
         LblAoPen2.Name = "LblAoPen2"
@@ -314,7 +345,7 @@ Partial Class ScoreBoard
         ' LblAoPen3
         ' 
         LblAoPen3.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAoPen3.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAoPen3.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAoPen3.ForeColor = Color.DarkGray
         LblAoPen3.Location = New Point(1020, 9)
         LblAoPen3.Name = "LblAoPen3"
@@ -326,7 +357,7 @@ Partial Class ScoreBoard
         ' LblAoPen4
         ' 
         LblAoPen4.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAoPen4.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAoPen4.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAoPen4.ForeColor = Color.DarkGray
         LblAoPen4.Location = New Point(935, 9)
         LblAoPen4.Name = "LblAoPen4"
@@ -338,7 +369,7 @@ Partial Class ScoreBoard
         ' LblAoPen5
         ' 
         LblAoPen5.BackColor = Color.FromArgb(CByte(35), CByte(35), CByte(35))
-        LblAoPen5.Font = New Font("Segoe UI", 14F, FontStyle.Bold)
+        LblAoPen5.Font = New Font("Segoe UI", 14.0F, FontStyle.Bold)
         LblAoPen5.ForeColor = Color.DarkGray
         LblAoPen5.Location = New Point(850, 9)
         LblAoPen5.Name = "LblAoPen5"
@@ -374,7 +405,7 @@ Partial Class ScoreBoard
         ' 
         ' LblTatamiTitle
         ' 
-        LblTatamiTitle.Font = New Font("Segoe UI", 24F, FontStyle.Bold)
+        LblTatamiTitle.Font = New Font("Segoe UI", 24.0F, FontStyle.Bold)
         LblTatamiTitle.ForeColor = Color.Gold
         LblTatamiTitle.Location = New Point(20, 12)
         LblTatamiTitle.Name = "LblTatamiTitle"
@@ -384,7 +415,7 @@ Partial Class ScoreBoard
         ' 
         ' LblTatamiNum
         ' 
-        LblTatamiNum.Font = New Font("Segoe UI", 55F, FontStyle.Bold)
+        LblTatamiNum.Font = New Font("Segoe UI", 55.0F, FontStyle.Bold)
         LblTatamiNum.ForeColor = Color.White
         LblTatamiNum.Location = New Point(20, 62)
         LblTatamiNum.Name = "LblTatamiNum"
@@ -395,7 +426,7 @@ Partial Class ScoreBoard
         ' 
         ' LblStudio
         ' 
-        LblStudio.Font = New Font("Segoe UI", 12F, FontStyle.Italic)
+        LblStudio.Font = New Font("Segoe UI", 12.0F, FontStyle.Italic)
         LblStudio.ForeColor = Color.LightGray
         LblStudio.Location = New Point(180, 75)
         LblStudio.Name = "LblStudio"
@@ -404,7 +435,7 @@ Partial Class ScoreBoard
         ' 
         ' LblTimerMain
         ' 
-        LblTimerMain.Font = New Font("Segoe UI", 90F, FontStyle.Bold)
+        LblTimerMain.Font = New Font("Segoe UI", 90.0F, FontStyle.Bold)
         LblTimerMain.ForeColor = Color.White
         LblTimerMain.Location = New Point(400, -19)
         LblTimerMain.Name = "LblTimerMain"
@@ -415,7 +446,7 @@ Partial Class ScoreBoard
         ' 
         ' LblTimerMilli
         ' 
-        LblTimerMilli.Font = New Font("Segoe UI", 48F, FontStyle.Bold)
+        LblTimerMilli.Font = New Font("Segoe UI", 48.0F, FontStyle.Bold)
         LblTimerMilli.ForeColor = Color.White
         LblTimerMilli.Location = New Point(780, 50)
         LblTimerMilli.Name = "LblTimerMilli"
@@ -426,7 +457,7 @@ Partial Class ScoreBoard
         ' 
         ' LblMatchDesc
         ' 
-        LblMatchDesc.Font = New Font("Segoe UI", 24F, FontStyle.Bold)
+        LblMatchDesc.Font = New Font("Segoe UI", 24.0F, FontStyle.Bold)
         LblMatchDesc.ForeColor = Color.Gold
         LblMatchDesc.Location = New Point(850, 62)
         LblMatchDesc.Name = "LblMatchDesc"
@@ -434,12 +465,54 @@ Partial Class ScoreBoard
         LblMatchDesc.TabIndex = 5
         LblMatchDesc.TextAlign = ContentAlignment.MiddleRight
         ' 
+        ' LblVrAka
+        ' 
+        LblVrAka.BackColor = Color.Red
+        LblVrAka.Font = New Font("Microsoft Sans Serif", 24.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrAka.ForeColor = Color.FromArgb(CByte(192), CByte(192), CByte(0))
+        LblVrAka.Location = New Point(87, 539)
+        LblVrAka.Name = "LblVrAka"
+        LblVrAka.Size = New Size(78, 86)
+        LblVrAka.TabIndex = 12
+        LblVrAka.Text = "VR"
+        LblVrAka.TextAlign = ContentAlignment.BottomCenter
+        LblVrAka.Visible = False
+        ' 
+        ' LblVrAo
+        ' 
+        LblVrAo.BackColor = Color.Blue
+        LblVrAo.Font = New Font("Microsoft Sans Serif", 24.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrAo.ForeColor = Color.FromArgb(CByte(192), CByte(192), CByte(0))
+        LblVrAo.Location = New Point(1105, 539)
+        LblVrAo.Name = "LblVrAo"
+        LblVrAo.Size = New Size(78, 86)
+        LblVrAo.TabIndex = 13
+        LblVrAo.Text = "VR"
+        LblVrAo.TextAlign = ContentAlignment.BottomCenter
+        LblVrAo.Visible = False
+        ' 
+        ' LblVrBumper
+        ' 
+        LblVrBumper.Dock = DockStyle.Fill
+        LblVrBumper.Font = New Font("Segoe UI", 72.0F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrBumper.ForeColor = Color.Gold
+        LblVrBumper.Location = New Point(0, 0)
+        LblVrBumper.Name = "LblVrBumper"
+        LblVrBumper.Size = New Size(1280, 900)
+        LblVrBumper.TabIndex = 14
+        LblVrBumper.Text = "VIDEO REVIEW REQUESTED"
+        LblVrBumper.TextAlign = ContentAlignment.MiddleCenter
+        LblVrBumper.Visible = False
+        ' 
         ' ScoreBoard
         ' 
-        AutoScaleDimensions = New SizeF(8F, 20F)
+        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.FromArgb(CByte(15), CByte(15), CByte(15))
         ClientSize = New Size(1280, 900)
+        Controls.Add(LblVrBumper)
+        Controls.Add(LblVrAo)
+        Controls.Add(LblVrAka)
         Controls.Add(PnlPenaltyBar)
         Controls.Add(PnlFooter)
         Controls.Add(PnlAkaScore)
@@ -506,4 +579,9 @@ Partial Class ScoreBoard
     Friend WithEvents LblAoPen4 As System.Windows.Forms.Label
     Friend WithEvents LblAoPen5 As System.Windows.Forms.Label
     Friend WithEvents PicMatchLogo As PictureBox
+    Friend WithEvents LblVrAka As Label
+    Friend WithEvents LblVrAo As Label
+    Friend WithEvents LblSenshuAka As Label
+    Friend WithEvents LblSenshuAo As Label
+    Friend WithEvents LblVrBumper As Label
 End Class
