@@ -60,6 +60,96 @@
         End If
 
         Me.MinimumSize = New Size(1400, 800)
+        ' Form should capture keyboard for global shortcuts
+        Me.KeyPreview = True
+    End Sub
+
+    Private Sub KataMainControl_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        Try
+            If Not FromKeyboardShortcutKata.IsShortcutEnabled Then Exit Sub
+
+            Dim strShortcut As String = ""
+            If e.Control Then strShortcut &= "Control+"
+            If e.Shift Then strShortcut &= "Shift+"
+            If e.Alt Then strShortcut &= "Alt+"
+            strShortcut &= e.KeyCode.ToString()
+
+            For Each pair In FromKeyboardShortcutKata.ShortcutMap
+                Dim actionName As String = pair.Key
+                Dim combo As String = pair.Value
+                If String.Equals(combo, strShortcut, StringComparison.OrdinalIgnoreCase) Then
+                    ProcessShortcutAction(actionName)
+                    e.SuppressKeyPress = True
+                    e.Handled = True
+                    Exit For
+                End If
+            Next
+        Catch ex As Exception
+            ' ignore
+        End Try
+    End Sub
+
+    Private Sub ProcessShortcutAction(actionName As String)
+        Try
+            Select Case actionName
+                Case "Start-Close Scoreboard"
+                    If BtnStartScoreboard IsNot Nothing Then BtnStartScoreboard.PerformClick()
+                Case "Timer Waiting Start-Stop"
+                    If BtnStartWaitingTimer IsNot Nothing Then BtnStartWaitingTimer.PerformClick()
+                Case "Match Timer Start-Stop"
+                    If BtnStartTimer IsNot Nothing Then BtnStartTimer.PerformClick()
+                Case "Match Timer Reset"
+                    ' Try to invoke gear timer (as reset) if available
+                    If BtnGearTimer IsNot Nothing Then BtnGearTimer.PerformClick()
+                Case "Next Match"
+                    If BtnNextMatch IsNot Nothing Then BtnNextMatch.PerformClick()
+                Case "Save Match Result"
+                    If BtnSaveMatchResult IsNot Nothing Then BtnSaveMatchResult.PerformClick()
+                Case "Show Winner"
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "Show Score to Scoreboard"
+                    If BtnShowScore IsNot Nothing Then BtnShowScore.PerformClick()
+                Case "Assign Task to Judges"
+                    If BtnAssignTask IsNot Nothing Then BtnAssignTask.PerformClick()
+                Case "Hide-Show KATA Timer"
+                    If BtnEyeTimer IsNot Nothing Then BtnEyeTimer.PerformClick()
+                Case "Show Competitor 1 (AKA)"
+                    If RbComp1 IsNot Nothing Then RbComp1.Checked = True
+                    If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
+                Case "Show Competitor 2 (AO)"
+                    If RbComp2 IsNot Nothing Then RbComp2.Checked = True
+                    If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
+                Case "Show All Competitor"
+                    If RbAllComp IsNot Nothing Then RbAllComp.Checked = True
+                    If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
+                Case "AKA - Yuko(1)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 1)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - Wazaari(2)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 2)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - Ippon(3)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 3)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - SENSHU"
+                    ApplyPenaltyAndDeclareWinner(BtnKikenAka, "AO")
+                Case "AO - Yuko(1)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 1)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - Wazaari(2)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 2)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - Ippon(3)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 3)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - SENSHU"
+                    ApplyPenaltyAndDeclareWinner(BtnKikenAo, "AKA")
+                Case Else
+                    ' Unknown action: no-op
+            End Select
+        Catch ex As Exception
+            ' ignore
+        End Try
     End Sub
 
     ' ==============================================================================
@@ -457,7 +547,7 @@
     ' Fungsi ini otomatis terbuat saat kamu double-click tombol Shortcut
     Private Sub BtnShortcutKata_Click(sender As Object, e As EventArgs) Handles BtnShortcut.Click
         Try
-            Dim frmShortcut As New FormKeyboardShortcut()
+            Dim frmShortcut As New FromKeyboardShortcutKata()
             frmShortcut.ShowDialog(Me)
 
         Catch ex As Exception
