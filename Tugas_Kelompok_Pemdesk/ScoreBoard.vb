@@ -171,4 +171,58 @@ Partial Public Class ScoreBoard
             MessageBox.Show("Gagal mengganti font Match Detail: " & ex.Message, "Error Scoreboard", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    Private originalBaseFonts As New Dictionary(Of Control, Single)
+
+    Public Sub AdjustTextSize(category As String, action As String, amount As Single)
+        ' 1. Simpan ukuran font bawaan asli pertama kali (Untuk kebutuhan tombol Reset 'R')
+        If originalBaseFonts.Count = 0 Then
+            For Each kvp In ctrlFonts
+                originalBaseFonts(kvp.Key) = kvp.Value
+            Next
+        End If
+
+        ' 2. Tentukan elemen mana saja yang akan diubah ukurannya berdasarkan pilihan Dropdown
+        Dim targets As New List(Of Control)
+
+        If category = "All" Or category = "Player Name" Then
+            targets.AddRange({LblAkaName, LblAoName})
+        End If
+        ' Pindahkan target ke Label Titik Kuning (Untuk Team Name)
+        If category = "All" Or category = "Team" Then
+            targets.AddRange({LblAkaDotsTop, LblAoDotsTop})
+        End If
+        ' Pindahkan target ke Label Titik Putih (Untuk Team Info)
+        If category = "All" Or category = "Team Info" Then
+            targets.AddRange({LblAkaDotsBot, LblAoDotsBot})
+        End If
+        If category = "All" Or category = "Score" Then
+            targets.AddRange({LblAkaScore, LblAoScore})
+        End If
+        If category = "All" Or category = "Timer" Then
+            targets.AddRange({LblTimerMain, LblTimerMilli})
+        End If
+        If category = "All" Or category = "Tatami" Then
+            targets.AddRange({LblTatamiNum, LblTatamiTitle})
+        End If
+        If category = "All" Or category = "Match Detail" Or category = "Category" Then
+            targets.Add(LblMatchDesc)
+        End If
+
+        ' 3. Eksekusi penambahan (+), pengurangan (-), atau reset (R)
+        For Each ctrl In targets
+            If ctrl IsNot Nothing AndAlso ctrlFonts.ContainsKey(ctrl) Then
+                If action = "Plus" Then
+                    ctrlFonts(ctrl) += amount ' Tambah ukuran
+                ElseIf action = "Minus" Then
+                    ctrlFonts(ctrl) -= amount ' Kurangi ukuran
+                ElseIf action = "Reset" Then
+                    ctrlFonts(ctrl) = originalBaseFonts(ctrl) ' Kembalikan ke ukuran asli
+                End If
+            End If
+        Next
+
+        ' 4. Paksa layar Scoreboard untuk menggambar ulang (Refresh) dengan ukuran baru
+        ScoreBoard_SizeChanged(Nothing, Nothing)
+    End Sub
 End Class
