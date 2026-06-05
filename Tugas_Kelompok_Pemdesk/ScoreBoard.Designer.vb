@@ -23,12 +23,14 @@ Partial Class ScoreBoard
         LblAkaName = New Label()
         LblAkaInfo = New Label()
         PnlAkaScore = New Panel()
+        LblSenshuAka = New Label()
         LblAkaScore = New Label()
         LblAoDotsTop = New Label()
         LblAoDotsBot = New Label()
         LblAoName = New Label()
         LblAoInfo = New Label()
         PnlAoScore = New Panel()
+        LblSenshuAo = New Label()
         LblAoScore = New Label()
         PnlPenaltyBar = New Panel()
         LblPenaltyTitle = New Label()
@@ -50,11 +52,22 @@ Partial Class ScoreBoard
         LblTimerMain = New Label()
         LblTimerMilli = New Label()
         LblMatchDesc = New Label()
+        LblVrAka = New Label()
+        LblVrAo = New Label()
+        PicAkaTeamLogoSb = New PictureBox()
+        PicAoTeamLogoSb = New PictureBox()
+        PicAoProfileSb = New PictureBox()
+        PicAkaProfileSb = New PictureBox()
+        LblVrBumper = New Label()
         PnlAkaScore.SuspendLayout()
         PnlAoScore.SuspendLayout()
         PnlPenaltyBar.SuspendLayout()
         PnlFooter.SuspendLayout()
         CType(PicMatchLogo, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAkaTeamLogoSb, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAoTeamLogoSb, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAoProfileSb, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicAkaProfileSb, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' PnlBackground
@@ -111,12 +124,25 @@ Partial Class ScoreBoard
         ' PnlAkaScore
         ' 
         PnlAkaScore.BackColor = Color.FromArgb(CByte(180), CByte(25), CByte(40))
+        PnlAkaScore.Controls.Add(LblSenshuAka)
         PnlAkaScore.Controls.Add(LblAkaScore)
         PnlAkaScore.Location = New Point(230, 350)
         PnlAkaScore.Margin = New Padding(3, 4, 3, 4)
         PnlAkaScore.Name = "PnlAkaScore"
         PnlAkaScore.Size = New Size(350, 275)
         PnlAkaScore.TabIndex = 2
+        ' 
+        ' LblSenshuAka
+        ' 
+        LblSenshuAka.BackColor = Color.Yellow
+        LblSenshuAka.Font = New Font("Arial Rounded MT Bold", 24F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSenshuAka.Location = New Point(303, 229)
+        LblSenshuAka.Name = "LblSenshuAka"
+        LblSenshuAka.Size = New Size(47, 46)
+        LblSenshuAka.TabIndex = 1
+        LblSenshuAka.Text = "S"
+        LblSenshuAka.TextAlign = ContentAlignment.MiddleCenter
+        LblSenshuAka.Visible = False
         ' 
         ' LblAkaScore
         ' 
@@ -177,12 +203,25 @@ Partial Class ScoreBoard
         ' PnlAoScore
         ' 
         PnlAoScore.BackColor = Color.FromArgb(CByte(25), CByte(110), CByte(200))
+        PnlAoScore.Controls.Add(LblSenshuAo)
         PnlAoScore.Controls.Add(LblAoScore)
         PnlAoScore.Location = New Point(700, 350)
         PnlAoScore.Margin = New Padding(3, 4, 3, 4)
         PnlAoScore.Name = "PnlAoScore"
         PnlAoScore.Size = New Size(350, 275)
         PnlAoScore.TabIndex = 7
+        ' 
+        ' LblSenshuAo
+        ' 
+        LblSenshuAo.BackColor = Color.Yellow
+        LblSenshuAo.Font = New Font("Arial Rounded MT Bold", 24F, FontStyle.Italic, GraphicsUnit.Point, CByte(0))
+        LblSenshuAo.Location = New Point(303, 229)
+        LblSenshuAo.Name = "LblSenshuAo"
+        LblSenshuAo.Size = New Size(47, 46)
+        LblSenshuAo.TabIndex = 2
+        LblSenshuAo.Text = "S"
+        LblSenshuAo.TextAlign = ContentAlignment.MiddleCenter
+        LblSenshuAo.Visible = False
         ' 
         ' LblAoScore
         ' 
@@ -434,12 +473,93 @@ Partial Class ScoreBoard
         LblMatchDesc.TabIndex = 5
         LblMatchDesc.TextAlign = ContentAlignment.MiddleRight
         ' 
+        ' LblVrAka
+        ' 
+        LblVrAka.BackColor = Color.Red
+        LblVrAka.Font = New Font("Microsoft Sans Serif", 24F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrAka.ForeColor = Color.FromArgb(CByte(192), CByte(192), CByte(0))
+        LblVrAka.Location = New Point(87, 539)
+        LblVrAka.Name = "LblVrAka"
+        LblVrAka.Size = New Size(78, 86)
+        LblVrAka.TabIndex = 12
+        LblVrAka.Text = "VR"
+        LblVrAka.TextAlign = ContentAlignment.BottomCenter
+        LblVrAka.Visible = False
+        ' 
+        ' LblVrAo
+        ' 
+        LblVrAo.BackColor = Color.Blue
+        LblVrAo.Font = New Font("Microsoft Sans Serif", 24F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrAo.ForeColor = Color.FromArgb(CByte(192), CByte(192), CByte(0))
+        LblVrAo.Location = New Point(1105, 539)
+        LblVrAo.Name = "LblVrAo"
+        LblVrAo.Size = New Size(78, 86)
+        LblVrAo.TabIndex = 13
+        LblVrAo.Text = "VR"
+        LblVrAo.TextAlign = ContentAlignment.BottomCenter
+        LblVrAo.Visible = False
+        ' 
+        ' PicAkaTeamLogoSb
+        ' 
+        PicAkaTeamLogoSb.Location = New Point(40, 38)
+        PicAkaTeamLogoSb.Name = "PicAkaTeamLogoSb"
+        PicAkaTeamLogoSb.Size = New Size(125, 121)
+        PicAkaTeamLogoSb.TabIndex = 14
+        PicAkaTeamLogoSb.TabStop = False
+        ' 
+        ' PicAoTeamLogoSb
+        ' 
+        PicAoTeamLogoSb.Location = New Point(1125, 38)
+        PicAoTeamLogoSb.Name = "PicAoTeamLogoSb"
+        PicAoTeamLogoSb.Size = New Size(125, 121)
+        PicAoTeamLogoSb.SizeMode = PictureBoxSizeMode.Zoom
+        PicAoTeamLogoSb.TabIndex = 15
+        PicAoTeamLogoSb.TabStop = False
+        ' 
+        ' PicAoProfileSb
+        ' 
+        PicAoProfileSb.Location = New Point(1125, 350)
+        PicAoProfileSb.Name = "PicAoProfileSb"
+        PicAoProfileSb.Size = New Size(125, 121)
+        PicAoProfileSb.SizeMode = PictureBoxSizeMode.Zoom
+        PicAoProfileSb.TabIndex = 16
+        PicAoProfileSb.TabStop = False
+        ' 
+        ' PicAkaProfileSb
+        ' 
+        PicAkaProfileSb.Location = New Point(40, 350)
+        PicAkaProfileSb.Name = "PicAkaProfileSb"
+        PicAkaProfileSb.Size = New Size(125, 121)
+        PicAkaProfileSb.SizeMode = PictureBoxSizeMode.Zoom
+        PicAkaProfileSb.TabIndex = 17
+        PicAkaProfileSb.TabStop = False
+        ' 
+        ' LblVrBumper
+        ' 
+        LblVrBumper.Dock = DockStyle.Fill
+        LblVrBumper.Font = New Font("Segoe UI", 72F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblVrBumper.ForeColor = Color.Gold
+        LblVrBumper.Location = New Point(0, 0)
+        LblVrBumper.Name = "LblVrBumper"
+        LblVrBumper.Size = New Size(1280, 900)
+        LblVrBumper.TabIndex = 14
+        LblVrBumper.Text = "VIDEO REVIEW REQUITED"
+        LblVrBumper.TextAlign = ContentAlignment.MiddleCenter
+        LblVrBumper.Visible = False
+        ' 
         ' ScoreBoard
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.FromArgb(CByte(15), CByte(15), CByte(15))
         ClientSize = New Size(1280, 900)
+        Controls.Add(LblVrBumper)
+        Controls.Add(PicAkaProfileSb)
+        Controls.Add(PicAoProfileSb)
+        Controls.Add(PicAoTeamLogoSb)
+        Controls.Add(PicAkaTeamLogoSb)
+        Controls.Add(LblVrAo)
+        Controls.Add(LblVrAka)
         Controls.Add(PnlPenaltyBar)
         Controls.Add(PnlFooter)
         Controls.Add(PnlAkaScore)
@@ -461,6 +581,10 @@ Partial Class ScoreBoard
         PnlPenaltyBar.ResumeLayout(False)
         PnlFooter.ResumeLayout(False)
         CType(PicMatchLogo, ComponentModel.ISupportInitialize).EndInit()
+        CType(PicAkaTeamLogoSb, ComponentModel.ISupportInitialize).EndInit()
+        CType(PicAoTeamLogoSb, ComponentModel.ISupportInitialize).EndInit()
+        CType(PicAoProfileSb, ComponentModel.ISupportInitialize).EndInit()
+        CType(PicAkaProfileSb, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
 
     End Sub
@@ -506,4 +630,13 @@ Partial Class ScoreBoard
     Friend WithEvents LblAoPen4 As System.Windows.Forms.Label
     Friend WithEvents LblAoPen5 As System.Windows.Forms.Label
     Friend WithEvents PicMatchLogo As PictureBox
+    Friend WithEvents LblVrAka As Label
+    Friend WithEvents LblVrAo As Label
+    Friend WithEvents LblSenshuAka As Label
+    Friend WithEvents LblSenshuAo As Label
+    Friend WithEvents PicAkaTeamLogoSb As PictureBox
+    Friend WithEvents PicAoTeamLogoSb As PictureBox
+    Friend WithEvents PicAoProfileSb As PictureBox
+    Friend WithEvents PicAkaProfileSb As PictureBox
+    Friend WithEvents LblVrBumper As Label
 End Class
