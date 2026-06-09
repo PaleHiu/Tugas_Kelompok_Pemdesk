@@ -585,4 +585,22 @@
             MessageBox.Show("Gagal membuka menu QR Code: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    Private Sub BtnSelectLogo_Click(sender As Object, e As EventArgs) Handles BtnSelectLogo.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp"
+            ofd.Title = "Pilih Gambar Logo/Profil"
+
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(ofd.FileName)
+                Dim ms As New IO.MemoryStream(bytes)
+                PicPreviewLogo.Image = Image.FromStream(ms)
+            End If
+        End Using
+    End Sub
+
+    Private Sub BtnRemoveLogo_Click(sender As Object, e As EventArgs) Handles BtnRemoveLogo.Click
+        PicPreviewLogo.Image = Nothing
+    End Sub
+
 End Class
