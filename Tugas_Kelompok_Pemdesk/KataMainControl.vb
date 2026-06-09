@@ -590,6 +590,10 @@
         Using ofd As New OpenFileDialog()
             ofd.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp"
             ofd.Title = "Pilih Gambar Logo/Profil"
+<<<<<<< HEAD
+=======
+
+>>>>>>> b677df0d6edad1bb1c95358e20885bbdd7cf3183
             If ofd.ShowDialog() = DialogResult.OK Then
                 Dim bytes As Byte() = System.IO.File.ReadAllBytes(ofd.FileName)
                 Dim ms As New IO.MemoryStream(bytes)

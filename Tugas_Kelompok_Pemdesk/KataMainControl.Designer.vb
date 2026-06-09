@@ -3539,27 +3539,45 @@ Partial Class KataMainControl
         ' PicPreviewLogo
         ' 
         PicPreviewLogo.BorderStyle = BorderStyle.FixedSingle
+<<<<<<< HEAD
         PicPreviewLogo.Location = New Point(16, 15)
         PicPreviewLogo.Name = "PicPreviewLogo"
         PicPreviewLogo.Size = New Size(102, 97)
+=======
+        PicPreviewLogo.Location = New Point(21, 22)
+        PicPreviewLogo.Name = "PicPreviewLogo"
+        PicPreviewLogo.Size = New Size(90, 85)
+>>>>>>> b677df0d6edad1bb1c95358e20885bbdd7cf3183
         PicPreviewLogo.SizeMode = PictureBoxSizeMode.Zoom
         PicPreviewLogo.TabIndex = 0
         PicPreviewLogo.TabStop = False
         ' 
         ' BtnSelectLogo
         ' 
+<<<<<<< HEAD
         BtnSelectLogo.Location = New Point(132, 35)
         BtnSelectLogo.Name = "BtnSelectLogo"
         BtnSelectLogo.Size = New Size(105, 29)
+=======
+        BtnSelectLogo.Location = New Point(126, 31)
+        BtnSelectLogo.Name = "BtnSelectLogo"
+        BtnSelectLogo.Size = New Size(111, 29)
+>>>>>>> b677df0d6edad1bb1c95358e20885bbdd7cf3183
         BtnSelectLogo.TabIndex = 1
         BtnSelectLogo.Text = "Select Image"
         BtnSelectLogo.UseVisualStyleBackColor = True
         ' 
         ' BtnRemoveLogo
         ' 
+<<<<<<< HEAD
         BtnRemoveLogo.Location = New Point(132, 70)
         BtnRemoveLogo.Name = "BtnRemoveLogo"
         BtnRemoveLogo.Size = New Size(105, 29)
+=======
+        BtnRemoveLogo.Location = New Point(125, 69)
+        BtnRemoveLogo.Name = "BtnRemoveLogo"
+        BtnRemoveLogo.Size = New Size(111, 29)
+>>>>>>> b677df0d6edad1bb1c95358e20885bbdd7cf3183
         BtnRemoveLogo.TabIndex = 2
         BtnRemoveLogo.Text = "Remove"
         BtnRemoveLogo.UseVisualStyleBackColor = True
@@ -3729,8 +3747,14 @@ Partial Class KataMainControl
     Friend WithEvents TxtMatchDetail As TextBox
     Friend WithEvents LblAoWinner As Label
     Friend WithEvents LblAkaWinner As Label
+<<<<<<< HEAD
     Friend WithEvents BtnSelectLogo As Button
     Friend WithEvents PicPreviewLogo As PictureBox
     Friend WithEvents BtnRemoveLogo As Button
+=======
+    Friend WithEvents BtnRemoveLogo As Button
+    Friend WithEvents BtnSelectLogo As Button
+    Friend WithEvents PicPreviewLogo As PictureBox
+>>>>>>> b677df0d6edad1bb1c95358e20885bbdd7cf3183
 
 End Class
