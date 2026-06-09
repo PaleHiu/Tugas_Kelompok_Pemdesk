@@ -20,12 +20,25 @@
     Private originalCenterWidth As Integer = 342
 
     ' ==============================================================================
+    ' [WAITING TIMER] DEKLARASI KOMPONEN & VARIABEL
+    ' ==============================================================================
+    Private WithEvents WaitTimer As New System.Windows.Forms.Timer()
+    Private WaitTimeRemaining As Integer ' Untuk menyimpan total detik yang tersisa
+    Private IsWaitTimerRunning As Boolean = False
+
+    ' ==============================================================================
     ' 1. KONSTRUKTOR (INITIALIZATION)
     ' ==============================================================================
     Public Sub New()
         InitializeComponent()
 
         InitializeScoringUI()
+
+        ' ==============================================================================
+        ' [WAITING TIMER] INISIALISASI INTERVAL (1 Detik = 1000 ms)
+        ' ==============================================================================
+        WaitTimer.Interval = 1000
+
         ApplyKataMatchDetailStyle(KataDetailFontName, KataDetailIsBold, KataDetailColor)
 
         ' 1. MATIKAN SEMUA DOCKING BAWAAN
@@ -358,23 +371,88 @@
         CheckWinner(0, 0)
     End Sub
 
+
     ' ==============================================================================
-    ' 8. LOGIKA PENALTI (KIKEN & DISKUALIFIKASI) - SUPPORT LABEL/BUTTON
+    ' [UI/UX ENHANCEMENT] FUNGSI HILANGKAN JEJAK FOKUS SAAT KLIK AREA KOSONG
+    ' ==============================================================================
+    Private Sub ClearFocus_Click(sender As Object, e As EventArgs) Handles Me.Click,
+        PnlMainWorkspace.Click, PnlCenterScore.Click, PnlAka.Click, PnlAo.Click,
+        PnlRightBar.Click, PnlLeftBar.Click, PnlTopBar.Click, PnlFooter.Click
+
+        ' Mengembalikan nilai fokus ke 0 (default/kosong)
+        ' Ini akan menghilangkan garis kotak putus-putus atau sorotan biru pada tombol terakhir yang diklik
+        Me.ActiveControl = Nothing
+    End Sub
+
+    ' ==============================================================================
+    ' [UI/UX ENHANCEMENT] HOVER EFFECT UNTUK TOMBOL RESET SCORE
+    ' ==============================================================================
+
+    ' Saat Mouse masuk ke area tombol Reset Score
+    Private Sub BtnResetScore_MouseEnter(sender As Object, e As EventArgs) Handles BtnResetScoreAka.MouseEnter, BtnResetScoreAo.MouseEnter
+        Dim btn As Button = CType(sender, Button)
+        btn.BackColor = Color.LightGray ' Memberikan highlight abu-abu
+        btn.Cursor = Cursors.Hand       ' Mengubah kursor menjadi ikon tangan
+    End Sub
+
+    ' Saat Mouse keluar dari area tombol Reset Score
+    Private Sub BtnResetScore_MouseLeave(sender As Object, e As EventArgs) Handles BtnResetScoreAka.MouseLeave, BtnResetScoreAo.MouseLeave
+        Dim btn As Button = CType(sender, Button)
+        btn.BackColor = Color.WhiteSmoke ' Mengembalikan ke warna putih pudar aslinya
+    End Sub
+
+    ' ==============================================================================
+    ' [UI/UX ENHANCEMENT] HOVER EFFECT UNTUK TEKS SHOW WINNER
+    ' ==============================================================================
+
+    ' Saat Mouse masuk ke area teks Show Winner
+    Private Sub LblShowWinner_MouseEnter(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.MouseEnter, LblAoWinnerStatus.MouseEnter
+        Dim lbl As Label = CType(sender, Label)
+        lbl.ForeColor = Color.Black     ' Teks menjadi hitam pekat agar terlihat menyala
+        lbl.Cursor = Cursors.Hand       ' Mengubah kursor menjadi ikon tangan
+    End Sub
+
+    ' Saat Mouse keluar dari area teks Show Winner
+    Private Sub LblShowWinner_MouseLeave(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.MouseLeave, LblAoWinnerStatus.MouseLeave
+        Dim lbl As Label = CType(sender, Label)
+        lbl.ForeColor = Color.Gray      ' Mengembalikan teks ke warna abu-abu aslinya
+    End Sub
+
+    ' ==============================================================================
+    ' [PENALTY SYSTEM] LOGIKA PENALTI DENGAN FITUR TOGGLE (ON/OFF)
     ' ==============================================================================
 
     Private Sub ResetPenaltyLabels()
-        ' Tetap pakai nama yang ada di properties UI lu
-        BtnKikenAka.BackColor = SystemColors.Control
-        BtnDiskualifikasiAka.BackColor = SystemColors.Control
-        BtnKikenAo.BackColor = SystemColors.Control
-        BtnDiskualifikasiAo.BackColor = SystemColors.Control
+        ' Kembalikan semua background ke warna putih (mengikuti warna UI awal)
+        BtnKikenAka.BackColor = Color.White
+        BtnDiskualifikasiAka.BackColor = Color.White
+        BtnKikenAo.BackColor = Color.White
+        BtnDiskualifikasiAo.BackColor = Color.White
     End Sub
 
-    ' Pakai "As Control" supaya mau nerima Label ataupun Button tanpa error convert
     Private Sub ApplyPenaltyAndDeclareWinner(clickedCtrl As Control, winningTeam As String)
+        ' 1. FITUR TOGGLE OFF (BATALKAN PENALTI)
+        ' Jika tombol yang diklik sudah aktif (Kuning), maka batalkan penalti
+        If clickedCtrl.BackColor = Color.Yellow Then
+            ' Reset warna tombol kembali putih
+            ResetPenaltyLabels()
+
+            ' Kembalikan status pemenang murni berdasarkan skor angka saat ini 
+            ' (Mencegah bug di mana label winner hilang padahal poinnya lebih tinggi)
+            CheckWinner(CInt(TotalScoreAKA.Value), CInt(TotalScoreAO.Value))
+
+            ' Hentikan eksekusi kode di sini agar tidak memproses baris di bawahnya
+            Exit Sub
+        End If
+
+        ' 2. FITUR TOGGLE ON (AKTIFKAN PENALTI)
+        ' Pastikan tombol penalti yang lain bersih/putih dulu
         ResetPenaltyLabels()
+
+        ' Beri highlight Kuning pada tombol yang baru saja diklik
         clickedCtrl.BackColor = Color.Yellow
 
+        ' Deklarasikan pemenang mutlak karena lawan terkena penalti (Disqualification/Kiken)
         If winningTeam = "AKA" Then
             LblAkaWinner.Text = "WINNER"
             LblAkaWinner.Visible = True
@@ -386,6 +464,16 @@
         End If
     End Sub
 
+
+    Private Sub TxtMatchDetail_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDetail.TextChanged
+    End Sub
+
+    Private Sub LblTextAlign_Click(sender As Object, e As EventArgs) Handles LblTextAlign.Click
+    End Sub
+
+    ' ==============================================================================
+    ' [PENALTY SYSTEM] EVENT CLICK PENALTI (KIKEN & DISKUALIFIKASI)
+    ' ==============================================================================
     Private Sub BtnKikenAka_Click(sender As Object, e As EventArgs) Handles BtnKikenAka.Click
         ApplyPenaltyAndDeclareWinner(BtnKikenAka, "AO")
     End Sub
@@ -402,17 +490,65 @@
         ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
     End Sub
 
-    Private Sub LblDiskualifikasiAo_Click(sender As Object, e As EventArgs) Handles BtnDiskualifikasiAo.Click
-        ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
+
+    ' ==============================================================================
+    ' [PENALTY SYSTEM] HOVER EFFECT UNTUK TOMBOL KIKEN & DISKUALIFIKASI
+    ' ==============================================================================
+
+    ' Saat Mouse masuk ke area tombol (Hover)
+    Private Sub Penalty_MouseEnter(sender As Object, e As EventArgs) Handles BtnKikenAka.MouseEnter, BtnDiskualifikasiAka.MouseEnter, BtnKikenAo.MouseEnter, BtnDiskualifikasiAo.MouseEnter
+        Dim ctrl As Control = CType(sender, Control)
+
+        ' Ubah warna menjadi abu-abu muda hanya jika tombol sedang TIDAK aktif (bukan kuning)
+        If ctrl.BackColor <> Color.Yellow Then
+            ctrl.BackColor = Color.WhiteSmoke
+            ctrl.Cursor = Cursors.Hand ' Mengubah kursor panah menjadi ikon jari/tangan
+        End If
     End Sub
 
-    Private Sub TxtMatchDetail_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDetail.TextChanged
+    ' Saat Mouse keluar dari area tombol (Leave)
+    Private Sub Penalty_MouseLeave(sender As Object, e As EventArgs) Handles BtnKikenAka.MouseLeave, BtnDiskualifikasiAka.MouseLeave, BtnKikenAo.MouseLeave, BtnDiskualifikasiAo.MouseLeave
+        Dim ctrl As Control = CType(sender, Control)
+
+        ' Kembalikan ke warna asli (Putih) hanya jika tombol sedang TIDAK aktif (bukan kuning)
+        If ctrl.BackColor <> Color.Yellow Then
+            ctrl.BackColor = Color.White
+        End If
     End Sub
 
-    Private Sub LblTextAlign_Click(sender As Object, e As EventArgs) Handles LblTextAlign.Click
+
+    ' ==============================================================================
+    ' [SHOW WINNER POP-UP] 1. FUNGSI KLIK UNTUK TIM AKA (MERAH)
+    ' ==============================================================================
+    Private Sub LblAkaWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.Click
+        ' 1. Ambil teks langsung dari kotak inputan UI
+        Dim namaPeserta As String = TxtAkaNameMain.Text.Trim()
+        Dim namaTim As String = TxtAkaTeam1.Text.Trim()
+
+        ' 2. Validasi ringan: Jika kosong, tampilkan strip (-) agar desain form tidak aneh
+        If String.IsNullOrEmpty(namaPeserta) Then namaPeserta = "-"
+        If String.IsNullOrEmpty(namaTim) Then namaTim = "-"
+
+        ' 3. Memanggil WinnerForm (True = Merah/AKA)
+        Dim frmWinner As New WinnerForm(True, namaPeserta, namaTim)
+        frmWinner.Show()
     End Sub
 
+    ' ==============================================================================
+    ' [SHOW WINNER POP-UP] 2. FUNGSI KLIK UNTUK TIM AO (BIRU)
+    ' ==============================================================================
     Private Sub LblAoWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAoWinnerStatus.Click
+        ' 1. Ambil teks langsung dari kotak inputan UI
+        Dim namaPeserta As String = TxtAoNameMain.Text.Trim()
+        Dim namaTim As String = TxtAoTeam1.Text.Trim()
+
+        ' 2. Validasi ringan: Jika kosong, tampilkan strip (-) agar desain form tidak aneh
+        If String.IsNullOrEmpty(namaPeserta) Then namaPeserta = "-"
+        If String.IsNullOrEmpty(namaTim) Then namaTim = "-"
+
+        ' 3. Memanggil WinnerForm (False = Biru/AO)
+        Dim frmWinner As New WinnerForm(False, namaPeserta, namaTim)
+        frmWinner.Show()
     End Sub
 
     Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
@@ -441,6 +577,77 @@
             Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
         Catch ex As Exception
         End Try
+    End Sub
+
+
+    ' ==============================================================================
+    ' [WAITING TIMER] 1. FUNGSI TOMBOL START/STOP
+    ' ==============================================================================
+    Private Sub BtnStartWaitingTimer_Click(sender As Object, e As EventArgs) Handles BtnStartWaitingTimer.Click
+        If Not IsWaitTimerRunning Then
+            ' Ambil nilai dari inputan kotak Waiting (Menit dan Detik)
+            Dim menit As Integer = Convert.ToInt32(NumWaitMin.Value)
+            Dim detik As Integer = Convert.ToInt32(NumWaitSec.Value)
+            WaitTimeRemaining = (menit * 60) + detik
+
+            ' Cegah timer berjalan jika nilainya 0
+            If WaitTimeRemaining > 0 Then
+                IsWaitTimerRunning = True
+                WaitTimer.Start()
+
+                ' Ubah tombol menjadi mode Stop sebagai indikator
+                BtnStartWaitingTimer.Text = "Stop Waiting Timer"
+                BtnStartWaitingTimer.BackColor = Color.LightCoral
+                BtnStartWaitingTimer.ForeColor = Color.White
+
+                UpdateWaitTimerDisplay()
+            Else
+                MessageBox.Show("Silakan atur waktu Waiting terlebih dahulu.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+        Else
+            ' Logika jika tombol diklik untuk me-STOp timer yang sedang berjalan
+            StopWaitingTimer()
+        End If
+    End Sub
+
+    ' ==============================================================================
+    ' [WAITING TIMER] 2. LOGIKA HITUNG MUNDUR (TICK EVENT)
+    ' ==============================================================================
+    Private Sub WaitTimer_Tick(sender As Object, e As EventArgs) Handles WaitTimer.Tick
+        If WaitTimeRemaining > 0 Then
+            WaitTimeRemaining -= 1
+            UpdateWaitTimerDisplay()
+        Else
+            ' Waktu habis
+            StopWaitingTimer()
+            ' Opsional: Tampilkan alert kedip atau suara jika diperlukan
+            LblTimerDisplayMain.Text = "00:00 00"
+        End If
+    End Sub
+
+    ' ==============================================================================
+    ' [WAITING TIMER] 3. UPDATE TAMPILAN KE LAYAR UTAMA
+    ' ==============================================================================
+    Private Sub UpdateWaitTimerDisplay()
+        ' Kalkulasi ulang sisa detik menjadi format Menit dan Detik
+        Dim m As Integer = WaitTimeRemaining \ 60
+        Dim s As Integer = WaitTimeRemaining Mod 60
+
+        ' Timpa LblTimerDisplayMain dengan format digital "MM:SS 00"
+        LblTimerDisplayMain.Text = String.Format("{0:00}:{1:00} 00", m, s)
+    End Sub
+
+    ' ==============================================================================
+    ' [WAITING TIMER] 4. FUNGSI HELPER UNTUK RESET TOMBOL
+    ' ==============================================================================
+    Private Sub StopWaitingTimer()
+        WaitTimer.Stop()
+        IsWaitTimerRunning = False
+
+        ' Kembalikan warna dan teks tombol ke bentuk asli
+        BtnStartWaitingTimer.Text = "Start Waiting Timer"
+        BtnStartWaitingTimer.BackColor = Color.FromArgb(255, 228, 196) ' Warna BurlyWood/Peach asli
+        BtnStartWaitingTimer.ForeColor = Color.Black
     End Sub
 
     ' Fungsi ini otomatis terbuat saat kamu double-click tombol Setting
