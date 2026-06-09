@@ -16,10 +16,14 @@ Partial Public Class KumiteMainControl
     Public NextAkaName As String = ""
     Public NextAkaTeam As String = ""
     Public NextAkaInfo As String = ""
-
     Public NextAoName As String = ""
     Public NextAoTeam As String = ""
     Public NextAoInfo As String = ""
+    Private isAkaVrActive As Boolean = False
+    Private isAoVrActive As Boolean = False
+    Private isVrBumperActive As Boolean = False
+    Private isAkaSenshu As Boolean = False
+    Private isAoSenshu As Boolean = False
 
     ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
     Public Sub SetCompetitorData(nama As String, team As String, info As String)
@@ -123,9 +127,9 @@ Partial Public Class KumiteMainControl
 
                 If finalPath <> "" Then
                     Dim bytes As Byte() = System.IO.File.ReadAllBytes(finalPath)
-                    Using ms As New IO.MemoryStream(bytes)
-                        Return Image.FromStream(ms)
-                    End Using
+                    ' PERBAIKAN: Hilangkan blok 'Using' agar memori gambar tidak dihapus sistem (Anti-Crash)
+                    Dim ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
                 Else
                     ' Kotak darurat jika gambar bendera asli di folder tidak ditemukan
                     Dim bmp As New Bitmap(100, 60)
@@ -140,9 +144,9 @@ Partial Public Class KumiteMainControl
                 ' 2. JIKA INI ADALAH LOGO CUSTOM BIASA (Alamat File)
             ElseIf System.IO.File.Exists(pathOrFlag) Then
                 Dim bytes As Byte() = System.IO.File.ReadAllBytes(pathOrFlag)
-                Using ms As New IO.MemoryStream(bytes)
-                    Return Image.FromStream(ms)
-                End Using
+                ' PERBAIKAN: Hilangkan blok 'Using' agar memori gambar tidak dihapus sistem
+                Dim ms As New IO.MemoryStream(bytes)
+                Return Image.FromStream(ms)
             End If
         Catch ex As Exception
         End Try
@@ -312,28 +316,12 @@ Partial Public Class KumiteMainControl
         If frmKeyboardShortcutApp Is Nothing OrElse frmKeyboardShortcutApp.IsDisposed Then
             frmKeyboardShortcutApp = New FormKeyboardShortcut()
         End If
-
-        ' 3. SAKLAR GAIB: Memanggil properti ".Handle" akan memaksa sistem operasi Windows 
-        ' untuk membangun kerangka form ini secara diam-diam.
-        ' Aksi ini otomatis memicu event 'FormKeyboardShortcut_Load' dan menjalankan 'isiDataShortcut()' tanpa perlu muncul di layar!
         Dim phantomHandle As IntPtr = frmKeyboardShortcutApp.Handle
-
-        ' ==========================================================
-        ' LOCK FIXATION TAMPILAN (ANTI-RESPONSIF / STATIC SIZE)
-        ' ==========================================================
         Me.FormBorderStyle = FormBorderStyle.FixedSingle ' 1. Mengunci border agar tidak bisa ditarik/di-stretch manual
         Me.MaximizeBox = False                           ' 2. Mematikan fungsi tombol kotak (Maximize) di pojok kanan atas
         Me.StartPosition = FormStartPosition.CenterScreen ' 3. Memaksa aplikasi muncul rapi tepat di tengah-tengah monitor
 
-        ' ==========================================================
-        ' SEBAR SENSOR KLIK AREA KOSONG KE SELURUH LAYAR
-        ' ==========================================================
         AttachBackgroundClickSensor(Me)
-
-        ' ==========================================================
-        ' DEFAULT LOCK: WIN. POINT & TATAMI
-        ' ==========================================================
-        ' Mematikan kotak angka Win. Point secara default
         NumWinPoint.Enabled = False
         ' Mematikan tombol Save, dan menyalakan tombol Edit
         BtnSaveWinPoint.Enabled = False
@@ -389,6 +377,10 @@ Partial Public Class KumiteMainControl
 
         TxtAoName.ForeColor = AoColor
         TxtAoName.Font = New Font(TxtAoName.Font, FontStyle.Bold)
+
+        CboAdjustPlayer.Items.Clear()
+        CboAdjustPlayer.Items.AddRange({"All", "Player Name", "Score", "Team", "Team Info", "Category", "Timer", "Tatami", "Match Detail"})
+        CboAdjustPlayer.SelectedIndex = 0
     End Sub
 
     ' ==========================================================
@@ -1516,20 +1508,42 @@ Partial Public Class KumiteMainControl
     ' ==========================================================
 
     ''' <summary>
-    ''' Sinkronisasi Nama, Kontingen, dan Nomor Tatami.
+    ''' Sinkronisasi Nama Pemain, Nama Tim (ke titik kuning), dan Info Tim (ke titik putih), serta Gambar.
     ''' </summary>
     Public Sub SyncScoreboardProfile()
         If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
-            ' Mengupdate Label Nama dan Info (Team + Info)
+            ' 1. Mengupdate Nama Pemain
             frmScoreboard.LblAkaName.Text = TxtAkaNameMain.Text
-            frmScoreboard.LblAkaInfo.Text = TxtAkaTeam.Text & " (" & TxtAkaTeamInfo.Text & ")"
-
             frmScoreboard.LblAoName.Text = TxtAoNameMain.Text
-            frmScoreboard.LblAoInfo.Text = TxtAoTeam.Text & " (" & TxtAoTeamInfo.Text & ")"
 
-            ' Mengupdate Nomor Tatami
+            ' 2. Mengupdate Nama Tim ke Titik Kuning (Atas)
+            frmScoreboard.LblAkaDotsTop.Text = TxtAkaTeam.Text
+            frmScoreboard.LblAoDotsTop.Text = TxtAoTeam.Text
+
+            ' 3. Mengupdate Info Tim ke Titik Putih (Bawah)
+            frmScoreboard.LblAkaDotsBot.Text = TxtAkaTeamInfo.Text
+            frmScoreboard.LblAoDotsBot.Text = TxtAoTeamInfo.Text
+
+            ' 4. Kosongkan teks di bawah nama pemain agar tidak dobel/berantakan
+            frmScoreboard.LblAkaInfo.Text = ""
+            frmScoreboard.LblAoInfo.Text = ""
+
             frmScoreboard.LblTatamiNum.Text = NumTatami.Value.ToString()
             frmScoreboard.LblMatchDesc.Text = TxtMatchDesc.Text
+
+            ' 6. SINKRONISASI GAMBAR (PROFIL & LOGO)
+            ' Memaksa mode gambar menjadi Zoom agar bendera utuh dan tidak nge-zoom ke warna merah saja
+            frmScoreboard.PicAkaProfileSb.SizeMode = PictureBoxSizeMode.Zoom
+            frmScoreboard.PicAkaTeamLogoSb.SizeMode = PictureBoxSizeMode.Zoom
+            frmScoreboard.PicAoProfileSb.SizeMode = PictureBoxSizeMode.Zoom
+            frmScoreboard.PicAoTeamLogoSb.SizeMode = PictureBoxSizeMode.Zoom
+
+            ' Transfer gambar dari Control Panel ke Scoreboard
+            frmScoreboard.PicAkaProfileSb.Image = PicAkaProfile.Image
+            frmScoreboard.PicAkaTeamLogoSb.Image = PicAkaTeamLogo.Image
+
+            frmScoreboard.PicAoProfileSb.Image = PicAoProfile.Image
+            frmScoreboard.PicAoTeamLogoSb.Image = PicAoTeamLogo.Image
         End If
     End Sub
 
@@ -1559,6 +1573,8 @@ Partial Public Class KumiteMainControl
             End If
         End If
     End Sub
+
+
 
     Public Sub SyncScoreboardPenalties()
         ' Pastikan menggunakan nama variabel form yang sudah dideklarasikan (frmScoreboard)
@@ -1919,5 +1935,215 @@ Partial Public Class KumiteMainControl
 
     Private Sub BtnRemoveLogo_Click(sender As Object, e As EventArgs) Handles BtnRemoveLogo.Click
         PicPreviewLogo.Image = Nothing
+    End Sub
+
+    Private Sub BtnAkaVR_Click(sender As Object, e As EventArgs) Handles BtnAkaVR.Click
+        isAkaVrActive = Not isAkaVrActive
+
+        ' 2. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isAkaVrActive Then
+            btn.BackColor = AkaColor
+            btn.ForeColor = Color.White
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+
+        ' 3. Munculkan/sembunyikan di Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblVrAka.Visible = isAkaVrActive
+        End If
+    End Sub
+    Private Sub BtnAoVR_Click(sender As Object, e As EventArgs) Handles BtnAoVR.Click
+        isAoVrActive = Not isAoVrActive
+
+        ' 2. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isAoVrActive Then
+            btn.BackColor = AoColor
+            btn.ForeColor = Color.White
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+
+        ' 3. Munculkan/sembunyikan di Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblVrAo.Visible = isAoVrActive
+        End If
+    End Sub
+    Private Sub ShowVrRequestedSplash(teamName As String, teamColor As Color)
+        Dim targetScreen As Screen
+
+        ' 1. Cek ketersediaan monitor/proyektor
+        If Screen.AllScreens.Length > 1 Then
+            ' Jika ADA layar kedua (Extend Mode), targetkan ke proyektor
+            targetScreen = Screen.AllScreens(1)
+        Else
+            ' Jika TIDAK ADA layar kedua (sedang ngoding/testing di laptop), 
+            ' paksa targetkan ke layar utama laptop saja!
+            targetScreen = Screen.AllScreens(0)
+        End If
+
+        ' 2. Buat Form layar penuh
+        Dim splash As New Form()
+        splash.FormBorderStyle = FormBorderStyle.None
+        splash.BackColor = Color.Black
+        splash.StartPosition = FormStartPosition.Manual
+        splash.TopMost = True ' Selalu berada di paling depan
+
+        ' 3. Pindahkan form ke layar yang sudah ditentukan oleh mesin pengecek di atas
+        splash.Bounds = targetScreen.Bounds
+
+        ' 4. Buat teks peringatan raksasa di tengah layar
+        Dim lblPeringatan As New Label()
+        lblPeringatan.Text = teamName & " VIDEO REVIEW REQUESTED"
+        lblPeringatan.ForeColor = teamColor
+        lblPeringatan.Font = New Font("Segoe UI", 65, FontStyle.Bold)
+        lblPeringatan.Dock = DockStyle.Fill
+        lblPeringatan.TextAlign = ContentAlignment.MiddleCenter
+        splash.Controls.Add(lblPeringatan)
+
+        ' 5. Fitur Pintar: Klik di mana saja pada layar raksasa ini untuk menutupnya
+        AddHandler splash.Click, Sub() splash.Close()
+        AddHandler lblPeringatan.Click, Sub() splash.Close()
+
+        ' Tampilkan layarnya!
+        splash.Show()
+    End Sub
+
+    Private Sub UpdateSenshuUI()
+        ' 1. Ubah warna tombol di panel operator (KumiteMainControl)
+        If isAkaSenshu Then
+            BtnAkaSenshu.BackColor = AkaColor
+            BtnAkaSenshu.ForeColor = Color.White
+        Else
+            BtnAkaSenshu.BackColor = SystemColors.Control
+            BtnAkaSenshu.ForeColor = Color.Black
+        End If
+
+        If isAoSenshu Then
+            BtnAoSenshu.BackColor = AoColor
+            BtnAoSenshu.ForeColor = Color.White
+        Else
+            BtnAoSenshu.BackColor = SystemColors.Control
+            BtnAoSenshu.ForeColor = Color.Black
+        End If
+
+        ' 2. Munculkan/Sembunyikan Label "S" kuning di Layar Scoreboard Raksasa
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.LblSenshuAka.Visible = isAkaSenshu
+            frmScoreboard.LblSenshuAo.Visible = isAoSenshu
+        End If
+    End Sub
+
+    Private Sub BtnAkaSenshu_Click(sender As Object, e As EventArgs) Handles BtnAkaSenshu.Click
+        isAkaSenshu = Not isAkaSenshu
+
+        ' LOGIKA KUNCI: Jika Senshu AKA menyala, Senshu AO otomatis DIMATIKAN!
+        If isAkaSenshu Then
+            isAoSenshu = False
+        End If
+
+        ' Panggil mesin update
+        UpdateSenshuUI()
+    End Sub
+
+    Private Sub BtnAoSenshu_Click(sender As Object, e As EventArgs) Handles BtnAoSenshu.Click
+        isAoSenshu = Not isAoSenshu
+        ' LOGIKA KUNCI: Jika Senshu AO menyala, Senshu AKA otomatis DIMATIKAN!
+        If isAoSenshu Then
+            isAkaSenshu = False
+        End If
+        ' Panggil mesin update
+        UpdateSenshuUI()
+    End Sub
+
+    Private Sub AKAVR_Click(sender As Object, e As EventArgs) Handles AKAVR.Click
+        If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
+            MessageBox.Show("Scoreboard belum dinyalakan!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        ' 2. Balikkan status saklar Tirai (Bumper)
+        isVrBumperActive = Not isVrBumperActive
+
+        ' 3. Kirim perintah ke layar Scoreboard untuk menurunkan "Tirai Hitam"
+        frmScoreboard.LblVrBumper.Visible = isVrBumperActive
+
+        ' 4. Ubah warna teks tirai sesuai tim yang meminta VR (AKA = Merah)
+        frmScoreboard.LblVrBumper.ForeColor = AkaColor
+
+        ' 5. Bawa Tirai ke lapisan paling depan (menutupi segalanya)
+        frmScoreboard.LblVrBumper.BringToFront()
+
+        ' 6. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isVrBumperActive Then
+            btn.BackColor = AkaColor
+            btn.ForeColor = Color.White
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub AOVR_Click(sender As Object, e As EventArgs) Handles AOVR.Click
+        If frmScoreboard Is Nothing OrElse frmScoreboard.IsDisposed Then
+            MessageBox.Show("Scoreboard belum dinyalakan!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        ' 2. Balikkan status saklar Tirai (Bumper)
+        isVrBumperActive = Not isVrBumperActive
+
+        ' 3. Kirim perintah ke layar Scoreboard untuk menurunkan "Tirai Hitam"
+        frmScoreboard.LblVrBumper.Visible = isVrBumperActive
+
+        ' 4. Ubah warna teks tirai sesuai tim yang meminta VR (AO = Biru)
+        frmScoreboard.LblVrBumper.ForeColor = AoColor
+
+        ' 5. Bawa Tirai ke lapisan paling depan
+        frmScoreboard.LblVrBumper.BringToFront()
+
+        ' 6. Ubah warna tombol wasit sebagai indikator
+        Dim btn As Button = CType(sender, Button)
+        If isVrBumperActive Then
+            btn.BackColor = AoColor
+            btn.ForeColor = Color.White
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+        Else
+            btn.BackColor = SystemColors.Control
+            btn.ForeColor = Color.Black
+        End If
+    End Sub
+
+    Private Sub BtnAdjustPlus_Click(sender As Object, e As EventArgs) Handles BtnAdjustPlus.Click
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Ambil angka dari kotak NumAdjustSize, lalu perintahkan Scoreboard untuk "Plus"
+            frmScoreboard.AdjustTextSize(CboAdjustPlayer.Text, "Plus", CSng(NumAdjustSize.Value))
+        End If
+    End Sub
+
+    ' Tombol Minus (-)
+    Private Sub BtnAdjustMin_Click(sender As Object, e As EventArgs) Handles BtnAdjustMin.Click
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Ambil angka dari kotak NumAdjustSize, lalu perintahkan Scoreboard untuk "Minus"
+            frmScoreboard.AdjustTextSize(CboAdjustPlayer.Text, "Minus", CSng(NumAdjustSize.Value))
+        End If
+    End Sub
+
+    ' Tombol Reset (R)
+    Private Sub BtnAdjustR_Click(sender As Object, e As EventArgs) Handles BtnAdjustR.Click
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            ' Perintahkan Scoreboard untuk "Reset" ke ukuran bawaan pabrik
+            frmScoreboard.AdjustTextSize(CboAdjustPlayer.Text, "Reset", 0)
+        End If
     End Sub
 End Class

@@ -983,6 +983,7 @@ Partial Class KumiteMainControl
         ' 
         ' AKAVR
         ' 
+        AKAVR.Font = New Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         AKAVR.Location = New Point(331, 288)
         AKAVR.Margin = New Padding(3, 4, 3, 4)
         AKAVR.Name = "AKAVR"

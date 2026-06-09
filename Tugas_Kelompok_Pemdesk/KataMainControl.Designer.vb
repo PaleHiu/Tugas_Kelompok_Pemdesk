@@ -455,6 +455,9 @@ Partial Class KataMainControl
         BtnAkaUpdateInfo = New Button()
         LblAkaName = New Label()
         LblAkaHeader = New Label()
+        PicPreviewLogo = New PictureBox()
+        BtnSelectLogo = New Button()
+        BtnRemoveLogo = New Button()
         TabPageDetail = New TabPage()
         TabPageDetail.SuspendLayout()
         PnlLeftBar.SuspendLayout()
@@ -478,6 +481,7 @@ Partial Class KataMainControl
         GrpScoreboardSelect.SuspendLayout()
         CType(NumTatamiId, ComponentModel.ISupportInitialize).BeginInit()
         TabMatchDetail.SuspendLayout()
+        TabPageLogo.SuspendLayout()
         PnlMainWorkspace.SuspendLayout()
         PnlCenterScore.SuspendLayout()
         CType(TotalScoreAO, ComponentModel.ISupportInitialize).BeginInit()
@@ -520,6 +524,7 @@ Partial Class KataMainControl
         PnlAka.SuspendLayout()
         CType(PicAkaAvatar, ComponentModel.ISupportInitialize).BeginInit()
         CType(PicAkaCircle, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PicPreviewLogo, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' TabPageDetail
@@ -1789,7 +1794,11 @@ Partial Class KataMainControl
         ' 
         ' TabPageLogo
         ' 
-        TabPageLogo.Location = New Point(4, 22)
+        TabPageLogo.Controls.Add(BtnRemoveLogo)
+        TabPageLogo.Controls.Add(BtnSelectLogo)
+        TabPageLogo.Controls.Add(PicPreviewLogo)
+        TabPageLogo.Location = New Point(4, 26)
+        TabPageLogo.Margin = New Padding(3, 4, 3, 4)
         TabPageLogo.Name = "TabPageLogo"
         TabPageLogo.Size = New Size(214, 94)
         TabPageLogo.TabIndex = 1
@@ -1916,7 +1925,7 @@ Partial Class KataMainControl
         ' 
         ' TotalScoreAO
         ' 
-        TotalScoreAO.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        TotalScoreAO.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         TotalScoreAO.Increment = New Decimal(New Integer() {0, 0, 0, 0})
         TotalScoreAO.Location = New Point(153, 519)
         TotalScoreAO.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
@@ -1928,7 +1937,7 @@ Partial Class KataMainControl
         ' 
         ' TotalScoreAKA
         ' 
-        TotalScoreAKA.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
+        TotalScoreAKA.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
         TotalScoreAKA.Increment = New Decimal(New Integer() {0, 0, 0, 0})
         TotalScoreAKA.Location = New Point(4, 519)
         TotalScoreAKA.Maximum = New Decimal(New Integer() {1000, 0, 0, 0})
@@ -1944,8 +1953,9 @@ Partial Class KataMainControl
         BtnResetScoreAka.BackColor = Color.WhiteSmoke
         BtnResetScoreAka.FlatAppearance.BorderColor = Color.LightGray
         BtnResetScoreAka.FlatStyle = FlatStyle.Popup
-        BtnResetScoreAka.Font = New Font("Segoe UI", 10.0F)
-        BtnResetScoreAka.Location = New Point(4, 596)
+        BtnResetScoreAka.Font = New Font("Segoe UI", 10F)
+        BtnResetScoreAka.Location = New Point(5, 795)
+        BtnResetScoreAka.Margin = New Padding(3, 4, 3, 4)
         BtnResetScoreAka.Name = "BtnResetScoreAka"
         BtnResetScoreAka.Size = New Size(140, 30)
         BtnResetScoreAka.TabIndex = 4
@@ -1957,8 +1967,9 @@ Partial Class KataMainControl
         BtnResetScoreAo.BackColor = Color.WhiteSmoke
         BtnResetScoreAo.FlatAppearance.BorderColor = Color.LightGray
         BtnResetScoreAo.FlatStyle = FlatStyle.Popup
-        BtnResetScoreAo.Font = New Font("Segoe UI", 10.0F)
-        BtnResetScoreAo.Location = New Point(153, 596)
+        BtnResetScoreAo.Font = New Font("Segoe UI", 10F)
+        BtnResetScoreAo.Location = New Point(175, 795)
+        BtnResetScoreAo.Margin = New Padding(3, 4, 3, 4)
         BtnResetScoreAo.Name = "BtnResetScoreAo"
         BtnResetScoreAo.Size = New Size(140, 30)
         BtnResetScoreAo.TabIndex = 4
@@ -2398,8 +2409,8 @@ Partial Class KataMainControl
         ' Label26
         ' 
         Label26.Enabled = False
-        Label26.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label26.Location = New Point(48, 6)
+        Label26.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label26.Location = New Point(55, 8)
         Label26.Name = "Label26"
         Label26.Size = New Size(64, 39)
         Label26.TabIndex = 0
@@ -2434,8 +2445,8 @@ Partial Class KataMainControl
         ' Label24
         ' 
         Label24.Enabled = False
-        Label24.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label24.Location = New Point(48, 6)
+        Label24.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label24.Location = New Point(55, 8)
         Label24.Name = "Label24"
         Label24.Size = New Size(64, 39)
         Label24.TabIndex = 0
@@ -2470,8 +2481,8 @@ Partial Class KataMainControl
         ' Label22
         ' 
         Label22.Enabled = False
-        Label22.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label22.Location = New Point(48, 6)
+        Label22.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label22.Location = New Point(55, 8)
         Label22.Name = "Label22"
         Label22.Size = New Size(64, 39)
         Label22.TabIndex = 0
@@ -2506,8 +2517,8 @@ Partial Class KataMainControl
         ' Label20
         ' 
         Label20.Enabled = False
-        Label20.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label20.Location = New Point(48, 6)
+        Label20.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label20.Location = New Point(55, 8)
         Label20.Name = "Label20"
         Label20.Size = New Size(64, 39)
         Label20.TabIndex = 0
@@ -2542,8 +2553,8 @@ Partial Class KataMainControl
         ' Label18
         ' 
         Label18.Enabled = False
-        Label18.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label18.Location = New Point(48, 6)
+        Label18.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label18.Location = New Point(55, 8)
         Label18.Name = "Label18"
         Label18.Size = New Size(64, 39)
         Label18.TabIndex = 0
@@ -2578,8 +2589,8 @@ Partial Class KataMainControl
         ' Label16
         ' 
         Label16.Enabled = False
-        Label16.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label16.Location = New Point(48, 6)
+        Label16.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label16.Location = New Point(55, 8)
         Label16.Name = "Label16"
         Label16.Size = New Size(64, 39)
         Label16.TabIndex = 0
@@ -2614,8 +2625,8 @@ Partial Class KataMainControl
         ' Label14
         ' 
         Label14.Enabled = False
-        Label14.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label14.Location = New Point(48, 6)
+        Label14.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label14.Location = New Point(55, 8)
         Label14.Name = "Label14"
         Label14.Size = New Size(64, 39)
         Label14.TabIndex = 0
@@ -2667,8 +2678,8 @@ Partial Class KataMainControl
         ' Label12
         ' 
         Label12.Enabled = False
-        Label12.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label12.Location = New Point(7, 5)
+        Label12.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label12.Location = New Point(8, 7)
         Label12.Name = "Label12"
         Label12.Size = New Size(64, 39)
         Label12.TabIndex = 0
@@ -2702,8 +2713,8 @@ Partial Class KataMainControl
         ' Label10
         ' 
         Label10.Enabled = False
-        Label10.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label10.Location = New Point(7, 5)
+        Label10.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label10.Location = New Point(8, 7)
         Label10.Name = "Label10"
         Label10.Size = New Size(64, 39)
         Label10.TabIndex = 0
@@ -2737,8 +2748,8 @@ Partial Class KataMainControl
         ' Label8
         ' 
         Label8.Enabled = False
-        Label8.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label8.Location = New Point(7, 5)
+        Label8.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label8.Location = New Point(8, 7)
         Label8.Name = "Label8"
         Label8.Size = New Size(64, 39)
         Label8.TabIndex = 0
@@ -2772,8 +2783,8 @@ Partial Class KataMainControl
         ' Label6
         ' 
         Label6.Enabled = False
-        Label6.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label6.Location = New Point(7, 5)
+        Label6.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label6.Location = New Point(8, 7)
         Label6.Name = "Label6"
         Label6.Size = New Size(64, 39)
         Label6.TabIndex = 0
@@ -2807,8 +2818,8 @@ Partial Class KataMainControl
         ' Label4
         ' 
         Label4.Enabled = False
-        Label4.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label4.Location = New Point(7, 5)
+        Label4.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label4.Location = New Point(8, 7)
         Label4.Name = "Label4"
         Label4.Size = New Size(64, 39)
         Label4.TabIndex = 0
@@ -2842,8 +2853,8 @@ Partial Class KataMainControl
         ' Label2
         ' 
         Label2.Enabled = False
-        Label2.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        Label2.Location = New Point(7, 5)
+        Label2.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        Label2.Location = New Point(8, 7)
         Label2.Name = "Label2"
         Label2.Size = New Size(64, 39)
         Label2.TabIndex = 0
@@ -2877,8 +2888,8 @@ Partial Class KataMainControl
         ' LblFlagAo7
         ' 
         LblFlagAo7.Enabled = False
-        LblFlagAo7.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        LblFlagAo7.Location = New Point(7, 5)
+        LblFlagAo7.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        LblFlagAo7.Location = New Point(8, 7)
         LblFlagAo7.Name = "LblFlagAo7"
         LblFlagAo7.Size = New Size(64, 39)
         LblFlagAo7.TabIndex = 0
@@ -2889,7 +2900,7 @@ Partial Class KataMainControl
         ' 
         LblTotalScoreAkaTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
         LblTotalScoreAkaTitle.BorderStyle = BorderStyle.FixedSingle
-        LblTotalScoreAkaTitle.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
+        LblTotalScoreAkaTitle.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
         LblTotalScoreAkaTitle.ForeColor = Color.Black
         LblTotalScoreAkaTitle.Location = New Point(4, 486)
         LblTotalScoreAkaTitle.Name = "LblTotalScoreAkaTitle"
@@ -2902,7 +2913,7 @@ Partial Class KataMainControl
         ' 
         LblTotalScoreAoTitle.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
         LblTotalScoreAoTitle.BorderStyle = BorderStyle.FixedSingle
-        LblTotalScoreAoTitle.Font = New Font("Segoe UI", 11.0F, FontStyle.Bold)
+        LblTotalScoreAoTitle.Font = New Font("Segoe UI", 11F, FontStyle.Bold)
         LblTotalScoreAoTitle.ForeColor = Color.Black
         LblTotalScoreAoTitle.Location = New Point(153, 486)
         LblTotalScoreAoTitle.Name = "LblTotalScoreAoTitle"
@@ -2914,7 +2925,7 @@ Partial Class KataMainControl
         ' LblJudgeScoreTitle
         ' 
         LblJudgeScoreTitle.Dock = DockStyle.Top
-        LblJudgeScoreTitle.Font = New Font("Segoe UI", 13.0F, FontStyle.Bold)
+        LblJudgeScoreTitle.Font = New Font("Segoe UI", 13F, FontStyle.Bold)
         LblJudgeScoreTitle.Location = New Point(0, 0)
         LblJudgeScoreTitle.Name = "LblJudgeScoreTitle"
         LblJudgeScoreTitle.Size = New Size(299, 35)
@@ -2965,7 +2976,7 @@ Partial Class KataMainControl
         ' LblAoWinnerStatus
         ' 
         LblAoWinnerStatus.AutoSize = True
-        LblAoWinnerStatus.Font = New Font("Segoe UI", 8.0F)
+        LblAoWinnerStatus.Font = New Font("Segoe UI", 8F)
         LblAoWinnerStatus.ForeColor = Color.Gray
         LblAoWinnerStatus.Location = New Point(15, 345)
         LblAoWinnerStatus.Name = "LblAoWinnerStatus"
@@ -3023,8 +3034,9 @@ Partial Class KataMainControl
         ' CmbAoKata
         ' 
         CmbAoKata.DropDownStyle = ComboBoxStyle.DropDownList
-        CmbAoKata.Font = New Font("Segoe UI", 9.0F)
-        CmbAoKata.Location = New Point(15, 210)
+        CmbAoKata.Font = New Font("Segoe UI", 9F)
+        CmbAoKata.Location = New Point(17, 280)
+        CmbAoKata.Margin = New Padding(3, 4, 3, 4)
         CmbAoKata.Name = "CmbAoKata"
         CmbAoKata.Size = New Size(295, 23)
         CmbAoKata.TabIndex = 11
@@ -3042,8 +3054,9 @@ Partial Class KataMainControl
         ' TxtAoTeam2
         ' 
         TxtAoTeam2.BorderStyle = BorderStyle.FixedSingle
-        TxtAoTeam2.Font = New Font("Segoe UI", 9.0F)
-        TxtAoTeam2.Location = New Point(15, 155)
+        TxtAoTeam2.Font = New Font("Segoe UI", 9F)
+        TxtAoTeam2.Location = New Point(17, 207)
+        TxtAoTeam2.Margin = New Padding(3, 4, 3, 4)
         TxtAoTeam2.Name = "TxtAoTeam2"
         TxtAoTeam2.Size = New Size(295, 23)
         TxtAoTeam2.TabIndex = 9
@@ -3051,8 +3064,9 @@ Partial Class KataMainControl
         ' TxtAoTeam1
         ' 
         TxtAoTeam1.BorderStyle = BorderStyle.FixedSingle
-        TxtAoTeam1.Font = New Font("Segoe UI", 9.0F)
-        TxtAoTeam1.Location = New Point(15, 125)
+        TxtAoTeam1.Font = New Font("Segoe UI", 9F)
+        TxtAoTeam1.Location = New Point(17, 167)
+        TxtAoTeam1.Margin = New Padding(3, 4, 3, 4)
         TxtAoTeam1.Name = "TxtAoTeam1"
         TxtAoTeam1.Size = New Size(295, 23)
         TxtAoTeam1.TabIndex = 8
@@ -3075,8 +3089,9 @@ Partial Class KataMainControl
         BtnAoSwap.BackColor = Color.WhiteSmoke
         BtnAoSwap.FlatAppearance.BorderColor = Color.LightGray
         BtnAoSwap.FlatStyle = FlatStyle.Flat
-        BtnAoSwap.Font = New Font("Segoe UI", 9.0F)
-        BtnAoSwap.Location = New Point(230, 96)
+        BtnAoSwap.Font = New Font("Segoe UI", 9F)
+        BtnAoSwap.Location = New Point(263, 128)
+        BtnAoSwap.Margin = New Padding(3, 4, 3, 4)
         BtnAoSwap.Name = "BtnAoSwap"
         BtnAoSwap.Size = New Size(30, 24)
         BtnAoSwap.TabIndex = 6
@@ -3086,8 +3101,8 @@ Partial Class KataMainControl
         ' LblAoTeam
         ' 
         LblAoTeam.AutoSize = True
-        LblAoTeam.Font = New Font("Segoe UI", 8.0F, FontStyle.Bold)
-        LblAoTeam.Location = New Point(15, 100)
+        LblAoTeam.Font = New Font("Segoe UI", 8F, FontStyle.Bold)
+        LblAoTeam.Location = New Point(17, 133)
         LblAoTeam.Name = "LblAoTeam"
         LblAoTeam.Size = New Size(95, 13)
         LblAoTeam.TabIndex = 5
@@ -3096,8 +3111,9 @@ Partial Class KataMainControl
         ' TxtAoNameMain
         ' 
         TxtAoNameMain.BorderStyle = BorderStyle.FixedSingle
-        TxtAoNameMain.Font = New Font("Segoe UI", 9.0F)
-        TxtAoNameMain.Location = New Point(15, 65)
+        TxtAoNameMain.Font = New Font("Segoe UI", 9F)
+        TxtAoNameMain.Location = New Point(17, 87)
+        TxtAoNameMain.Margin = New Padding(3, 4, 3, 4)
         TxtAoNameMain.Name = "TxtAoNameMain"
         TxtAoNameMain.Size = New Size(295, 23)
         TxtAoNameMain.TabIndex = 4
@@ -3107,8 +3123,9 @@ Partial Class KataMainControl
         BtnAoExtraIcon.BackColor = Color.WhiteSmoke
         BtnAoExtraIcon.FlatAppearance.BorderColor = Color.LightGray
         BtnAoExtraIcon.FlatStyle = FlatStyle.Flat
-        BtnAoExtraIcon.Font = New Font("Segoe UI", 9.0F)
-        BtnAoExtraIcon.Location = New Point(280, 36)
+        BtnAoExtraIcon.Font = New Font("Segoe UI", 9F)
+        BtnAoExtraIcon.Location = New Point(320, 48)
+        BtnAoExtraIcon.Margin = New Padding(3, 4, 3, 4)
         BtnAoExtraIcon.Name = "BtnAoExtraIcon"
         BtnAoExtraIcon.Size = New Size(30, 24)
         BtnAoExtraIcon.TabIndex = 3
@@ -3142,7 +3159,7 @@ Partial Class KataMainControl
         ' 
         LblAoHeader.BackColor = Color.FromArgb(CByte(30), CByte(120), CByte(250))
         LblAoHeader.Dock = DockStyle.Top
-        LblAoHeader.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
+        LblAoHeader.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
         LblAoHeader.ForeColor = Color.White
         LblAoHeader.Location = New Point(0, 0)
         LblAoHeader.Name = "LblAoHeader"
@@ -3383,6 +3400,34 @@ Partial Class KataMainControl
         LblAkaHeader.Text = "AKA"
         LblAkaHeader.TextAlign = ContentAlignment.MiddleCenter
         ' 
+        ' PicPreviewLogo
+        ' 
+        PicPreviewLogo.BorderStyle = BorderStyle.FixedSingle
+        PicPreviewLogo.Location = New Point(21, 22)
+        PicPreviewLogo.Name = "PicPreviewLogo"
+        PicPreviewLogo.Size = New Size(90, 85)
+        PicPreviewLogo.SizeMode = PictureBoxSizeMode.Zoom
+        PicPreviewLogo.TabIndex = 0
+        PicPreviewLogo.TabStop = False
+        ' 
+        ' BtnSelectLogo
+        ' 
+        BtnSelectLogo.Location = New Point(126, 31)
+        BtnSelectLogo.Name = "BtnSelectLogo"
+        BtnSelectLogo.Size = New Size(111, 29)
+        BtnSelectLogo.TabIndex = 1
+        BtnSelectLogo.Text = "Select Image"
+        BtnSelectLogo.UseVisualStyleBackColor = True
+        ' 
+        ' BtnRemoveLogo
+        ' 
+        BtnRemoveLogo.Location = New Point(125, 69)
+        BtnRemoveLogo.Name = "BtnRemoveLogo"
+        BtnRemoveLogo.Size = New Size(111, 29)
+        BtnRemoveLogo.TabIndex = 2
+        BtnRemoveLogo.Text = "Remove"
+        BtnRemoveLogo.UseVisualStyleBackColor = True
+        ' 
         ' KataMainControl
         ' 
         AutoScaleDimensions = New SizeF(7.0F, 15.0F)
@@ -3428,6 +3473,7 @@ Partial Class KataMainControl
         GrpScoreboardSelect.PerformLayout()
         CType(NumTatamiId, ComponentModel.ISupportInitialize).EndInit()
         TabMatchDetail.ResumeLayout(False)
+        TabPageLogo.ResumeLayout(False)
         PnlMainWorkspace.ResumeLayout(False)
         PnlCenterScore.ResumeLayout(False)
         CType(TotalScoreAO, ComponentModel.ISupportInitialize).EndInit()
@@ -3486,6 +3532,7 @@ Partial Class KataMainControl
         PnlAka.PerformLayout()
         CType(PicAkaAvatar, ComponentModel.ISupportInitialize).EndInit()
         CType(PicAkaCircle, ComponentModel.ISupportInitialize).EndInit()
+        CType(PicPreviewLogo, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
 
     End Sub
@@ -3545,5 +3592,8 @@ Partial Class KataMainControl
     Friend WithEvents TxtMatchDetail As TextBox
     Friend WithEvents LblAoWinner As Label
     Friend WithEvents LblAkaWinner As Label
+    Friend WithEvents BtnRemoveLogo As Button
+    Friend WithEvents BtnSelectLogo As Button
+    Friend WithEvents PicPreviewLogo As PictureBox
 
 End Class
