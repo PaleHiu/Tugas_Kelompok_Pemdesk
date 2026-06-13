@@ -289,7 +289,6 @@ Partial Public Class KumiteMainControl
     End Sub
 
     Public Shared frmScoreboardSettingApp As FrmScoreboardSetting
-    Public Shared frmLogActivityApp As FormLogActivity
     Public Shared frmKeyboardShortcutApp As FormKeyboardShortcut
     Public Shared frmHanteiApp As HanteiForm
     Public Shared frmScoreboard As ScoreBoard
@@ -305,7 +304,6 @@ Partial Public Class KumiteMainControl
         Me.Text = "Kumite Main Control"
         Me.StartPosition = FormStartPosition.CenterScreen
 
-        frmLogActivityApp = New FormLogActivity()
     End Sub
 
     Private Sub KumiteMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -394,9 +392,10 @@ Partial Public Class KumiteMainControl
     End Sub
 
     Private Sub BtnLogActivity_Click(sender As Object, e As EventArgs) Handles BtnLogActivity.Click
-        ' Cukup tampilkan saja, karena sudah di-New saat aplikasi pertama kali jalan
-        frmLogActivityApp.Show()
-        frmLogActivityApp.BringToFront()
+        ' Menggunakan form global yang sama dengan KATA
+        ActivityLogger.InitializeLogger()
+        ActivityLogger.SharedLogForm.Show()
+        ActivityLogger.SharedLogForm.BringToFront()
     End Sub
 
     Private Sub BtnShortcut_Click(sender As Object, e As EventArgs)
@@ -1423,17 +1422,16 @@ Partial Public Class KumiteMainControl
     Private Sub GlobalLogger_Click(sender As Object, e As EventArgs)
         Dim btn As Button = CType(sender, Button)
 
-        ' Ambil teks dari tombol yang diklik. Bersihkan teks jika ada enter/baris baru (seperti pada tombol "Approve Knocked Out")
+        ' Ambil teks dari tombol yang diklik. Bersihkan teks jika ada enter/baris baru
         Dim actionText As String = btn.Text.Replace(vbCrLf, " ").Replace(vbLf, " ")
 
-        ' Abaikan jika tombol tidak memiliki teks (misal tombol icon kaca pembesar/profil)
+        ' Abaikan jika tombol tidak memiliki teks
         If String.IsNullOrWhiteSpace(actionText) Then Return
 
         ' Deteksi Cerdas: Apakah ini tombol AKA, AO, atau Sistem Umum?
         Dim logDetail As String = ""
         Dim logType As String = "SYSTEM"
 
-        ' Kita menebak konteks berdasarkan nama tombol (Name) di Designer
         If btn.Name.StartsWith("BtnAka") Then
             logDetail = $"(AKA) Clicked {actionText}"
             logType = "AKA ACTION"
@@ -1449,10 +1447,10 @@ Partial Public Class KumiteMainControl
         Dim currentTime As String = "0:00"
         If LblMatchTimerValue IsNot Nothing Then currentTime = LblMatchTimerValue.Text
 
-        ' Kirim datanya ke FormLogActivity!
-        If frmLogActivityApp IsNot Nothing AndAlso Not frmLogActivityApp.IsDisposed Then
-            frmLogActivityApp.InsertLog(logDetail, logType, currentTime)
-        End If
+        ' ==========================================================
+        ' [BUG FIX]: KIRIM DATA KE LOG GLOBAL (ACTIVITY LOGGER)
+        ' ==========================================================
+        ActivityLogger.LogKumiteAction(logDetail, logType, currentTime)
     End Sub
 
 
