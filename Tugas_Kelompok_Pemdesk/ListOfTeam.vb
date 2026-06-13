@@ -147,6 +147,11 @@ Public Class ListOfTeam
                 mainFrm.UpdateTeamData(selectedTeam, selectedInfo)
             End If
 
+            Dim kataFrm As KataMainControl = TryCast(Application.OpenForms("KataMainControl"), KataMainControl)
+            If kataFrm IsNot Nothing Then
+                kataFrm.UpdateTeamData(selectedTeam, selectedInfo)
+            End If
+
             Me.Close()
         Else
             MessageBox.Show("Pilih tim terlebih dahulu!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
