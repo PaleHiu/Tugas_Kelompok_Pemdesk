@@ -45,7 +45,7 @@ Partial Public Class ScoreBoard
         ' 3. Aktifkan fitur geser (Drag) ke Form dan seluruh isinya
         EnableBorderlessDrag(Me)
 
-        ' 4. Aktifkan pembacaan keyboard (F11/ESC/Enter)
+        ' 4. Aktifkan pembacaan keyboard (F11/Enter = fullscreen, ESC = tutup)
         Me.KeyPreview = True
     End Sub
 
@@ -123,7 +123,11 @@ Partial Public Class ScoreBoard
     End Sub
 
     Private Sub ScoreBoard_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.F11 OrElse e.KeyCode = Keys.Enter Then
+        If e.KeyCode = Keys.Escape Then
+            ' ESC = tutup Scoreboard
+            Me.Close()
+        ElseIf e.KeyCode = Keys.F11 OrElse e.KeyCode = Keys.Enter Then
+            ' F11 / Enter = toggle fullscreen (perilaku lama dipertahankan)
             ToggleFullScreen(Nothing, Nothing)
         End If
     End Sub

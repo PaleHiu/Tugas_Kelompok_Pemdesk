@@ -26,6 +26,11 @@ Partial Public Class KumiteMainControl
     Private isAoSenshu As Boolean = False
     Public isAkaHanteiWin As Boolean = False
     Public isAoHanteiWin As Boolean = False
+    Private frmKOActive As Form = Nothing
+    Private koTimerActive As Timer = Nothing
+    Private isKOCountdownDone As Boolean = False
+    Private frmKOTrackingActive As Form = Nothing   ' Referensi popup Tracking KO (AKA/AO KNOCKOUT)
+
 
     ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
     Public Sub SetCompetitorData(nama As String, team As String, info As String)
@@ -1237,57 +1242,83 @@ Partial Public Class KumiteMainControl
     ' ==========================================================
     ' FUNGSI POP-UP TIMER KNOCKED OUT (UPDATE: OTOMATIS WINNER)
     ' ==========================================================
-    Private Function ShowKnockOutCountdown(isAka As Boolean, sourceButton As Button, winnerLabel As Label) As DialogResult
-        ' 1. Buat Form Dasar Popup KO
+    Private Sub ShowKnockOutCountdown(isAka As Boolean, sourceButton As Button, winnerLabel As Label)
+
+        ' Jika ada popup KO sebelumnya yang belum ditutup, tutup dulu
+        If frmKOActive IsNot Nothing AndAlso Not frmKOActive.IsDisposed Then
+            frmKOActive.Close()
+        End If
+        If koTimerActive IsNot Nothing Then
+            koTimerActive.Stop()
+        End If
+
+        isKOCountdownDone = False
+
+        ' ----------------------------------------------------------
+        ' 1. Buat Form popup KO (hanya untuk display angka)
+        ' ----------------------------------------------------------
         Dim frmKO As New Form()
-        frmKO.Size = New Size(600, 350)
-        frmKO.StartPosition = FormStartPosition.CenterParent
-        frmKO.FormBorderStyle = FormBorderStyle.FixedToolWindow
         frmKO.Text = If(isAka, "AKA Knocked Out Countdown", "AO Knocked Out Countdown")
-
-        ' Aktifkan KeyPreview agar form bisa menangkap input keyboard operator
         frmKO.KeyPreview = True
+        frmKO.TopMost = True   ' Selalu di atas semua window
 
-        ' Tentukan warna background atas berdasarkan sudut atlet (AKA = Merah, AO = Biru)
+        Dim bottomPanelHeight As Integer = 80
+
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed AndAlso frmScoreboard.Visible Then
+            frmKO.StartPosition = FormStartPosition.Manual
+            frmKO.FormBorderStyle = FormBorderStyle.None
+            frmKO.Location = frmScoreboard.Location
+            frmKO.Size = frmScoreboard.Size
+            bottomPanelHeight = CInt(frmKO.Height * 0.25)
+        Else
+            frmKO.Size = New Size(600, 350)
+            frmKO.StartPosition = FormStartPosition.CenterScreen
+            frmKO.FormBorderStyle = FormBorderStyle.FixedToolWindow
+        End If
+
         Dim bgColor As Color = If(isAka, AkaColor, AoColor)
 
-        ' 2. Buat Panel Atas (Latar Berwarna untuk Angka)
+        ' Panel atas: angka countdown
         Dim pnlTop As New Panel() With {.Dock = DockStyle.Fill, .BackColor = bgColor}
-
-        ' 3. Buat Label Angka Raksasa (Hitung Mundur)
+        Dim numberFontSize As Single = If(frmKO.Height > 500, 250, 130)
         Dim lblNumber As New Label() With {
             .AutoSize = False,
             .Dock = DockStyle.Fill,
             .TextAlign = ContentAlignment.MiddleCenter,
-            .Font = New Font("Segoe UI", 130, FontStyle.Bold),
+            .Font = New Font("Segoe UI", numberFontSize, FontStyle.Bold),
             .ForeColor = Color.White,
             .Text = "10"
         }
         pnlTop.Controls.Add(lblNumber)
 
-        ' 4. Buat Panel Bawah (Latar Putih untuk Teks Deskripsi)
-        Dim pnlBottom As New Panel() With {.Dock = DockStyle.Bottom, .Height = 80, .BackColor = Color.White}
-
-        ' 5. Buat Label Teks Status Bawah
+        ' Panel bawah: teks status
+        Dim pnlBottom As New Panel() With {.Dock = DockStyle.Bottom, .Height = bottomPanelHeight, .BackColor = Color.White}
+        Dim textFontSize As Single = If(frmKO.Height > 500, 60, 32)
         Dim lblText As New Label() With {
             .AutoSize = False,
             .Dock = DockStyle.Fill,
             .TextAlign = ContentAlignment.MiddleCenter,
-            .Font = New Font("Segoe UI", 32, FontStyle.Bold),
+            .Font = New Font("Segoe UI", textFontSize, FontStyle.Bold),
             .ForeColor = Color.Black,
             .Text = "Knocked Out Countdown"
         }
         pnlBottom.Controls.Add(lblText)
 
-        ' Gabungkan seluruh komponen ke dalam form popup KO
         frmKO.Controls.Add(pnlTop)
         frmKO.Controls.Add(pnlBottom)
 
-        ' 6. Logika Jalannya Timer Countdown
+        ' Simpan referensi ke variabel class agar bisa diakses dari luar
+        frmKOActive = frmKO
+
+        ' ----------------------------------------------------------
+        ' 2. Setup timer countdown
+        ' ----------------------------------------------------------
         Dim timeLeft As Integer = 10
         Dim koTimer As New Timer() With {.Interval = 1000}
+        koTimerActive = koTimer
 
-        ' Ubah warna tombol di control panel utama sebagai penanda sedang aktif
+        ' Teks tombol saat countdown berjalan
+        sourceButton.Text = $"Stop Countdown ({timeLeft:00})"
         sourceButton.BackColor = bgColor
         sourceButton.ForeColor = Color.White
 
@@ -1296,106 +1327,131 @@ Partial Public Class KumiteMainControl
                                      lblNumber.Text = timeLeft.ToString("00")
                                      sourceButton.Text = $"Stop Countdown ({timeLeft:00})"
 
-                                     ' KONDISI KETIKA TIMEOUT / MENYENTUH 0 DETIK
                                      If timeLeft <= 0 Then
                                          koTimer.Stop()
+                                         isKOCountdownDone = True   ' <-- flag: siap Approve
 
-                                         ' ==========================================================
-                                         ' LOGIKA FIXATION: MENAHAN TAMPILAN SESUAI APLIKASI ASLI
-                                         ' ==========================================================
                                          lblNumber.Text = "00"
                                          lblText.Text = If(isAka, "AKA Knocked Out", "AO Knocked Out")
-                                         sourceButton.Text = "Approve Knocked Out?"
 
-                                         ' Nyalakan pemenang di sisi lawan secara otomatis
+                                         ' Ganti teks tombol menjadi Approve
+                                         sourceButton.Text = "Approve Knocked Out?"
+                                         sourceButton.BackColor = Color.LimeGreen
+                                         sourceButton.ForeColor = Color.Black
+
+                                         ' Nyalakan pemenang lawan
                                          winnerLabel.Visible = True
                                          AudioController.PlaySound("Knocked Out")
 
-                                         ' Hentikan jalannya timer pertandingan utama (Yame otomatis)
+                                         ' Stop timer pertandingan
                                          matchTimer.Stop()
                                          BtnStartTimer.Text = "Start Timer"
                                          BtnStartTimer.BackColor = Color.Gold
-
-                                         ' DELEGATE DISMISS: Membuat seluruh area layar peka terhadap klik penutupan
-                                         Dim dismissSub As EventHandler = Sub(s, ev)
-                                                                              frmKO.DialogResult = DialogResult.OK
-                                                                              frmKO.Close()
-                                                                          End Sub
-
-                                         ' Pasang handler klik penutup ke setiap jengkal elemen popup
-                                         AddHandler frmKO.Click, dismissSub
-                                         AddHandler pnlTop.Click, dismissSub
-                                         AddHandler lblNumber.Click, dismissSub
-                                         AddHandler pnlBottom.Click, dismissSub
-                                         AddHandler lblText.Click, dismissSub
-
-                                         ' Pasang handler tombol keyboard (Space / Enter / ESC) untuk menutup popup
-                                         AddHandler frmKO.KeyDown, Sub(sKey, eKey)
-                                                                       If eKey.KeyCode = Keys.Escape OrElse eKey.KeyCode = Keys.Enter OrElse eKey.KeyCode = Keys.Space Then
-                                                                           frmKO.DialogResult = DialogResult.OK
-                                                                           frmKO.Close()
-                                                                       End If
-                                                                   End Sub
                                      End If
                                  End Sub
 
-        ' Event Failsafe: Jika popup ditutup (baik lewat X manual atau setelah selesai)
+        ' Tutup popup jika ESC ditekan (sama dengan Stop)
+        AddHandler frmKO.KeyDown, Sub(sKey, eKey)
+                                      If eKey.KeyCode = Keys.Escape Then
+                                          koTimer.Stop()
+                                          frmKO.Close()
+                                      End If
+                                  End Sub
+
+        ' Saat popup ditutup karena alasan apapun: stop timer, bersihkan referensi
         AddHandler frmKO.FormClosing, Sub(senderObj, eArgs)
                                           koTimer.Stop()
-                                          ' Kembalikan wujud asli tombol kontrol utama agar bisa digunakan kembali
-                                          sourceButton.Text = "Knocked Out"
-                                          sourceButton.BackColor = SystemColors.Control
-                                          sourceButton.ForeColor = Color.Black
+                                          koTimerActive = Nothing
+                                          frmKOActive = Nothing
                                       End Sub
 
-        ' Nyalakan mesin hitung mundur
         koTimer.Start()
-        Return frmKO.ShowDialog()
-    End Function
+        frmKO.Show()   ' <-- NON-MODAL: KumiteMainControl tetap bisa diklik
+    End Sub
 
     ' ==========================================================
     ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI PRO)
     ' ==========================================================
 
     ' Tombol Knocked Out AKA (Merah)
+    ' ==========================================================
+    ' EVENT HANDLER TOMBOL KNOCKED OUT AKA & AO (VERSI PRO + POPUP TRACKING)
+    ' ==========================================================
+
+    ' Tombol Knocked Out AKA (Merah)
     Private Sub BtnAkaKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAkaKnockedOut.Click
-        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+
+        ' === FASE TUTUP TRACKING: popup "AKA KNOCKOUT" sedang tampil, klik = tutup & selesai ===
+        If frmKOTrackingActive IsNot Nothing AndAlso Not frmKOTrackingActive.IsDisposed Then
+            frmKOTrackingActive.Close()
+            frmKOTrackingActive = Nothing
+            Return
+        End If
+
+        ' === FASE APPROVE: countdown sudah 0, tunggu konfirmasi ===
+        If isKOCountdownDone Then
+            isKOCountdownDone = False
+
+            If frmKOActive IsNot Nothing AndAlso Not frmKOActive.IsDisposed Then
+                frmKOActive.Close()
+            End If
+
+            BtnAkaKnockedOut.Text = "Knocked Out"
+            BtnAkaKnockedOut.BackColor = AkaColor
+            BtnAkaKnockedOut.ForeColor = Color.White
+
+            If BtnAoKnockedOut.BackColor = AoColor Then
+                LblAoWinner.Visible = False
+                LblAkaWinner.Visible = False
+            Else
+                ShowTrackingKnockOutPopup(True)
+            End If
+            Return
+        End If
+
+        ' === FASE STOP: countdown sedang berjalan, batalkan KO ===
+        If koTimerActive IsNot Nothing AndAlso koTimerActive.Enabled Then
+            koTimerActive.Stop()
+            koTimerActive = Nothing
+
+            If frmKOActive IsNot Nothing AndAlso Not frmKOActive.IsDisposed Then
+                frmKOActive.Close()
+            End If
+
+            BtnAkaKnockedOut.Text = "Knocked Out"
+            BtnAkaKnockedOut.BackColor = SystemColors.Control
+            BtnAkaKnockedOut.ForeColor = Color.Black
+            Return
+        End If
+
+        ' === FASE UNDO: KO sudah dikonfirmasi, batalkan ===
         If BtnAkaKnockedOut.BackColor = AkaColor Then
             BtnAkaKnockedOut.BackColor = SystemColors.Control
             BtnAkaKnockedOut.ForeColor = Color.Black
+            BtnAkaKnockedOut.Text = "Knocked Out"
             LblAoWinner.Visible = False
 
-            ' Jika ternyata AO sedang K.O, berarti AKA yang harusnya kembali menang
             If BtnAoKnockedOut.BackColor = AoColor Then
                 LblAkaWinner.Visible = True
             End If
 
-            ' Hitung ulang skor barangkali AO menang karena poin
             RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
             Return
         End If
 
-        ' --- 2. LOGIKA K.O AKTIF ---
+        ' === FASE MULAI: Mulai countdown baru ===
         If UseKnockoutCountdown Then
-            ' MODE 1: Hitung Mundur 10 Detik
-            If ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner) = DialogResult.OK Then
-                ' Cegah Double Winner jika kedua pihak K.O
-                If BtnAoKnockedOut.BackColor = AoColor Then
-                    LblAoWinner.Visible = False
-                    LblAkaWinner.Visible = False
-                End If
-            End If
+            ShowKnockOutCountdown(True, BtnAkaKnockedOut, LblAoWinner)
         Else
-            ' MODE 2: Instan K.O (Tanpa Pop-up)
             BtnAkaKnockedOut.BackColor = AkaColor
             BtnAkaKnockedOut.ForeColor = AkaTextColor
 
-            ' Tentukan Pemenang (Cegah Double Winner)
             If BtnAoKnockedOut.BackColor = AoColor Then
                 LblAoWinner.Visible = False
                 LblAkaWinner.Visible = False
             Else
                 LblAoWinner.Visible = True
+                ShowTrackingKnockOutPopup(True)
             End If
 
             AudioController.PlaySound("Knocked Out")
@@ -1407,43 +1463,78 @@ Partial Public Class KumiteMainControl
 
     ' Tombol Knocked Out AO (Biru)
     Private Sub BtnAoKnockedOut_Click(sender As Object, e As EventArgs) Handles BtnAoKnockedOut.Click
-        ' --- 1. LOGIKA UNDO (BATALKAN K.O) ---
+
+        ' === FASE TUTUP TRACKING: popup "AO KNOCKOUT" sedang tampil, klik = tutup & selesai ===
+        If frmKOTrackingActive IsNot Nothing AndAlso Not frmKOTrackingActive.IsDisposed Then
+            frmKOTrackingActive.Close()
+            frmKOTrackingActive = Nothing
+            Return
+        End If
+
+        ' === FASE APPROVE: countdown sudah 0, tunggu konfirmasi ===
+        If isKOCountdownDone Then
+            isKOCountdownDone = False
+
+            If frmKOActive IsNot Nothing AndAlso Not frmKOActive.IsDisposed Then
+                frmKOActive.Close()
+            End If
+
+            BtnAoKnockedOut.Text = "Knocked Out"
+            BtnAoKnockedOut.BackColor = AoColor
+            BtnAoKnockedOut.ForeColor = Color.White
+
+            If BtnAkaKnockedOut.BackColor = AkaColor Then
+                LblAkaWinner.Visible = False
+                LblAoWinner.Visible = False
+            Else
+                ShowTrackingKnockOutPopup(False)
+            End If
+            Return
+        End If
+
+        ' === FASE STOP: countdown sedang berjalan, batalkan KO ===
+        If koTimerActive IsNot Nothing AndAlso koTimerActive.Enabled Then
+            koTimerActive.Stop()
+            koTimerActive = Nothing
+
+            If frmKOActive IsNot Nothing AndAlso Not frmKOActive.IsDisposed Then
+                frmKOActive.Close()
+            End If
+
+            BtnAoKnockedOut.Text = "Knocked Out"
+            BtnAoKnockedOut.BackColor = SystemColors.Control
+            BtnAoKnockedOut.ForeColor = Color.Black
+            Return
+        End If
+
+        ' === FASE UNDO: KO sudah dikonfirmasi, batalkan ===
         If BtnAoKnockedOut.BackColor = AoColor Then
             BtnAoKnockedOut.BackColor = SystemColors.Control
             BtnAoKnockedOut.ForeColor = Color.Black
+            BtnAoKnockedOut.Text = "Knocked Out"
             LblAkaWinner.Visible = False
 
-            ' Jika ternyata AKA sedang K.O, berarti AO yang harusnya kembali menang
             If BtnAkaKnockedOut.BackColor = AkaColor Then
                 LblAoWinner.Visible = True
             End If
 
-            ' Hitung ulang skor barangkali AKA menang karena poin
             RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
             Return
         End If
 
-        ' --- 2. LOGIKA K.O AKTIF ---
+        ' === FASE MULAI: Mulai countdown baru ===
         If UseKnockoutCountdown Then
-            ' MODE 1: Hitung Mundur 10 Detik
-            If ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner) = DialogResult.OK Then
-                ' Cegah Double Winner jika kedua pihak K.O
-                If BtnAkaKnockedOut.BackColor = AkaColor Then
-                    LblAkaWinner.Visible = False
-                    LblAoWinner.Visible = False
-                End If
-            End If
+            ShowKnockOutCountdown(False, BtnAoKnockedOut, LblAkaWinner)
         Else
-            ' MODE 2: Instan K.O (Tanpa Pop-up)
             BtnAoKnockedOut.BackColor = AoColor
             BtnAoKnockedOut.ForeColor = AoTextColor
 
-            ' Tentukan Pemenang (Cegah Double Winner)
             If BtnAkaKnockedOut.BackColor = AkaColor Then
                 LblAkaWinner.Visible = False
                 LblAoWinner.Visible = False
             Else
                 LblAkaWinner.Visible = True
+                ShowTrackingKnockOutPopup(False)
             End If
 
             AudioController.PlaySound("Knocked Out")
@@ -1472,6 +1563,71 @@ Partial Public Class KumiteMainControl
                 AttachGlobalLogger(ctrl)
             End If
         Next
+    End Sub
+
+
+    ' ==========================================================
+    ' FUNGSI HELPER: POP-UP KNOCKOUT YANG MENGIKUTI SCOREBOARD
+    ' ==========================================================
+    Private Sub ShowTrackingKnockOutPopup(isAkaKO As Boolean)
+        If frmKOTrackingActive IsNot Nothing AndAlso Not frmKOTrackingActive.IsDisposed Then
+            frmKOTrackingActive.Close()
+        End If
+
+        Dim popUp As New Form()
+        Dim koColor As Color = If(isAkaKO, AkaColor, AoColor)
+        Dim koText As String = If(isAkaKO, "AKA (RED)" & vbCrLf & "KNOCKOUT", "AO (BLUE)" & vbCrLf & "KNOCKOUT")
+
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed AndAlso frmScoreboard.Visible Then
+            popUp.StartPosition = FormStartPosition.Manual
+            popUp.FormBorderStyle = FormBorderStyle.None
+            popUp.Location = frmScoreboard.Location
+            popUp.Size = frmScoreboard.Size
+        Else
+            popUp.StartPosition = FormStartPosition.CenterScreen
+            popUp.FormBorderStyle = FormBorderStyle.None
+            popUp.Size = New Size(1366, 768)
+        End If
+
+        popUp.BackColor = Color.FromArgb(20, 20, 20)
+        popUp.TopMost = True
+        popUp.KeyPreview = True
+
+        Dim lblFontSize As Single = If(popUp.Height > 500, 90, 48)
+        Dim lblKO As New Label() With {
+            .Text = koText,
+            .ForeColor = koColor,
+            .Font = New Font("Segoe UI", lblFontSize, FontStyle.Bold),
+            .TextAlign = ContentAlignment.MiddleCenter,
+            .Dock = DockStyle.Fill,
+            .BackColor = Color.Transparent
+        }
+        popUp.Controls.Add(lblKO)
+
+        frmKOTrackingActive = popUp
+
+        ' Helper: tutup popup tracking
+        Dim closeTracking As Action = Sub()
+                                          If Not popUp.IsDisposed Then popUp.Close()
+                                          frmKOTrackingActive = Nothing
+                                      End Sub
+
+        ' Klik di area mana saja pada popup = tutup
+        Dim clickAnyArea As EventHandler = Sub(s, e) closeTracking()
+
+        AddHandler popUp.Click, clickAnyArea
+        AddHandler lblKO.Click, clickAnyArea
+
+        ' ESC = tutup
+        AddHandler popUp.KeyDown, Sub(sKey, eKey)
+                                      If eKey.KeyCode = Keys.Escape Then closeTracking()
+                                  End Sub
+
+        AddHandler popUp.FormClosing, Sub(s, e)
+                                          frmKOTrackingActive = Nothing
+                                      End Sub
+
+        popUp.Show()
     End Sub
 
     ' Fungsi 2: Aksi yang dijalankan ketika tombol APAPUN ditekan
@@ -1674,34 +1830,62 @@ Partial Public Class KumiteMainControl
     ' INTERFACES INTEGRASI: TOMBOL SHOW WINNER AKA & AO (KODE FINAL)
     ' ==========================================================
 
-    ' 1. Eksekusi Tampilan Pemenang Sudut AKA (Merah)
+    ' =========================================================
+    ' 1. EVENT CLICK SHOW WINNER (AKA - MERAH)
+    ' =========================================================
     Private Sub BtnAkaShowWinner_Click(sender As Object, e As EventArgs) Handles BtnAkaShowWinner.Click
-        ' Mengambil data dari TextBox input nama utama milik AKA
-        Dim atletName As String = TxtAkaNameMain.Text
-        Dim atletTeam As String = TxtAkaTeam.Text
+        ' Ambil nama dari field nama utama (TxtAkaNameMain), bukan TxtAkaName yang berisi "Nama | Tim"
+        Dim namaPemenang As String = TxtAkaNameMain.Text.Trim()
+        Dim timPemenang As String = TxtAkaTeam.Text.Trim()
 
-        ' Failsafe: Jika form kosong/belum di-load, beri nama default
-        If String.IsNullOrWhiteSpace(atletName) Then atletName = "AKA COMPETITOR"
-        If String.IsNullOrWhiteSpace(atletTeam) Then atletTeam = "CONTINGENT AKA"
+        ' Fallback: jika TxtAkaNameMain kosong, coba parse dari TxtAkaName ("Nama | Tim")
+        If String.IsNullOrWhiteSpace(namaPemenang) AndAlso TxtAkaName.Text.Contains("|") Then
+            Dim parts() As String = TxtAkaName.Text.Split("|"c)
+            namaPemenang = parts(0).Trim()
+            If String.IsNullOrWhiteSpace(timPemenang) AndAlso parts.Length > 1 Then
+                timPemenang = parts(1).Trim()
+            End If
+        End If
 
-        ' Buka jendela WinnerForm dengan konfigurasi AKA (True)
-        Dim showWin As New WinnerForm(True, atletName, atletTeam)
-        showWin.ShowDialog()
+        Dim frmWinner As New WinnerForm(True, namaPemenang, timPemenang)
+
+        ' --- LOGIKA OVERLAY FULLSIZE MENGIKUTI SCOREBOARD ---
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed AndAlso frmScoreboard.Visible Then
+            frmWinner.StartPosition = FormStartPosition.Manual
+            frmWinner.Location = frmScoreboard.Location
+            frmWinner.Size = frmScoreboard.Size
+        End If
+
+        frmWinner.ShowDialog()
     End Sub
 
-    ' 2. Eksekusi Tampilan Pemenang Sudut AO (Biru)
+    ' =========================================================
+    ' 2. EVENT CLICK SHOW WINNER (AO - BIRU)
+    ' =========================================================
     Private Sub BtnAoShowWinner_Click(sender As Object, e As EventArgs) Handles BtnAoShowWinner.Click
-        ' Mengambil data dari TextBox input nama utama milik AO
-        Dim atletName As String = TxtAoNameMain.Text
-        Dim atletTeam As String = TxtAoTeam.Text
+        ' Ambil nama dari field nama utama (TxtAoNameMain), bukan TxtAoName yang berisi "Nama | Tim"
+        Dim namaPemenang As String = TxtAoNameMain.Text.Trim()
+        Dim timPemenang As String = TxtAoTeam.Text.Trim()
 
-        ' Failsafe: Jika form kosong/belum di-load, beri nama default
-        If String.IsNullOrWhiteSpace(atletName) Then atletName = "AO COMPETITOR"
-        If String.IsNullOrWhiteSpace(atletTeam) Then atletTeam = "CONTINGENT AO"
+        ' Fallback: jika TxtAoNameMain kosong, coba parse dari TxtAoName ("Nama | Tim")
+        If String.IsNullOrWhiteSpace(namaPemenang) AndAlso TxtAoName.Text.Contains("|") Then
+            Dim parts() As String = TxtAoName.Text.Split("|"c)
+            namaPemenang = parts(0).Trim()
+            If String.IsNullOrWhiteSpace(timPemenang) AndAlso parts.Length > 1 Then
+                timPemenang = parts(1).Trim()
+            End If
+        End If
 
-        ' Buka jendela WinnerForm dengan konfigurasi AO (False)
-        Dim showWin As New WinnerForm(False, atletName, atletTeam)
-        showWin.ShowDialog()
+        Dim frmWinner As New WinnerForm(False, namaPemenang, timPemenang)
+
+        ' --- LOGIKA OVERLAY FULLSIZE MENGIKUTI SCOREBOARD ---
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed AndAlso frmScoreboard.Visible Then
+            frmWinner.StartPosition = FormStartPosition.Manual
+            frmWinner.Location = frmScoreboard.Location
+            frmWinner.Size = frmScoreboard.Size
+        End If
+
+        frmWinner.ShowDialog()
     End Sub
 
     ' ==========================================================
