@@ -42,6 +42,13 @@ Public Class team
         UpdateTotalRecordsTeam()
     End Sub
 
+    Private Sub team_VisibleChanged(sender As Object, e As EventArgs) Handles MyBase.VisibleChanged
+        ' Jika form ini sedang tampil di layar, DAN proses Load pertama sudah selesai
+        If Me.Visible AndAlso isFormLoaded Then
+            LoadTeamsFromDatabase()
+        End If
+    End Sub
+
     Private Sub gridEntriesTeam_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridEntriesTeam.DataError
         e.ThrowException = False
     End Sub
@@ -122,7 +129,7 @@ Public Class team
     End Sub
 
     ' FUNGSI MEMUAT GAMBAR AMAN
-    Private Function GetTeamImage(pathOrFlag As String) As Image
+    Public Function GetTeamImage(pathOrFlag As String) As Image
         Try
             If pathOrFlag.StartsWith("Flag: ") Then
                 Dim countryName As String = pathOrFlag.Replace("Flag: ", "")
@@ -173,15 +180,6 @@ Public Class team
         End If
 
         Dim teamName As String = txtNamaTeam.Text.Trim()
-        ' --- CEK DUPLIKASI MANUAL DI LAYAR ---
-        If editRowIndex = -1 Then ' Hanya cek jika sedang mode Add (bukan Update)
-            For Each row As DataGridViewRow In gridEntriesTeam.Rows
-                If Not row.IsNewRow AndAlso row.Cells("ColTeamGrid").Value.ToString().Equals(teamName, StringComparison.OrdinalIgnoreCase) Then
-                    MessageBox.Show("Tim dengan nama '" & teamName & "' sudah ada di dalam daftar!", "Duplikat", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return
-                End If
-            Next
-        End If
         Dim teamInfo As String = txtTimInfoTeam.Text.Trim()
 
         Dim teamPictPath As String = "No Image"
@@ -194,12 +192,36 @@ Public Class team
         Dim displayImage As Image = GetTeamImage(teamPictPath)
 
         If editRowIndex >= 0 Then
+            ' 1. AMBIL NAMA TIM LAMA SEBELUM DIUBAH
+            Dim oldTeamName As String = gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamGrid").Value.ToString()
+
+            ' 2. UPDATE GRID LAYAR TIM
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamGrid").Value = teamName
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamInfoGrid").Value = teamInfo
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamPictGrid").Value = displayImage
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamPictPath").Value = teamPictPath
+
+            ' 3. UPDATE OTOMATIS KE TABEL PESERTA (CASCADE UPDATE)
+            If oldTeamName <> teamName Then
+                Try
+                    Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                        conn.Open()
+                        Dim queryUpdate As String = "UPDATE competitor SET team = @newTeam WHERE team = @oldTeam"
+                        Using cmd As New System.Data.SQLite.SQLiteCommand(queryUpdate, conn)
+                            cmd.Parameters.AddWithValue("@newTeam", teamName)
+                            cmd.Parameters.AddWithValue("@oldTeam", oldTeamName)
+                            cmd.ExecuteNonQuery()
+                        End Using
+                    End Using
+                Catch ex As Exception
+                End Try
+            End If
+
             editRowIndex = -1
+            btnAddTeam.Text = "Add"
+            btnAddTeam.BackColor = Color.DeepSkyBlue
         Else
+            ' LOGIKA ADD TIM BARU
             Dim idx As Integer = gridEntriesTeam.Rows.Add()
             Dim row As DataGridViewRow = gridEntriesTeam.Rows(idx)
             row.Cells("ColRowNoTeam").Value = ""
@@ -213,7 +235,11 @@ Public Class team
 
         UpdateRowNumbers()
         UpdateTotalRecordsTeam()
-        SyncTeamsToPeserta()
+        SaveAllTeamsToDatabase() ' Simpan perubahan layar tim ke database
+
+        ' 4. TRIGGER REFRESH LAYAR SEBELAH
+        TriggerRefreshPeserta()
+
         ClearInputTeam()
     End Sub
 
@@ -256,11 +282,32 @@ Public Class team
         If e.RowIndex >= 0 AndAlso Not gridEntriesTeam.Rows(e.RowIndex).IsNewRow Then
 
             If e.ColumnIndex = gridEntriesTeam.Columns("ColDeleteTeam").Index Then
-                If MessageBox.Show("Hapus tim ini?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                If MessageBox.Show("Hapus tim ini beserta seluruh pesertanya?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                    Dim teamName As String = gridEntriesTeam.Rows(e.RowIndex).Cells("ColTeamGrid").Value.ToString()
+
+                    ' 1. Hapus dari Database Permanen (Tabel Tim & Tabel Peserta)
+                    Try
+                        Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                            conn.Open()
+                            ' Hapus Tim
+                            Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM team_lengkap WHERE nama_team = @nama", conn)
+                                cmd.Parameters.AddWithValue("@nama", teamName)
+                                cmd.ExecuteNonQuery()
+                            End Using
+                            ' Hapus Peserta yang ada di tim tersebut (Cascade Delete)
+                            Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM competitor WHERE team = @nama", conn)
+                                cmd.Parameters.AddWithValue("@nama", teamName)
+                                cmd.ExecuteNonQuery()
+                            End Using
+                        End Using
+                    Catch ex As Exception
+                    End Try
+
+                    ' 2. Hapus dari Layar & Refresh
                     gridEntriesTeam.Rows.RemoveAt(e.RowIndex)
                     UpdateRowNumbers()
                     UpdateTotalRecordsTeam()
-                    SyncTeamsToPeserta()
+                    TriggerRefreshPeserta() ' <-- Perintah penyapu layar sebelah
                 End If
             End If
 
@@ -308,11 +355,24 @@ Public Class team
 
     ' DELETE ALL
     Private Sub btnDeleteAllTeam_Click(sender As Object, e As EventArgs) Handles btnDeleteAllTeam.Click
-        If MessageBox.Show("Hapus SEMUA data Tim?", "Peringatan", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+        If MessageBox.Show("Hapus SEMUA data Tim beserta SEMUA pesertanya?", "Peringatan", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+            Try
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM team_lengkap", conn)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                    Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM competitor", conn)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                End Using
+            Catch ex As Exception
+            End Try
+
             gridEntriesTeam.Rows.Clear()
             UpdateRowNumbers()
             UpdateTotalRecordsTeam()
-            SyncTeamsToPeserta()
+            TriggerRefreshPeserta() ' <-- Perintah penyapu layar sebelah
         End If
     End Sub
 
@@ -537,5 +597,16 @@ Public Class team
             UpdateTotalRecordsTeam()
         Catch ex As Exception
         End Try
+    End Sub
+
+    ' --- FUNGSI UNTUK MENYURUH FORM PESERTA REFRESH ---
+    Public Sub TriggerRefreshPeserta()
+        For Each frm As Form In Application.OpenForms
+            If TypeOf frm Is Peserta Then
+                Dim formPeserta As Peserta = DirectCast(frm, Peserta)
+                formPeserta.LoadDataPeserta()
+                formPeserta.LoadTeamsToComboBox()
+            End If
+        Next
     End Sub
 End Class

@@ -582,7 +582,7 @@ Partial Class KumiteMainControl
         TxtAoNameMain.Name = "TxtAoNameMain"
         TxtAoNameMain.Size = New Size(182, 27)
         TxtAoNameMain.TabIndex = 1
-        TxtAoNameMain.Text = "Farhan Nugraha"
+        TxtAoNameMain.Text = ""
         ' 
         ' BtnAoUserIcon1
         ' 
@@ -609,7 +609,7 @@ Partial Class KumiteMainControl
         TxtAoTeam.Name = "TxtAoTeam"
         TxtAoTeam.Size = New Size(182, 27)
         TxtAoTeam.TabIndex = 4
-        TxtAoTeam.Text = "Dojo Rajawali"
+        TxtAoTeam.Text = ""
         ' 
         ' BtnAoTeamSearch
         ' 
@@ -636,7 +636,7 @@ Partial Class KumiteMainControl
         TxtAoTeamInfo.Name = "TxtAoTeamInfo"
         TxtAoTeamInfo.Size = New Size(114, 27)
         TxtAoTeamInfo.TabIndex = 7
-        TxtAoTeamInfo.Text = "INKAI"
+        TxtAoTeamInfo.Text = ""
         ' 
         ' PicAoTeamLogo
         ' 
@@ -1047,7 +1047,7 @@ Partial Class KumiteMainControl
         TxtAkaNameMain.Name = "TxtAkaNameMain"
         TxtAkaNameMain.Size = New Size(182, 27)
         TxtAkaNameMain.TabIndex = 1
-        TxtAkaNameMain.Text = "Wahyu Hidayat"
+        TxtAkaNameMain.Text = ""
         ' 
         ' BtnAkaUserIcon1
         ' 
@@ -1074,7 +1074,7 @@ Partial Class KumiteMainControl
         TxtAkaTeam.Name = "TxtAkaTeam"
         TxtAkaTeam.Size = New Size(182, 27)
         TxtAkaTeam.TabIndex = 4
-        TxtAkaTeam.Text = "Dojo Rajawali"
+        TxtAkaTeam.Text = ""
         ' 
         ' BtnAkaTeamSearch
         ' 
@@ -1101,7 +1101,7 @@ Partial Class KumiteMainControl
         TxtAkaTeamInfo.Name = "TxtAkaTeamInfo"
         TxtAkaTeamInfo.Size = New Size(114, 27)
         TxtAkaTeamInfo.TabIndex = 7
-        TxtAkaTeamInfo.Text = "INKAI"
+        TxtAkaTeamInfo.Text = ""
         ' 
         ' PicAkaTeamLogo
         ' 

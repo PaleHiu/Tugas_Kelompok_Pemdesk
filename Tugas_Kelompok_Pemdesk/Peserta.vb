@@ -71,26 +71,37 @@ Public Class Peserta
     End Sub
 
     ' Menyimpan referensi logo tim ke dalam Dictionary agar CellPainting lebih ringan
+    ' Menyimpan referensi logo tim ke dalam Dictionary langsung dari Database
     Private Sub LoadTeamImageCache()
         teamImageCache.Clear()
         Try
-            If Dashboard.frmTeamApp IsNot Nothing AndAlso Dashboard.frmTeamApp.gridEntriesTeam IsNot Nothing Then
-                For Each r As DataGridViewRow In Dashboard.frmTeamApp.gridEntriesTeam.Rows
-                    If Not r.IsNewRow AndAlso r.Cells("ColTeamGrid").Value IsNot Nothing Then
-                        Dim tName = r.Cells("ColTeamGrid").Value.ToString()
-                        Dim teamImg = TryCast(r.Cells("ColTeamPictGrid").Value, Image)
-                        If teamImg IsNot Nothing AndAlso Not teamImageCache.ContainsKey(tName) Then
-                            teamImageCache.Add(tName, teamImg)
-                        End If
-                    End If
-                Next
-            End If
+            Using conn As New SQLiteConnection(DB_CONN)
+                conn.Open()
+                ' Ambil nama tim dan alamat gambarnya langsung dari database
+                Dim query As String = "SELECT nama_team, pict_path FROM team_lengkap"
+                Using cmd As New SQLiteCommand(query, conn)
+                    Using reader = cmd.ExecuteReader()
+                        While reader.Read()
+                            Dim tName As String = reader("nama_team").ToString()
+                            Dim pPath As String = reader("pict_path").ToString()
+
+                            ' Minta form Team untuk merender gambar/benderanya
+                            If Dashboard.frmTeamApp IsNot Nothing Then
+                                Dim teamImg As Image = Dashboard.frmTeamApp.GetTeamImage(pPath)
+                                If teamImg IsNot Nothing AndAlso Not teamImageCache.ContainsKey(tName) Then
+                                    teamImageCache.Add(tName, teamImg)
+                                End If
+                            End If
+                        End While
+                    End Using
+                End Using
+            End Using
         Catch ex As Exception
-            ' Biarkan cache kosong jika gagal
+            ' Biarkan cache kosong jika terjadi error koneksi
         End Try
     End Sub
 
-    Private Sub LoadTeamsToComboBox()
+    Public Sub LoadTeamsToComboBox()
         cmbTeam.Items.Clear()
         Try
             Using conn As New SQLiteConnection(DB_CONN)
@@ -336,6 +347,7 @@ Public Class Peserta
                 Dim t = If(row.Cells("ColTeamRight").Value IsNot Nothing, row.Cells("ColTeamRight").Value.ToString().ToLower(), "")
                 row.Visible = (key = "" OrElse n.Contains(key) OrElse t.Contains(key))
             End If
+            UpdateRowNumbers()
         Next
     End Sub
 
@@ -344,22 +356,19 @@ Public Class Peserta
         For Each row As DataGridViewRow In gridCompetitors.Rows
             If Not row.IsNewRow Then row.Visible = True
         Next
+        UpdateRowNumbers()
     End Sub
 
 
     ' 5. FUNGSI PENOMORAN & REFRESH UI
 
     Private Sub UpdateRowNumbers()
-        Dim counts As New Dictionary(Of String, Integer)
+        Dim count As Integer = 1
         For Each row As DataGridViewRow In gridCompetitors.Rows
-            If Not row.IsNewRow Then
-                Dim t = row.Cells("ColTeamRight").Value.ToString()
-                If Not counts.ContainsKey(t) Then
-                    counts.Add(t, 1)
-                Else
-                    counts(t) += 1
-                End If
-                row.Cells("ColNo").Value = counts(t).ToString()
+            ' Hanya beri nomor jika barisnya tidak kosong DAN sedang tidak disembunyikan (Visible)
+            If Not row.IsNewRow AndAlso row.Visible Then
+                row.Cells("ColNo").Value = count.ToString()
+                count += 1
             End If
         Next
     End Sub
@@ -451,6 +460,7 @@ Public Class Peserta
                     row.Visible = (row.Cells("ColTeamRight").Value.ToString() = filter)
                 End If
             Next
+            UpdateRowNumbers()
         End If
     End Sub
 
@@ -509,6 +519,7 @@ Public Class Peserta
         For Each row As DataGridViewRow In gridCompetitors.Rows
             If Not row.IsNewRow Then row.Visible = True
         Next
+        UpdateRowNumbers()
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
@@ -597,7 +608,7 @@ Public Class Peserta
         End If
     End Sub
 
-    Private Sub LoadDataPeserta()
+    Public Sub LoadDataPeserta()
         Try
             gridCompetitors.Rows.Clear()
             Using conn As New SQLiteConnection(DB_CONN)
