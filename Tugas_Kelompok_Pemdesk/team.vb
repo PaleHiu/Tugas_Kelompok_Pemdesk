@@ -173,6 +173,15 @@ Public Class team
         End If
 
         Dim teamName As String = txtNamaTeam.Text.Trim()
+        ' --- CEK DUPLIKASI MANUAL DI LAYAR ---
+        If editRowIndex = -1 Then ' Hanya cek jika sedang mode Add (bukan Update)
+            For Each row As DataGridViewRow In gridEntriesTeam.Rows
+                If Not row.IsNewRow AndAlso row.Cells("ColTeamGrid").Value.ToString().Equals(teamName, StringComparison.OrdinalIgnoreCase) Then
+                    MessageBox.Show("Tim dengan nama '" & teamName & "' sudah ada di dalam daftar!", "Duplikat", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+            Next
+        End If
         Dim teamInfo As String = txtTimInfoTeam.Text.Trim()
 
         Dim teamPictPath As String = "No Image"
@@ -375,44 +384,66 @@ Public Class team
         ofd.Filter = "CSV Files (*.csv)|*.csv"
         If ofd.ShowDialog() = DialogResult.OK Then
             Try
-                Dim sr As New StreamReader(ofd.FileName)
-                Dim isHeader As Boolean = True
-                While Not sr.EndOfStream
-                    Dim line As String = sr.ReadLine()
-                    If isHeader Then
-                        isHeader = False
-                        Continue While
-                    End If
+                Dim importCount As Integer = 0
 
-                    Dim data As String()
-                    If line.Contains(";") Then
-                        data = line.Split(";"c)
-                    Else
-                        data = line.Split(","c)
-                    End If
+                ' 1. BUKA KONEKSI & TRANSAKSI DATABASE
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Using trans = conn.BeginTransaction()
 
-                    If data.Length >= 2 Then
-                        Dim pictPath As String = "No Image"
-                        Dim displayImage As Image = GetTeamImage(pictPath)
+                        ' 2. QUERY ANTI-DUPLIKAT (Hanya insert jika nama_team belum ada)
+                        Dim query As String = "INSERT INTO team_lengkap (nama_team, team_info, pict_path) SELECT @nama, @info, @path WHERE NOT EXISTS (SELECT 1 FROM team_lengkap WHERE nama_team = @nama)"
 
-                        Dim idx As Integer = gridEntriesTeam.Rows.Add()
-                        Dim row As DataGridViewRow = gridEntriesTeam.Rows(idx)
-                        row.Cells("ColRowNoTeam").Value = ""
-                        row.Cells("ColDeleteTeam").Value = "❌"
-                        row.Cells("ColEditTeam").Value = "📝"
+                        Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                            cmd.Parameters.Add("@nama", System.Data.DbType.String)
+                            cmd.Parameters.Add("@info", System.Data.DbType.String)
+                            cmd.Parameters.Add("@path", System.Data.DbType.String)
 
-                        row.Cells("ColTeamGrid").Value = data(0)
-                        row.Cells("ColTeamInfoGrid").Value = data(1)
+                            Dim sr As New StreamReader(ofd.FileName)
+                            Dim isHeader As Boolean = True
 
-                        row.Cells("ColTeamPictGrid").Value = displayImage
-                        row.Cells("ColTeamPictPath").Value = pictPath
-                    End If
-                End While
-                sr.Close()
-                UpdateRowNumbers()
-                UpdateTotalRecordsTeam()
-                SyncTeamsToPeserta()
-                MessageBox.Show("Data berhasil diimport!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            While Not sr.EndOfStream
+                                Dim line As String = sr.ReadLine()
+                                If isHeader Then
+                                    isHeader = False
+                                    Continue While
+                                End If
+
+                                ' Deteksi separator otomatis (koma atau titik koma)
+                                Dim data As String() = If(line.Contains(";"), line.Split(";"c), line.Split(","c))
+
+                                If data.Length >= 2 Then
+                                    Dim tName As String = data(0).Trim()
+                                    Dim tInfo As String = data(1).Trim()
+
+                                    If tName <> "" Then
+                                        cmd.Parameters("@nama").Value = tName
+                                        cmd.Parameters("@info").Value = tInfo
+                                        cmd.Parameters("@path").Value = "No Image"
+
+                                        ' Jika Insert berhasil (bukan duplikat), rowsAffected akan bernilai > 0
+                                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                                        If rowsAffected > 0 Then
+                                            importCount += 1
+                                        End If
+                                    End If
+                                End If
+                            End While
+                            sr.Close()
+                        End Using
+                        trans.Commit()
+                    End Using
+                End Using
+
+                ' 3. REFRESH LAYAR & SINKRONISASI
+                If importCount > 0 Then
+                    LoadTeamsFromDatabase() ' Panggil ulang data bersih dari database ke layar
+                    SyncTeamsToPeserta()    ' Sinkronkan ke dropdown form Peserta yang sedang terbuka
+                    MessageBox.Show(importCount & " Tim baru berhasil diimport tanpa duplikasi!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Else
+                    MessageBox.Show("Tidak ada tim baru yang ditambahkan. Semua tim di Excel sudah ada di sistem (Duplikat).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
+
             Catch ex As Exception
                 MessageBox.Show("Error: " & ex.Message, "Gagal", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
@@ -475,7 +506,7 @@ Public Class team
     End Sub
 
     ' --- FUNGSI MEMANGGIL TIM DARI DATABASE ---
-    Private Sub LoadTeamsFromDatabase()
+    Public Sub LoadTeamsFromDatabase()
         Try
             gridEntriesTeam.Rows.Clear()
             Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")

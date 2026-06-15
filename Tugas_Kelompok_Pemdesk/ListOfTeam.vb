@@ -14,6 +14,9 @@ Public Class ListOfTeam
     Dim LblHint As New Label()
     Dim WithEvents BtnSelect As New Button()
 
+    ' --- SENTRALISASI CONNECTION STRING ---
+    Private Const DB_CONN As String = "Data Source=database.db;Version=3;"
+
     Private Sub ListOfTeam_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' 1. Pengaturan Form Dasar
         Me.Text = "List of Team"
@@ -55,9 +58,7 @@ Public Class ListOfTeam
         Dgv.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
         Dgv.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
 
-        ' ----------------------------------------------------
-        ' DATA DUMMY EVOS/RRQ SUDAH DIHAPUS. KITA PANGGIL DATABASE!
-        ' ----------------------------------------------------
+        ' Load Data
         LoadDataTimDariDatabase()
 
         ' 4. Panel Bawah (Merah Crimson)
@@ -95,31 +96,30 @@ Public Class ListOfTeam
         BtnSelect.FlatStyle = FlatStyle.Flat
         BtnSelect.FlatAppearance.BorderColor = Color.White
         BtnSelect.FlatAppearance.BorderSize = 1
+
         PnlBottom.Controls.AddRange(New Control() {TxtSearch, BtnSearch, BtnClear, LblHint, BtnSelect})
         BtnSelect.BringToFront()
         BtnSelect.Location = New Point(PnlBottom.Width - 145, 10)
         BtnSelect.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+
         Me.Controls.AddRange(New Control() {LblHeader, LblTotal, Dgv, PnlBottom})
     End Sub
+
     Private Sub LoadDataTimDariDatabase()
         Dgv.Rows.Clear()
 
-        ' String koneksi persis seperti di ListOfCompetitor
-        Dim connString As String = "Data Source=database.db;Version=3;"
-
         Try
-            Using conn As New SQLiteConnection(connString)
+            Using conn As New SQLiteConnection(DB_CONN)
                 conn.Open()
 
-                ' Mengambil nama tim dan info secara unik (DISTINCT agar tidak ada tim kembar) 
-                ' dari tabel competitor, lalu diurutkan sesuai abjad
-                Dim query As String = "SELECT DISTINCT team, team_info FROM competitor ORDER BY team ASC"
+                ' --- PERBAIKAN: Ambil data langsung dari team_lengkap agar semua tim terdaftar masuk, 
+                ' bukan hanya dari data competitor. Jika ingin kembali ke cara lama, ganti tabel menjadi competitor
+                Dim query As String = "SELECT nama_team as team, team_info FROM team_lengkap ORDER BY nama_team ASC"
 
                 Using cmd As New SQLiteCommand(query, conn)
                     Using reader = cmd.ExecuteReader()
                         Dim nomor As Integer = 1
                         While reader.Read()
-                            ' Memasukkan data ke DataGridView (No, Team, Team Info)
                             Dgv.Rows.Add(nomor, reader("team").ToString(), reader("team_info").ToString())
                             nomor += 1
                         End While
@@ -127,16 +127,29 @@ Public Class ListOfTeam
                 End Using
             End Using
         Catch ex As Exception
-            MessageBox.Show("Gagal memuat tim: " & ex.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ' Fallback ke query lama jika tabel team_lengkap belum ada
+            Try
+                Using conn As New SQLiteConnection(DB_CONN)
+                    conn.Open()
+                    Dim query As String = "SELECT DISTINCT team, team_info FROM competitor ORDER BY team ASC"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        Using reader = cmd.ExecuteReader()
+                            Dim nomor As Integer = 1
+                            While reader.Read()
+                                Dgv.Rows.Add(nomor, reader("team").ToString(), reader("team_info").ToString())
+                                nomor += 1
+                            End While
+                        End Using
+                    End Using
+                End Using
+            Catch innerEx As Exception
+                MessageBox.Show("Gagal memuat tim: " & innerEx.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
         End Try
 
-        ' Setelah selesai, otomatis update label jumlah data di pojok kiri atas
         LblTotal.Text = "Total Records : " & Dgv.Rows.Count.ToString()
     End Sub
 
-    ' ===============================================
-    ' LOGIKA MEMILIH TIM DAN MENGIRIMNYA KE KUMITE
-    ' ===============================================
     Private Sub PilihTim()
         If Dgv.SelectedRows.Count > 0 Then
             Dim selectedTeam As String = Dgv.SelectedRows(0).Cells(1).Value.ToString()
@@ -163,11 +176,14 @@ Public Class ListOfTeam
         End If
     End Sub
 
-    ' Logika Pencarian Tabel (Tidak perlu ke database, cukup filter isi tabel yang sudah ada)
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Dim keyword As String = TxtSearch.Text.ToLower()
+
+        ' --- PERBAIKAN: Melepaskan kaitan memori/fokus pada DataGridView ---
+        ' Ini WAJIB dilakukan sebelum menyembunyikan row, jika tidak aplikasi akan crash (Error: "Row associated with the currency manager's position cannot be made invisible.")
+        Dgv.CurrentCell = Nothing
+
         For Each row As DataGridViewRow In Dgv.Rows
-            ' Filter supaya tidak error jika datanya Nothing
             Dim tName As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")
             Dim tInfo As String = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString().ToLower(), "")
 
@@ -181,6 +197,9 @@ Public Class ListOfTeam
 
     Private Sub BtnClear_Click(sender As Object, e As EventArgs) Handles BtnClear.Click
         TxtSearch.Text = ""
+        ' --- PERBAIKAN: Sama seperti di atas ---
+        Dgv.CurrentCell = Nothing
+
         For Each row As DataGridViewRow In Dgv.Rows
             row.Visible = True
         Next

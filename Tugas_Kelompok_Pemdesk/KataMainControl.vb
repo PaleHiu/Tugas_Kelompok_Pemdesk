@@ -3,6 +3,8 @@
     ' ==============================================================================
     ' 0. DEKLARASI VARIABEL & PROPERTI GLOBAL
     ' ==============================================================================
+    Private frmLogActivity As FormLogActivity = Nothing
+
     Public Shared KataNameFontName As String = "Microsoft Sans Serif"
     Public Shared KataNameIsBold As Boolean = True
     Public Shared KataNameColor As System.Drawing.Color = System.Drawing.Color.LightGreen
@@ -14,14 +16,11 @@
     Public Shared KataTimerFontName As String = "Microsoft Sans Serif"
     Public Shared KataTimerIsBold As Boolean = True
     Public Shared KataTimerColor As System.Drawing.Color = System.Drawing.Color.Red
-
     Private originalXCoords As New Dictionary(Of Control, Integer)
     Private originalCenterWidth As Integer = 342
-
     Private WithEvents WaitTimer As New System.Windows.Forms.Timer()
     Private WaitTimeRemaining As Integer ' Untuk menyimpan total detik yang tersisa
     Private IsWaitTimerRunning As Boolean = False
-
     ' ==============================================================================
     ' 1. KONSTRUKTOR (INITIALIZATION)
     ' ==============================================================================
@@ -50,116 +49,114 @@
         If PnlCenterScore IsNot Nothing Then
             originalCenterWidth = PnlCenterScore.Width
 
-            ' Aktifkan Scrollbar jika layar ditarik terlalu sempit
+            ' Aktifkan Scrollbar jika layar ditarik terlalu sempit (Standar Aplikasi Profesional)
             PnlCenterScore.AutoScroll = True
 
             For Each ctrl As Control In PnlCenterScore.Controls
-                ' KUNCI MATI: Semua kotak dipaksa menempel ke atas.
+                ' KUNCI MATI: Semua kotak dipaksa menempel ke atas. 
+                ' Mereka tidak akan pernah bisa melayang menimpa "JUDGE SCORE" atau didorong menimpa "DISQUALIFICATION" lagi!
                 ctrl.Anchor = AnchorStyles.Top Or AnchorStyles.Left
+
+                ' Rekam posisi X asli (hasil drag & drop-mu) ke dalam memori
                 originalXCoords(ctrl) = ctrl.Left
             Next
         End If
 
         Me.MinimumSize = New Size(1400, 800)
-
-        ' Memaksa Form untuk mendeteksi semua input keyboard (Syarat utama Shortcut)
+        ' Form should capture keyboard for global shortcuts
         Me.KeyPreview = True
     End Sub
 
-    ' ==============================================================================
-    ' 2. SISTEM SHORTCUT KEYBOARD (TELINGA PENDENGAR & EKSEKUTOR)
-    ' ==============================================================================
     Private Sub KataMainControl_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
         Try
-            ' 1. Cek apakah tombol master switch Shortcut sedang ON
             If Not FromKeyboardShortcutKata.IsShortcutEnabled Then Exit Sub
 
-            ' 2. JANGAN jalankan shortcut jika operator sedang mengetik nama atlet di TextBox!
-            If TypeOf Me.ActiveControl Is TextBox Then Exit Sub
-
-            ' 3. Terjemahkan tombol yang ditekan menjadi teks (Contoh: "Control+Space")
             Dim strShortcut As String = ""
             If e.Control Then strShortcut &= "Control+"
             If e.Shift Then strShortcut &= "Shift+"
             If e.Alt Then strShortcut &= "Alt+"
             strShortcut &= e.KeyCode.ToString()
 
-            ' 4. Cari apakah teks tombol tersebut ada di dalam kamus ShortcutMap
             For Each pair In FromKeyboardShortcutKata.ShortcutMap
                 Dim actionName As String = pair.Key
                 Dim combo As String = pair.Value
-
                 If String.Equals(combo, strShortcut, StringComparison.OrdinalIgnoreCase) Then
-                    ExecuteShortcutAction(actionName)
+                    ProcessShortcutAction(actionName)
                     e.SuppressKeyPress = True
                     e.Handled = True
                     Exit For
                 End If
             Next
         Catch ex As Exception
+            ' ignore
         End Try
     End Sub
 
-    ' ==============================================================================
-    ' [SHORTCUT SYSTEM] MAPPER KATA: MENGHUBUNGKAN TEKS SHORTCUT DENGAN AKSI TOMBOL
-    ' ==============================================================================
-    Private Sub ExecuteShortcutAction(actionName As String)
+    Private Sub ProcessShortcutAction(actionName As String)
         Try
-            ' Teks di dalam Case ini sudah disamakan 100% dengan isiDataShortcut() di FromKeyboardShortcutKata
             Select Case actionName
-
                 Case "Start-Close Scoreboard"
                     If BtnStartScoreboard IsNot Nothing Then BtnStartScoreboard.PerformClick()
-
                 Case "Timer Waiting Start-Stop"
                     If BtnStartWaitingTimer IsNot Nothing Then BtnStartWaitingTimer.PerformClick()
-
                 Case "Match Timer Start-Stop"
                     If BtnStartTimer IsNot Nothing Then BtnStartTimer.PerformClick()
-
                 Case "Match Timer Reset"
-                    ' Sesuaikan dengan nama tombol gear/reset di desain Anda
+                    ' Try to invoke gear timer (as reset) if available
                     If BtnGearTimer IsNot Nothing Then BtnGearTimer.PerformClick()
-
-                Case "Hide-Show KATA Timer"
-                    If BtnEyeTimer IsNot Nothing Then BtnEyeTimer.PerformClick()
-
-                Case "Show Winner"
-                    ' Langsung memanggil fungsi kalkulasi pemenang
-                    CheckWinner(CInt(TotalScoreAKA.Value), CInt(TotalScoreAO.Value))
-
-                Case "Show Score to Scoreboard"
-                    If BtnShowScore IsNot Nothing Then BtnShowScore.PerformClick()
-
-                Case "Assign Task to Judges"
-                    If BtnAssignTask IsNot Nothing Then BtnAssignTask.PerformClick()
-
                 Case "Next Match"
                     If BtnNextMatch IsNot Nothing Then BtnNextMatch.PerformClick()
-
                 Case "Save Match Result"
                     If BtnSaveMatchResult IsNot Nothing Then BtnSaveMatchResult.PerformClick()
-
+                Case "Show Winner"
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "Show Score to Scoreboard"
+                    If BtnShowScore IsNot Nothing Then BtnShowScore.PerformClick()
+                Case "Assign Task to Judges"
+                    If BtnAssignTask IsNot Nothing Then BtnAssignTask.PerformClick()
+                Case "Hide-Show KATA Timer"
+                    If BtnEyeTimer IsNot Nothing Then BtnEyeTimer.PerformClick()
                 Case "Show Competitor 1 (AKA)"
                     If RbComp1 IsNot Nothing Then RbComp1.Checked = True
                     If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
-
                 Case "Show Competitor 2 (AO)"
                     If RbComp2 IsNot Nothing Then RbComp2.Checked = True
                     If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
-
                 Case "Show All Competitor"
                     If RbAllComp IsNot Nothing Then RbAllComp.Checked = True
                     If BtnSelectPlayer IsNot Nothing Then BtnSelectPlayer.PerformClick()
-
+                Case "AKA - Yuko(1)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 1)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - Wazaari(2)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 2)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - Ippon(3)"
+                    If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, TotalScoreAKA.Value + 3)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AKA - SENSHU"
+                    ApplyPenaltyAndDeclareWinner(BtnKikenAka, "AO")
+                Case "AO - Yuko(1)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 1)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - Wazaari(2)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 2)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - Ippon(3)"
+                    If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, TotalScoreAO.Value + 3)
+                    CheckWinner(TotalScoreAKA.Value, TotalScoreAO.Value)
+                Case "AO - SENSHU"
+                    ApplyPenaltyAndDeclareWinner(BtnKikenAo, "AKA")
+                Case Else
+                    ' Unknown action: no-op
             End Select
         Catch ex As Exception
-            ' Abaikan error secara senyap jika ada tombol yang belum dirender oleh sistem
+            ' ignore
         End Try
     End Sub
 
     ' ==============================================================================
-    ' 3. FUNGSI HELPER UI & CUSTOM STYLE 
+    ' 2. FUNGSI HELPER UI & CUSTOM STYLE 
     ' ==============================================================================
     Private Sub CheckWinner(AkaScore As Integer, AoScore As Integer)
         ' Kondisi Awal / Reset (0 - 0) -> Sembunyikan (Hide) kedua label winner
@@ -169,7 +166,7 @@
             Exit Sub
         End If
 
-        ' Logika Hide / Show secara default
+        ' Logika Hide / Show secara default tanpa mengubah kosmetik warna/font
         If AkaScore > AoScore Then
             LblAkaWinner.Text = "WINNER"
             LblAkaWinner.Visible = True
@@ -195,8 +192,9 @@
     End Sub
 
     ' ==============================================================================
-    ' 4. MANAJEMEN MODE (SCORE VS FLAG) & VISIBILITAS JURI
+    ' 3. MANAJEMEN MODE (SCORE VS FLAG) & VISIBILITAS JURI
     ' ==============================================================================
+
     Private Sub ToggleScoringMode()
         Me.SuspendLayout()
         Try
@@ -288,8 +286,9 @@
     End Function
 
     ' ==============================================================================
-    ' 5. LOGIKA VISUAL SISTEM BENDERA PADA PANEL UI
+    ' 4. LOGIKA VISUAL SISTEM BENDERA PADA PANEL UI
     ' ==============================================================================
+
     Private Sub HighlightFlag(pnl As Panel, isActive As Boolean, isAka As Boolean)
         If pnl Is Nothing Then Exit Sub
 
@@ -333,6 +332,10 @@
         CheckWinner(akaScore, aoScore)
     End Sub
 
+    ' ==============================================================================
+    ' 5. EVENT HANDLERS: KLIK PANEL BENDERA
+    ' ==============================================================================
+
     Private Sub FlagAka_PanelClick(sender As Object, e As EventArgs) Handles PnlFlagAka1.Click, PnlFlagAka2.Click, PnlFlagAka3.Click, PnlFlagAka4.Click, PnlFlagAka5.Click, PnlFlagAka6.Click, PnlFlagAka7.Click
         Dim clickedPanel = CType(sender, Panel)
         Dim score As Integer = 0
@@ -341,7 +344,7 @@
             If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then Integer.TryParse(ctrl.Text, score)
         Next
 
-        Dim currentAkaScore As Integer = CInt(TotalScoreAKA.Value)
+        Dim currentAkaScore As Integer = TotalScoreAKA.Value
         Dim total = GetActiveJudgeCount()
 
         If score > total Then Exit Sub
@@ -361,7 +364,7 @@
             If TypeOf ctrl Is Label AndAlso ctrl.Text <> "⚑" Then Integer.TryParse(ctrl.Text, score)
         Next
 
-        Dim currentAoScore As Integer = CInt(TotalScoreAO.Value)
+        Dim currentAoScore As Integer = TotalScoreAO.Value
         Dim total = GetActiveJudgeCount()
 
         If score > total Then Exit Sub
@@ -374,7 +377,11 @@
     End Sub
 
     ' ==============================================================================
-    ' 6. EVENT HANDLERS KONTROL UTAMA
+    ' 6. EVENT HANDLERS: INTERAKSI TOMBOL LAINNYA
+    ' ==============================================================================
+
+    ' ==============================================================================
+    ' [LOG ACTIVITY] BUKA JENDELA LOG GLOBAL
     ' ==============================================================================
     Private Sub BtnLogActivity_Click(sender As Object, e As EventArgs) Handles BtnLogActivity.Click
         ActivityLogger.InitializeLogger()
@@ -428,6 +435,7 @@
     ' ==============================================================================
     ' 7. MASTER RESET DATA SCORING
     ' ==============================================================================
+
     Private Sub ResetAllScores()
         ProcessFlagVisuals(0, 0)
 
@@ -446,9 +454,11 @@
     End Sub
 
     ' ==============================================================================
-    ' 8. SISTEM PENALTI (KIKEN & DISKUALIFIKASI)
+    ' [PENALTY SYSTEM] LOGIKA PENALTI DENGAN FITUR TOGGLE (ON/OFF)
     ' ==============================================================================
+
     Private Sub ResetPenaltyLabels()
+        ' Kembalikan semua background ke warna putih (mengikuti warna UI awal)
         BtnKikenAka.BackColor = Color.White
         BtnDiskualifikasiAka.BackColor = Color.White
         BtnKikenAo.BackColor = Color.White
@@ -457,17 +467,27 @@
 
     Private Sub ApplyPenaltyAndDeclareWinner(clickedCtrl As Control, winningTeam As String)
         ' 1. FITUR TOGGLE OFF (BATALKAN PENALTI)
+        ' Jika tombol yang diklik sudah aktif (Kuning), maka batalkan penalti
         If clickedCtrl.BackColor = Color.Yellow Then
+            ' Reset warna tombol kembali putih
             ResetPenaltyLabels()
+
+            ' Kembalikan status pemenang murni berdasarkan skor angka saat ini 
+            ' (Mencegah bug di mana label winner hilang padahal poinnya lebih tinggi)
             CheckWinner(CInt(TotalScoreAKA.Value), CInt(TotalScoreAO.Value))
             ActivityLogger.LogKataAction($"Batal Penalti {clickedCtrl.Text}", "Keputusan penalti dianulir", LblTimerDisplayMain.Text)
+            ' Hentikan eksekusi kode di sini agar tidak memproses baris di bawahnya
             Exit Sub
         End If
 
         ' 2. FITUR TOGGLE ON (AKTIFKAN PENALTI)
+        ' Pastikan tombol penalti yang lain bersih/putih dulu
         ResetPenaltyLabels()
+
+        ' Beri highlight Kuning pada tombol yang baru saja diklik
         clickedCtrl.BackColor = Color.Yellow
 
+        ' Deklarasikan pemenang mutlak karena lawan terkena penalti (Disqualification/Kiken)
         If winningTeam = "AKA" Then
             LblAkaWinner.Text = "WINNER"
             LblAkaWinner.Visible = True
@@ -480,6 +500,9 @@
         ActivityLogger.LogKataAction($"Penalti {clickedCtrl.Text}", $"Tim lawan menerima penalti. {winningTeam} WIN.", LblTimerDisplayMain.Text)
     End Sub
 
+    ' ==============================================================================
+    ' [PENALTY SYSTEM] EVENT CLICK PENALTI (KIKEN & DISKUALIFIKASI)
+    ' ==============================================================================
     Private Sub BtnKikenAka_Click(sender As Object, e As EventArgs) Handles BtnKikenAka.Click
         ApplyPenaltyAndDeclareWinner(BtnKikenAka, "AO")
     End Sub
@@ -496,81 +519,123 @@
         ApplyPenaltyAndDeclareWinner(BtnDiskualifikasiAo, "AKA")
     End Sub
 
+    Private Sub TxtMatchDetail_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDetail.TextChanged
+    End Sub
+
+    Private Sub LblTextAlign_Click(sender As Object, e As EventArgs) Handles LblTextAlign.Click
+    End Sub
+
+
     ' ==============================================================================
-    ' 9. UI / UX ENHANCEMENT (HOVER & FOCUS)
+    ' [PENALTY SYSTEM] HOVER EFFECT UNTUK TOMBOL KIKEN & DISKUALIFIKASI
     ' ==============================================================================
+
+    ' Saat Mouse masuk ke area tombol (Hover)
     Private Sub Penalty_MouseEnter(sender As Object, e As EventArgs) Handles BtnKikenAka.MouseEnter, BtnDiskualifikasiAka.MouseEnter, BtnKikenAo.MouseEnter, BtnDiskualifikasiAo.MouseEnter
         Dim ctrl As Control = CType(sender, Control)
+
+        ' Ubah warna menjadi abu-abu muda hanya jika tombol sedang TIDAK aktif (bukan kuning)
         If ctrl.BackColor <> Color.Yellow Then
             ctrl.BackColor = Color.WhiteSmoke
-            ctrl.Cursor = Cursors.Hand
+            ctrl.Cursor = Cursors.Hand ' Mengubah kursor panah menjadi ikon jari/tangan
         End If
     End Sub
 
+    ' Saat Mouse keluar dari area tombol (Leave)
     Private Sub Penalty_MouseLeave(sender As Object, e As EventArgs) Handles BtnKikenAka.MouseLeave, BtnDiskualifikasiAka.MouseLeave, BtnKikenAo.MouseLeave, BtnDiskualifikasiAo.MouseLeave
         Dim ctrl As Control = CType(sender, Control)
+
+        ' Kembalikan ke warna asli (Putih) hanya jika tombol sedang TIDAK aktif (bukan kuning)
         If ctrl.BackColor <> Color.Yellow Then
             ctrl.BackColor = Color.White
         End If
     End Sub
 
-    Private Sub ClearFocus_Click(sender As Object, e As EventArgs) Handles Me.Click, PnlMainWorkspace.Click, PnlCenterScore.Click, PnlAka.Click, PnlAo.Click, PnlRightBar.Click, PnlLeftBar.Click, PnlTopBar.Click, PnlFooter.Click
+    ' ==============================================================================
+    ' [UI/UX ENHANCEMENT] FUNGSI HILANGKAN JEJAK FOKUS SAAT KLIK AREA KOSONG
+    ' ==============================================================================
+    Private Sub ClearFocus_Click(sender As Object, e As EventArgs) Handles Me.Click,
+        PnlMainWorkspace.Click, PnlCenterScore.Click, PnlAka.Click, PnlAo.Click,
+        PnlRightBar.Click, PnlLeftBar.Click, PnlTopBar.Click, PnlFooter.Click
+
+        ' Mengembalikan nilai fokus ke 0 (default/kosong)
+        ' Ini akan menghilangkan garis kotak putus-putus atau sorotan biru pada tombol terakhir yang diklik
         Me.ActiveControl = Nothing
     End Sub
 
+    ' ==============================================================================
+    ' [UI/UX ENHANCEMENT] HOVER EFFECT UNTUK TOMBOL RESET SCORE
+    ' ==============================================================================
+
+    ' Saat Mouse masuk ke area tombol Reset Score
     Private Sub BtnResetScore_MouseEnter(sender As Object, e As EventArgs) Handles BtnResetScoreAka.MouseEnter, BtnResetScoreAo.MouseEnter
         Dim btn As Button = CType(sender, Button)
-        btn.BackColor = Color.LightGray
-        btn.Cursor = Cursors.Hand
+        btn.BackColor = Color.LightGray ' Memberikan highlight abu-abu
+        btn.Cursor = Cursors.Hand       ' Mengubah kursor menjadi ikon tangan
     End Sub
 
+    ' Saat Mouse keluar dari area tombol Reset Score
     Private Sub BtnResetScore_MouseLeave(sender As Object, e As EventArgs) Handles BtnResetScoreAka.MouseLeave, BtnResetScoreAo.MouseLeave
         Dim btn As Button = CType(sender, Button)
-        btn.BackColor = Color.WhiteSmoke
+        btn.BackColor = Color.WhiteSmoke ' Mengembalikan ke warna putih pudar aslinya
     End Sub
 
+    ' ==============================================================================
+    ' [UI/UX ENHANCEMENT] HOVER EFFECT UNTUK TEKS SHOW WINNER
+    ' ==============================================================================
+
+    ' Saat Mouse masuk ke area teks Show Winner
     Private Sub LblShowWinner_MouseEnter(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.MouseEnter, LblAoWinnerStatus.MouseEnter
         Dim lbl As Label = CType(sender, Label)
-        lbl.ForeColor = Color.Black
-        lbl.Cursor = Cursors.Hand
+        lbl.ForeColor = Color.Black     ' Teks menjadi hitam pekat agar terlihat menyala
+        lbl.Cursor = Cursors.Hand       ' Mengubah kursor menjadi ikon tangan
     End Sub
 
+    ' Saat Mouse keluar dari area teks Show Winner
     Private Sub LblShowWinner_MouseLeave(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.MouseLeave, LblAoWinnerStatus.MouseLeave
         Dim lbl As Label = CType(sender, Label)
-        lbl.ForeColor = Color.Gray
+        lbl.ForeColor = Color.Gray      ' Mengembalikan teks ke warna abu-abu aslinya
     End Sub
 
     ' ==============================================================================
-    ' 10. SHOW WINNER POP-UP (DYNAMIC NAME)
+    ' [SHOW WINNER POP-UP] 1. FUNGSI KLIK UNTUK TIM AKA (MERAH)
     ' ==============================================================================
     Private Sub LblAkaWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAkaWinnerStatus.Click
+        ' 1. Ambil teks langsung dari kotak inputan UI
         Dim namaPeserta As String = TxtAkaNameMain.Text.Trim()
         Dim namaTim As String = TxtAkaTeam1.Text.Trim()
 
+        ' 2. Validasi ringan: Jika kosong, tampilkan strip (-) agar desain form tidak aneh
         If String.IsNullOrEmpty(namaPeserta) Then namaPeserta = "-"
         If String.IsNullOrEmpty(namaTim) Then namaTim = "-"
 
+        ' 3. Memanggil WinnerForm (True = Merah/AKA)
         Dim frmWinner As New WinnerForm(True, namaPeserta, namaTim)
         frmWinner.Show()
     End Sub
 
+    ' ==============================================================================
+    ' [SHOW WINNER POP-UP] 2. FUNGSI KLIK UNTUK TIM AO (BIRU)
+    ' ==============================================================================
     Private Sub LblAoWinnerStatus_Click(sender As Object, e As EventArgs) Handles LblAoWinnerStatus.Click
+        ' 1. Ambil teks langsung dari kotak inputan UI
         Dim namaPeserta As String = TxtAoNameMain.Text.Trim()
         Dim namaTim As String = TxtAoTeam1.Text.Trim()
 
+        ' 2. Validasi ringan: Jika kosong, tampilkan strip (-) agar desain form tidak aneh
         If String.IsNullOrEmpty(namaPeserta) Then namaPeserta = "-"
         If String.IsNullOrEmpty(namaTim) Then namaTim = "-"
 
+        ' 3. Memanggil WinnerForm (False = Biru/AO)
         Dim frmWinner As New WinnerForm(False, namaPeserta, namaTim)
         frmWinner.Show()
     End Sub
 
-    ' ==============================================================================
-    ' 11. STYLE FORMATTING HELPERS
-    ' ==============================================================================
     Public Sub ApplyKataMatchDetailStyle(fontName As String, isBold As Boolean, textColor As System.Drawing.Color)
         Try
             Dim style As FontStyle = If(isBold, FontStyle.Bold, FontStyle.Regular)
+
+            ' Tes visual ke Judge Status
             If LblJudgeStatusTitle IsNot Nothing Then
                 LblJudgeStatusTitle.Font = New Font(fontName, LblJudgeStatusTitle.Font.Size, style)
                 LblJudgeStatusTitle.ForeColor = textColor
@@ -595,18 +660,21 @@
     End Sub
 
     ' ==============================================================================
-    ' 12. WAITING TIMER SYSTEM
+    ' [WAITING TIMER] 1. FUNGSI TOMBOL START/STOP
     ' ==============================================================================
     Private Sub BtnStartWaitingTimer_Click(sender As Object, e As EventArgs) Handles BtnStartWaitingTimer.Click
         If Not IsWaitTimerRunning Then
+            ' Ambil nilai dari inputan kotak Waiting (Menit dan Detik)
             Dim menit As Integer = Convert.ToInt32(NumWaitMin.Value)
             Dim detik As Integer = Convert.ToInt32(NumWaitSec.Value)
             WaitTimeRemaining = (menit * 60) + detik
 
+            ' Cegah timer berjalan jika nilainya 0
             If WaitTimeRemaining > 0 Then
                 IsWaitTimerRunning = True
                 WaitTimer.Start()
 
+                ' Ubah tombol menjadi mode Stop sebagai indikator
                 BtnStartWaitingTimer.Text = "Stop Waiting Timer"
                 BtnStartWaitingTimer.BackColor = Color.LightCoral
                 BtnStartWaitingTimer.ForeColor = Color.White
@@ -616,65 +684,92 @@
                 MessageBox.Show("Silakan atur waktu Waiting terlebih dahulu.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
         Else
+            ' Logika jika tombol diklik untuk me-STOp timer yang sedang berjalan
             StopWaitingTimer()
         End If
     End Sub
 
+    ' ==============================================================================
+    ' [WAITING TIMER] 2. LOGIKA HITUNG MUNDUR (TICK EVENT)
+    ' ==============================================================================
     Private Sub WaitTimer_Tick(sender As Object, e As EventArgs) Handles WaitTimer.Tick
         If WaitTimeRemaining > 0 Then
             WaitTimeRemaining -= 1
             UpdateWaitTimerDisplay()
         Else
+            ' Waktu habis
             StopWaitingTimer()
+            ' Opsional: Tampilkan alert kedip atau suara jika diperlukan
             LblTimerDisplayMain.Text = "00:00 00"
         End If
     End Sub
 
+    ' ==============================================================================
+    ' [WAITING TIMER] 3. UPDATE TAMPILAN KE LAYAR UTAMA
+    ' ==============================================================================
     Private Sub UpdateWaitTimerDisplay()
+        ' Kalkulasi ulang sisa detik menjadi format Menit dan Detik
         Dim m As Integer = WaitTimeRemaining \ 60
         Dim s As Integer = WaitTimeRemaining Mod 60
+
+        ' Timpa LblTimerDisplayMain dengan format digital "MM:SS 00"
         LblTimerDisplayMain.Text = String.Format("{0:00}:{1:00} 00", m, s)
     End Sub
 
+    ' ==============================================================================
+    ' [WAITING TIMER] 4. FUNGSI HELPER UNTUK RESET TOMBOL
+    ' ==============================================================================
     Private Sub StopWaitingTimer()
         WaitTimer.Stop()
         IsWaitTimerRunning = False
 
+        ' Kembalikan warna dan teks tombol ke bentuk asli
         BtnStartWaitingTimer.Text = "Start Waiting Timer"
-        BtnStartWaitingTimer.BackColor = Color.FromArgb(255, 228, 196)
+        BtnStartWaitingTimer.BackColor = Color.FromArgb(255, 228, 196) ' Warna BurlyWood/Peach asli
         BtnStartWaitingTimer.ForeColor = Color.Black
     End Sub
 
-    ' ==============================================================================
-    ' 13. ADDITIONAL FORM CALLS & BEHAVIORS
-    ' ==============================================================================
+
+
+
+
+
+
+
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Setting
     Private Sub BtnSettingKata_Click(sender As Object, e As EventArgs) Handles BtnSettings.Click
         Try
             Dim frmSetting As New FrmScoreboardSetting()
             frmSetting.ShowDialog(Me)
+
         Catch ex As Exception
             MessageBox.Show("Gagal membuka menu Setting: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
+    ' Fungsi ini otomatis terbuat saat kamu double-click tombol Shortcut
     Private Sub BtnShortcutKata_Click(sender As Object, e As EventArgs) Handles BtnShortcut.Click
         Try
             Dim frmShortcut As New FromKeyboardShortcutKata()
             frmShortcut.ShowDialog(Me)
+
         Catch ex As Exception
             MessageBox.Show("Gagal membuka menu Shortcut: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
-
     Private Sub PnlCenterScore_Resize(sender As Object, e As EventArgs) Handles PnlCenterScore.Resize
         If originalXCoords.Count > 0 AndAlso PnlCenterScore IsNot Nothing Then
+
             Dim currentCenter As Integer = PnlCenterScore.Width \ 2
             Dim originalCenter As Integer = originalCenterWidth \ 2
 
+            ' Geser semua kotak-kotak kecil secara serentak ke tengah layar
             For Each ctrl As Control In PnlCenterScore.Controls
                 If originalXCoords.ContainsKey(ctrl) Then
                     Dim originalX As Integer = originalXCoords(ctrl)
                     Dim offsetFromCenter As Integer = originalX - originalCenter
+
+                    ' Hanya geser sumbu X (Kiri-Kanan). Sumbu Y (Atas-Bawah) dibiarkan aman!
                     ctrl.Left = currentCenter + offsetFromCenter
                 End If
             Next
@@ -683,8 +778,12 @@
 
     Private Sub BtnQRCode_Click(sender As Object, e As EventArgs) Handles BtnQRCode.Click
         Try
+            ' 1. Buat objek form QR Code yang baru
             Dim frmQR As New FormQRGenerated()
+
+            ' 2. Tampilkan sebagai Dialog agar user fokus dan mencegah form terbuka ganda
             frmQR.ShowDialog(Me)
+
         Catch ex As Exception
             MessageBox.Show("Gagal membuka menu QR Code: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -707,4 +806,262 @@
         PicPreviewLogo.Image = Nothing
     End Sub
 
+    ' =====================================================================================
+    ' ===========  C. SCORING SETTING — PENGEMBANGAN (FOKUS SAAT INI: MODE MANUAL)  =======
+    ' Alur Manual: Mode "Manual" mengaktifkan input juri. Klik label juri (J1..J7) membuka
+    ' jendela pemilih skor (0 + 5.0..10.0). Nilai terpilih mengisi spinner juri, lalu
+    ' Total Score dihitung otomatis (trimmed-sum: buang 1 nilai tertinggi & 1 terendah).
+    ' Mode "Online" (juri input sendiri via QR/server) hanya menonaktifkan input - menyusul.
+    ' =====================================================================================
+    Private isInitializing As Boolean = True
+
+    Private Function JudgeNumsAll() As NumericUpDown()
+        Return New NumericUpDown() {NumAkaJ1, NumAkaJ2, NumAkaJ3, NumAkaJ4, NumAkaJ5, NumAkaJ6, NumAkaJ7,
+                                    NumAoJ1, NumAoJ2, NumAoJ3, NumAoJ4, NumAoJ5, NumAoJ6, NumAoJ7}
+    End Function
+
+    Private Function JudgeLabelsAll() As Label()
+        Return New Label() {LblAkaJ1, LblAkaJ2, LblAkaJ3, LblAkaJ4, LblAkaJ5, LblAkaJ6, LblAkaJ7,
+                            LblAoJ1, LblAoJ2, LblAoJ3, LblAoJ4, LblAoJ5, LblAoJ6, LblAoJ7}
+    End Function
+
+    Private Sub KataMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        isInitializing = True
+        Try
+            ' Rules: Voting (default) / Elimination
+            If CmbRules IsNot Nothing Then
+                CmbRules.DropDownStyle = ComboBoxStyle.DropDownList
+                CmbRules.Items.Clear()
+                CmbRules.Items.AddRange(New Object() {"Score -> Voting (2026)", "Score -> Elimination"})
+                CmbRules.SelectedIndex = 0
+            End If
+
+            ' Mode: untuk sekarang fokus MANUAL (Online menyusul/lewat server)
+            If CmbMode IsNot Nothing Then
+                CmbMode.DropDownStyle = ComboBoxStyle.DropDownList
+                CmbMode.Items.Clear()
+                CmbMode.Items.AddRange(New Object() {"Manual", "Online"})
+                CmbMode.SelectedItem = "Manual"
+            End If
+
+            ' Total Score tampil dengan 1 desimal (mis. 6.0)
+            If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.DecimalPlaces = 1
+            If TotalScoreAO IsNot Nothing Then TotalScoreAO.DecimalPlaces = 1
+
+            ApplyMode()
+        Catch
+        Finally
+            isInitializing = False
+        End Try
+        RecalcTotals()
+    End Sub
+
+    ' ---------- MODE ONLINE / MANUAL ----------
+    Private Function IsManualMode() As Boolean
+        If CmbMode Is Nothing OrElse CmbMode.SelectedItem Is Nothing Then Return True
+        Return CmbMode.SelectedItem.ToString() = "Manual"
+    End Function
+
+    Private Sub ApplyMode()
+        Dim manual As Boolean = IsManualMode()
+        ' Manual: operator yang mengisi -> input juri ENABLE.
+        ' Online: juri mengisi via QR/server -> input juri DISABLE.
+        For Each num As NumericUpDown In JudgeNumsAll()
+            If num IsNot Nothing Then num.Enabled = manual
+        Next
+        For Each lb As Label In JudgeLabelsAll()
+            If lb IsNot Nothing Then lb.Cursor = If(manual, Cursors.Hand, Cursors.Default)
+        Next
+    End Sub
+
+    Private Sub CmbMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CmbMode.SelectedIndexChanged
+        If isInitializing Then Return
+        ApplyMode()
+    End Sub
+
+    ' Tombol "Manual | Online" = toggle cepat antar mode
+    Private Sub BtnManualOnline_Click(sender As Object, e As EventArgs) Handles BtnManualOnline.Click
+        If CmbMode Is Nothing Then Return
+        CmbMode.SelectedItem = If(IsManualMode(), "Online", "Manual")
+    End Sub
+
+    ' ---------- RULES (Voting / Elimination) ----------
+    Private Sub CmbRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CmbRules.SelectedIndexChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    ' ---------- KLIK LABEL JURI -> JENDELA PEMILIH SKOR (hanya mode Manual) ----------
+    Private Sub JudgeLabel_Click(sender As Object, e As EventArgs) _
+        Handles LblAkaJ1.Click, LblAkaJ2.Click, LblAkaJ3.Click, LblAkaJ4.Click, LblAkaJ5.Click, LblAkaJ6.Click, LblAkaJ7.Click,
+                LblAoJ1.Click, LblAoJ2.Click, LblAoJ3.Click, LblAoJ4.Click, LblAoJ5.Click, LblAoJ6.Click, LblAoJ7.Click
+        If RbScoreType Is Nothing OrElse Not RbScoreType.Checked Then Return   ' hanya tipe Score
+        If Not IsManualMode() Then Return                                       ' hanya mode Manual
+
+        Dim lbl As Label = TryCast(sender, Label)
+        If lbl Is Nothing Then Return
+
+        Dim numName As String = lbl.Name.Replace("Lbl", "Num")                  ' LblAkaJ3 -> NumAkaJ3
+        Dim found() As Control = Me.Controls.Find(numName, True)
+        If found Is Nothing OrElse found.Length = 0 Then Return
+        Dim num As NumericUpDown = TryCast(found(0), NumericUpDown)
+        If num Is Nothing OrElse Not num.Visible Then Return
+
+        Using picker As New KataScorePicker(lbl.Text, num.Value)
+            If picker.ShowDialog(Me) = DialogResult.OK AndAlso picker.SelectedValue.HasValue Then
+                Dim v As Decimal = picker.SelectedValue.Value
+                If v < num.Minimum Then v = num.Minimum
+                If v > num.Maximum Then v = num.Maximum
+                num.Value = v   ' memicu RecalcTotals lewat ValueChanged
+            End If
+        End Using
+    End Sub
+
+    ' ---------- HITUNG TOTAL SKOR OTOMATIS ----------
+    Private Sub JudgeScore_ValueChanged(sender As Object, e As EventArgs) _
+        Handles NumAkaJ1.ValueChanged, NumAkaJ2.ValueChanged, NumAkaJ3.ValueChanged, NumAkaJ4.ValueChanged, NumAkaJ5.ValueChanged, NumAkaJ6.ValueChanged, NumAkaJ7.ValueChanged,
+                NumAoJ1.ValueChanged, NumAoJ2.ValueChanged, NumAoJ3.ValueChanged, NumAoJ4.ValueChanged, NumAoJ5.ValueChanged, NumAoJ6.ValueChanged, NumAoJ7.ValueChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    Private Sub JudgeCount_Changed(sender As Object, e As EventArgs) _
+        Handles Rb3Judge.CheckedChanged, Rb5Judge.CheckedChanged, Rb7Judge.CheckedChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    Private Function GetJudgeValues(isAka As Boolean) As Decimal()
+        Dim n As Integer = GetActiveJudgeCount()
+        Dim src() As NumericUpDown = If(isAka,
+            New NumericUpDown() {NumAkaJ1, NumAkaJ2, NumAkaJ3, NumAkaJ4, NumAkaJ5, NumAkaJ6, NumAkaJ7},
+            New NumericUpDown() {NumAoJ1, NumAoJ2, NumAoJ3, NumAoJ4, NumAoJ5, NumAoJ6, NumAoJ7})
+        Dim vals(n - 1) As Decimal
+        For i As Integer = 0 To n - 1
+            vals(i) = If(src(i) IsNot Nothing, src(i).Value, 0D)
+        Next
+        Return vals
+    End Function
+
+    ' Total = jumlah nilai juri SETELAH membuang 1 nilai tertinggi & 1 terendah.
+    ' (3 juri -> sisa 1 nilai tengah; 5 juri -> 3; 7 juri -> 5.)
+    Private Function TrimmedTotal(vals As Decimal()) As Decimal
+        If vals Is Nothing OrElse vals.Length = 0 Then Return 0D
+        Dim total As Decimal = 0D
+        Dim mn As Decimal = vals(0)
+        Dim mx As Decimal = vals(0)
+        For Each v As Decimal In vals
+            total += v
+            If v < mn Then mn = v
+            If v > mx Then mx = v
+        Next
+        If vals.Length <= 2 Then Return total
+        Return total - mn - mx   ' buang satu min & satu max (aman walau ada nilai kembar)
+    End Function
+
+    Private Sub RecalcTotals()
+        ' Flag System ditangani ProcessFlagVisuals; di sini khusus tipe Score.
+        If RbScoreType Is Nothing OrElse Not RbScoreType.Checked Then Return
+        Dim akaTotal As Decimal = TrimmedTotal(GetJudgeValues(True))
+        Dim aoTotal As Decimal = TrimmedTotal(GetJudgeValues(False))
+        If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, akaTotal)
+        If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, aoTotal)
+        UpdateScoreWinnerLabels(akaTotal, aoTotal)
+    End Sub
+
+    Private Sub UpdateScoreWinnerLabels(akaVal As Decimal, aoVal As Decimal)
+        If LblAkaWinner Is Nothing OrElse LblAoWinner Is Nothing Then Return
+        If akaVal = 0D AndAlso aoVal = 0D Then
+            LblAkaWinner.Visible = False
+            LblAoWinner.Visible = False
+        ElseIf akaVal > aoVal Then
+            LblAkaWinner.Text = "WINNER" : LblAkaWinner.Visible = True : LblAoWinner.Visible = False
+        ElseIf aoVal > akaVal Then
+            LblAoWinner.Text = "WINNER" : LblAoWinner.Visible = True : LblAkaWinner.Visible = False
+        Else
+            LblAkaWinner.Text = "DRAW" : LblAoWinner.Text = "DRAW"
+            LblAkaWinner.Visible = True : LblAoWinner.Visible = True
+        End If
+    End Sub
+
+End Class
+
+' =====================================================================================
+' JENDELA PEMILIH SKOR MANUAL (sesuai guide "J? Score": tombol 0 + 5.0 .. 10.0)
+' Dibuat sepenuhnya lewat kode sehingga tidak perlu menambah file .Designer terpisah.
+' =====================================================================================
+Friend Class KataScorePicker
+    Inherits System.Windows.Forms.Form
+
+    Public SelectedValue As Decimal? = Nothing
+
+    Public Sub New(judgeTitle As String, currentValue As Decimal)
+        Me.Text = judgeTitle & " Score"
+        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.StartPosition = FormStartPosition.CenterParent
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
+        Me.ShowInTaskbar = False
+        Me.AutoScaleMode = AutoScaleMode.None
+
+        Const cols As Integer = 10
+        Const rows As Integer = 6
+        Const cellW As Integer = 64
+        Const cellH As Integer = 46
+        Const pad As Integer = 10
+
+        Dim tlp As New TableLayoutPanel()
+        tlp.ColumnCount = cols
+        tlp.RowCount = rows
+        tlp.Dock = DockStyle.Fill
+        tlp.Padding = New Padding(pad)
+        For i As Integer = 0 To cols - 1
+            tlp.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, cellW))
+        Next
+        For i As Integer = 0 To rows - 1
+            tlp.RowStyles.Add(New RowStyle(SizeType.Absolute, cellH))
+        Next
+
+        ' Baris 5..9 dengan pecahan .0 .. .9
+        Dim baseVals() As Integer = {5, 6, 7, 8, 9}
+        For r As Integer = 0 To 4
+            For c As Integer = 0 To 9
+                Dim v As Decimal = CDec(baseVals(r)) + (CDec(c) * 0.1D)
+                tlp.Controls.Add(MakeBtn(v, currentValue, False), c, r)
+            Next
+        Next
+        ' Baris terakhir: 10 di kiri, 0 (merah) di kanan
+        tlp.Controls.Add(MakeBtn(10D, currentValue, False), 0, 5)
+        tlp.Controls.Add(MakeBtn(0D, currentValue, True), 9, 5)
+
+        Me.Controls.Add(tlp)
+        Me.ClientSize = New Size(cols * cellW + pad * 2, rows * cellH + pad * 2)
+    End Sub
+
+    Private Function MakeBtn(v As Decimal, current As Decimal, isZero As Boolean) As Button
+        Dim b As New Button()
+        b.Tag = v
+        b.Dock = DockStyle.Fill
+        b.Margin = New Padding(2)
+        b.FlatStyle = FlatStyle.Flat
+        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        b.Text = If(v = Math.Truncate(v), CInt(v).ToString(), v.ToString("0.0"))
+        If isZero Then
+            b.BackColor = Color.Red
+            b.ForeColor = Color.White
+        ElseIf v = current Then
+            b.BackColor = Color.FromArgb(50, 130, 246)
+            b.ForeColor = Color.White
+        Else
+            b.BackColor = Color.White
+        End If
+        AddHandler b.Click, AddressOf Btn_Click
+        Return b
+    End Function
+
+    Private Sub Btn_Click(sender As Object, e As EventArgs)
+        SelectedValue = CDec(CType(sender, Button).Tag)
+        Me.DialogResult = DialogResult.OK
+        Me.Close()
+    End Sub
 End Class
