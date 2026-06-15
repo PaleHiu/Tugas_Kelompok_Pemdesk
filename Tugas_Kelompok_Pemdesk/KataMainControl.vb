@@ -806,4 +806,262 @@
         PicPreviewLogo.Image = Nothing
     End Sub
 
+    ' =====================================================================================
+    ' ===========  C. SCORING SETTING — PENGEMBANGAN (FOKUS SAAT INI: MODE MANUAL)  =======
+    ' Alur Manual: Mode "Manual" mengaktifkan input juri. Klik label juri (J1..J7) membuka
+    ' jendela pemilih skor (0 + 5.0..10.0). Nilai terpilih mengisi spinner juri, lalu
+    ' Total Score dihitung otomatis (trimmed-sum: buang 1 nilai tertinggi & 1 terendah).
+    ' Mode "Online" (juri input sendiri via QR/server) hanya menonaktifkan input - menyusul.
+    ' =====================================================================================
+    Private isInitializing As Boolean = True
+
+    Private Function JudgeNumsAll() As NumericUpDown()
+        Return New NumericUpDown() {NumAkaJ1, NumAkaJ2, NumAkaJ3, NumAkaJ4, NumAkaJ5, NumAkaJ6, NumAkaJ7,
+                                    NumAoJ1, NumAoJ2, NumAoJ3, NumAoJ4, NumAoJ5, NumAoJ6, NumAoJ7}
+    End Function
+
+    Private Function JudgeLabelsAll() As Label()
+        Return New Label() {LblAkaJ1, LblAkaJ2, LblAkaJ3, LblAkaJ4, LblAkaJ5, LblAkaJ6, LblAkaJ7,
+                            LblAoJ1, LblAoJ2, LblAoJ3, LblAoJ4, LblAoJ5, LblAoJ6, LblAoJ7}
+    End Function
+
+    Private Sub KataMainControl_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        isInitializing = True
+        Try
+            ' Rules: Voting (default) / Elimination
+            If CmbRules IsNot Nothing Then
+                CmbRules.DropDownStyle = ComboBoxStyle.DropDownList
+                CmbRules.Items.Clear()
+                CmbRules.Items.AddRange(New Object() {"Score -> Voting (2026)", "Score -> Elimination"})
+                CmbRules.SelectedIndex = 0
+            End If
+
+            ' Mode: untuk sekarang fokus MANUAL (Online menyusul/lewat server)
+            If CmbMode IsNot Nothing Then
+                CmbMode.DropDownStyle = ComboBoxStyle.DropDownList
+                CmbMode.Items.Clear()
+                CmbMode.Items.AddRange(New Object() {"Manual", "Online"})
+                CmbMode.SelectedItem = "Manual"
+            End If
+
+            ' Total Score tampil dengan 1 desimal (mis. 6.0)
+            If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.DecimalPlaces = 1
+            If TotalScoreAO IsNot Nothing Then TotalScoreAO.DecimalPlaces = 1
+
+            ApplyMode()
+        Catch
+        Finally
+            isInitializing = False
+        End Try
+        RecalcTotals()
+    End Sub
+
+    ' ---------- MODE ONLINE / MANUAL ----------
+    Private Function IsManualMode() As Boolean
+        If CmbMode Is Nothing OrElse CmbMode.SelectedItem Is Nothing Then Return True
+        Return CmbMode.SelectedItem.ToString() = "Manual"
+    End Function
+
+    Private Sub ApplyMode()
+        Dim manual As Boolean = IsManualMode()
+        ' Manual: operator yang mengisi -> input juri ENABLE.
+        ' Online: juri mengisi via QR/server -> input juri DISABLE.
+        For Each num As NumericUpDown In JudgeNumsAll()
+            If num IsNot Nothing Then num.Enabled = manual
+        Next
+        For Each lb As Label In JudgeLabelsAll()
+            If lb IsNot Nothing Then lb.Cursor = If(manual, Cursors.Hand, Cursors.Default)
+        Next
+    End Sub
+
+    Private Sub CmbMode_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CmbMode.SelectedIndexChanged
+        If isInitializing Then Return
+        ApplyMode()
+    End Sub
+
+    ' Tombol "Manual | Online" = toggle cepat antar mode
+    Private Sub BtnManualOnline_Click(sender As Object, e As EventArgs) Handles BtnManualOnline.Click
+        If CmbMode Is Nothing Then Return
+        CmbMode.SelectedItem = If(IsManualMode(), "Online", "Manual")
+    End Sub
+
+    ' ---------- RULES (Voting / Elimination) ----------
+    Private Sub CmbRules_SelectedIndexChanged(sender As Object, e As EventArgs) Handles CmbRules.SelectedIndexChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    ' ---------- KLIK LABEL JURI -> JENDELA PEMILIH SKOR (hanya mode Manual) ----------
+    Private Sub JudgeLabel_Click(sender As Object, e As EventArgs) _
+        Handles LblAkaJ1.Click, LblAkaJ2.Click, LblAkaJ3.Click, LblAkaJ4.Click, LblAkaJ5.Click, LblAkaJ6.Click, LblAkaJ7.Click,
+                LblAoJ1.Click, LblAoJ2.Click, LblAoJ3.Click, LblAoJ4.Click, LblAoJ5.Click, LblAoJ6.Click, LblAoJ7.Click
+        If RbScoreType Is Nothing OrElse Not RbScoreType.Checked Then Return   ' hanya tipe Score
+        If Not IsManualMode() Then Return                                       ' hanya mode Manual
+
+        Dim lbl As Label = TryCast(sender, Label)
+        If lbl Is Nothing Then Return
+
+        Dim numName As String = lbl.Name.Replace("Lbl", "Num")                  ' LblAkaJ3 -> NumAkaJ3
+        Dim found() As Control = Me.Controls.Find(numName, True)
+        If found Is Nothing OrElse found.Length = 0 Then Return
+        Dim num As NumericUpDown = TryCast(found(0), NumericUpDown)
+        If num Is Nothing OrElse Not num.Visible Then Return
+
+        Using picker As New KataScorePicker(lbl.Text, num.Value)
+            If picker.ShowDialog(Me) = DialogResult.OK AndAlso picker.SelectedValue.HasValue Then
+                Dim v As Decimal = picker.SelectedValue.Value
+                If v < num.Minimum Then v = num.Minimum
+                If v > num.Maximum Then v = num.Maximum
+                num.Value = v   ' memicu RecalcTotals lewat ValueChanged
+            End If
+        End Using
+    End Sub
+
+    ' ---------- HITUNG TOTAL SKOR OTOMATIS ----------
+    Private Sub JudgeScore_ValueChanged(sender As Object, e As EventArgs) _
+        Handles NumAkaJ1.ValueChanged, NumAkaJ2.ValueChanged, NumAkaJ3.ValueChanged, NumAkaJ4.ValueChanged, NumAkaJ5.ValueChanged, NumAkaJ6.ValueChanged, NumAkaJ7.ValueChanged,
+                NumAoJ1.ValueChanged, NumAoJ2.ValueChanged, NumAoJ3.ValueChanged, NumAoJ4.ValueChanged, NumAoJ5.ValueChanged, NumAoJ6.ValueChanged, NumAoJ7.ValueChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    Private Sub JudgeCount_Changed(sender As Object, e As EventArgs) _
+        Handles Rb3Judge.CheckedChanged, Rb5Judge.CheckedChanged, Rb7Judge.CheckedChanged
+        If isInitializing Then Return
+        RecalcTotals()
+    End Sub
+
+    Private Function GetJudgeValues(isAka As Boolean) As Decimal()
+        Dim n As Integer = GetActiveJudgeCount()
+        Dim src() As NumericUpDown = If(isAka,
+            New NumericUpDown() {NumAkaJ1, NumAkaJ2, NumAkaJ3, NumAkaJ4, NumAkaJ5, NumAkaJ6, NumAkaJ7},
+            New NumericUpDown() {NumAoJ1, NumAoJ2, NumAoJ3, NumAoJ4, NumAoJ5, NumAoJ6, NumAoJ7})
+        Dim vals(n - 1) As Decimal
+        For i As Integer = 0 To n - 1
+            vals(i) = If(src(i) IsNot Nothing, src(i).Value, 0D)
+        Next
+        Return vals
+    End Function
+
+    ' Total = jumlah nilai juri SETELAH membuang 1 nilai tertinggi & 1 terendah.
+    ' (3 juri -> sisa 1 nilai tengah; 5 juri -> 3; 7 juri -> 5.)
+    Private Function TrimmedTotal(vals As Decimal()) As Decimal
+        If vals Is Nothing OrElse vals.Length = 0 Then Return 0D
+        Dim total As Decimal = 0D
+        Dim mn As Decimal = vals(0)
+        Dim mx As Decimal = vals(0)
+        For Each v As Decimal In vals
+            total += v
+            If v < mn Then mn = v
+            If v > mx Then mx = v
+        Next
+        If vals.Length <= 2 Then Return total
+        Return total - mn - mx   ' buang satu min & satu max (aman walau ada nilai kembar)
+    End Function
+
+    Private Sub RecalcTotals()
+        ' Flag System ditangani ProcessFlagVisuals; di sini khusus tipe Score.
+        If RbScoreType Is Nothing OrElse Not RbScoreType.Checked Then Return
+        Dim akaTotal As Decimal = TrimmedTotal(GetJudgeValues(True))
+        Dim aoTotal As Decimal = TrimmedTotal(GetJudgeValues(False))
+        If TotalScoreAKA IsNot Nothing Then TotalScoreAKA.Value = Math.Min(TotalScoreAKA.Maximum, akaTotal)
+        If TotalScoreAO IsNot Nothing Then TotalScoreAO.Value = Math.Min(TotalScoreAO.Maximum, aoTotal)
+        UpdateScoreWinnerLabels(akaTotal, aoTotal)
+    End Sub
+
+    Private Sub UpdateScoreWinnerLabels(akaVal As Decimal, aoVal As Decimal)
+        If LblAkaWinner Is Nothing OrElse LblAoWinner Is Nothing Then Return
+        If akaVal = 0D AndAlso aoVal = 0D Then
+            LblAkaWinner.Visible = False
+            LblAoWinner.Visible = False
+        ElseIf akaVal > aoVal Then
+            LblAkaWinner.Text = "WINNER" : LblAkaWinner.Visible = True : LblAoWinner.Visible = False
+        ElseIf aoVal > akaVal Then
+            LblAoWinner.Text = "WINNER" : LblAoWinner.Visible = True : LblAkaWinner.Visible = False
+        Else
+            LblAkaWinner.Text = "DRAW" : LblAoWinner.Text = "DRAW"
+            LblAkaWinner.Visible = True : LblAoWinner.Visible = True
+        End If
+    End Sub
+
+End Class
+
+' =====================================================================================
+' JENDELA PEMILIH SKOR MANUAL (sesuai guide "J? Score": tombol 0 + 5.0 .. 10.0)
+' Dibuat sepenuhnya lewat kode sehingga tidak perlu menambah file .Designer terpisah.
+' =====================================================================================
+Friend Class KataScorePicker
+    Inherits System.Windows.Forms.Form
+
+    Public SelectedValue As Decimal? = Nothing
+
+    Public Sub New(judgeTitle As String, currentValue As Decimal)
+        Me.Text = judgeTitle & " Score"
+        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.StartPosition = FormStartPosition.CenterParent
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
+        Me.ShowInTaskbar = False
+        Me.AutoScaleMode = AutoScaleMode.None
+
+        Const cols As Integer = 10
+        Const rows As Integer = 6
+        Const cellW As Integer = 64
+        Const cellH As Integer = 46
+        Const pad As Integer = 10
+
+        Dim tlp As New TableLayoutPanel()
+        tlp.ColumnCount = cols
+        tlp.RowCount = rows
+        tlp.Dock = DockStyle.Fill
+        tlp.Padding = New Padding(pad)
+        For i As Integer = 0 To cols - 1
+            tlp.ColumnStyles.Add(New ColumnStyle(SizeType.Absolute, cellW))
+        Next
+        For i As Integer = 0 To rows - 1
+            tlp.RowStyles.Add(New RowStyle(SizeType.Absolute, cellH))
+        Next
+
+        ' Baris 5..9 dengan pecahan .0 .. .9
+        Dim baseVals() As Integer = {5, 6, 7, 8, 9}
+        For r As Integer = 0 To 4
+            For c As Integer = 0 To 9
+                Dim v As Decimal = CDec(baseVals(r)) + (CDec(c) * 0.1D)
+                tlp.Controls.Add(MakeBtn(v, currentValue, False), c, r)
+            Next
+        Next
+        ' Baris terakhir: 10 di kiri, 0 (merah) di kanan
+        tlp.Controls.Add(MakeBtn(10D, currentValue, False), 0, 5)
+        tlp.Controls.Add(MakeBtn(0D, currentValue, True), 9, 5)
+
+        Me.Controls.Add(tlp)
+        Me.ClientSize = New Size(cols * cellW + pad * 2, rows * cellH + pad * 2)
+    End Sub
+
+    Private Function MakeBtn(v As Decimal, current As Decimal, isZero As Boolean) As Button
+        Dim b As New Button()
+        b.Tag = v
+        b.Dock = DockStyle.Fill
+        b.Margin = New Padding(2)
+        b.FlatStyle = FlatStyle.Flat
+        b.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        b.Text = If(v = Math.Truncate(v), CInt(v).ToString(), v.ToString("0.0"))
+        If isZero Then
+            b.BackColor = Color.Red
+            b.ForeColor = Color.White
+        ElseIf v = current Then
+            b.BackColor = Color.FromArgb(50, 130, 246)
+            b.ForeColor = Color.White
+        Else
+            b.BackColor = Color.White
+        End If
+        AddHandler b.Click, AddressOf Btn_Click
+        Return b
+    End Function
+
+    Private Sub Btn_Click(sender As Object, e As EventArgs)
+        SelectedValue = CDec(CType(sender, Button).Tag)
+        Me.DialogResult = DialogResult.OK
+        Me.Close()
+    End Sub
 End Class
