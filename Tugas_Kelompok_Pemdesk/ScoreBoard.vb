@@ -225,4 +225,57 @@ Partial Public Class ScoreBoard
         ' 4. Paksa layar Scoreboard untuk menggambar ulang (Refresh) dengan ukuran baru
         ScoreBoard_SizeChanged(Nothing, Nothing)
     End Sub
+    ' ==========================================================
+    ' LAYAR KHUSUS HANTEI (ANIMASI FADE IN/OUT)
+    ' ==========================================================
+    Public LblHanteiBumper As Label
+    Private WithEvents fadeTimer As New Timer() With {.Interval = 15}
+    Private isFadeIn As Boolean = False
+    Private currentAlpha As Integer = 0
+
+    Public Sub ToggleHanteiScreen(isShow As Boolean)
+        ' Pastikan objek dibuat hanya sekali
+        If LblHanteiBumper Is Nothing Then
+            LblHanteiBumper = New Label()
+            LblHanteiBumper.Dock = DockStyle.Fill
+            LblHanteiBumper.BackColor = Color.FromArgb(0, 20, 20, 20)
+            LblHanteiBumper.ForeColor = Color.FromArgb(0, 255, 255, 255)
+            LblHanteiBumper.Font = New Font("Segoe UI", 90, FontStyle.Bold)
+            LblHanteiBumper.TextAlign = ContentAlignment.MiddleCenter
+            LblHanteiBumper.Text = "HANTEI" & vbCrLf & "(Judge Decision)"
+            LblHanteiBumper.Visible = False
+            Me.Controls.Add(LblHanteiBumper)
+        End If
+
+        isFadeIn = isShow
+
+        If isShow Then
+            LblHanteiBumper.BringToFront()
+            LblHanteiBumper.Visible = True
+        End If
+
+        fadeTimer.Start()
+    End Sub
+
+    Private Sub fadeTimer_Tick(sender As Object, e As EventArgs) Handles fadeTimer.Tick
+        Dim fadeSpeed As Integer = 15
+
+        If isFadeIn Then
+            currentAlpha += fadeSpeed
+            If currentAlpha >= 255 Then
+                currentAlpha = 255
+                fadeTimer.Stop()
+            End If
+        Else
+            currentAlpha -= fadeSpeed
+            If currentAlpha <= 0 Then
+                currentAlpha = 0
+                fadeTimer.Stop()
+                LblHanteiBumper.Visible = False
+            End If
+        End If
+
+        LblHanteiBumper.BackColor = Color.FromArgb(currentAlpha, 20, 20, 20)
+        LblHanteiBumper.ForeColor = Color.FromArgb(currentAlpha, 255, 255, 255)
+    End Sub
 End Class

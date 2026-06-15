@@ -24,6 +24,8 @@ Partial Public Class KumiteMainControl
     Private isVrBumperActive As Boolean = False
     Private isAkaSenshu As Boolean = False
     Private isAoSenshu As Boolean = False
+    Public isAkaHanteiWin As Boolean = False
+    Public isAoHanteiWin As Boolean = False
 
     ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
     Public Sub SetCompetitorData(nama As String, team As String, info As String)
@@ -337,10 +339,12 @@ Partial Public Class KumiteMainControl
         DgvAkaHistory.AllowUserToResizeColumns = False
         DgvAkaHistory.AllowUserToResizeRows = False
         DgvAkaHistory.ScrollBars = ScrollBars.Vertical ' <- Kembalikan ke Vertical
+        DgvAkaHistory.AllowUserToAddRows = False
 
         DgvAoHistory.AllowUserToResizeColumns = False
         DgvAoHistory.AllowUserToResizeRows = False
         DgvAoHistory.ScrollBars = ScrollBars.Vertical ' <- Kembalikan ke Vertical
+        DgvAoHistory.AllowUserToAddRows = False
 
         ' 2. BUAT SEMUA TEKS RATA TENGAH (Isi Tabel & Header)
         ' Untuk Tabel AKA
@@ -412,7 +416,55 @@ Partial Public Class KumiteMainControl
         If frmHanteiApp Is Nothing OrElse frmHanteiApp.IsDisposed Then
             frmHanteiApp = New HanteiForm()
         End If
-        frmHanteiApp.ShowDialog()
+
+        ' Sapu bersih memori Hantei sebelumnya
+        frmHanteiApp.ResetAll()
+
+        ' ---> 1. TAMPILKAN LAYAR HITAM HANTEI DI SCOREBOARD <---
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.ToggleHanteiScreen(True)
+        End If
+
+        ' ---> 2. TAMPILKAN FORM POPUP UNTUK WASIT <---
+        If frmHanteiApp.ShowDialog() = DialogResult.OK Then
+            Me.Activate() ' Mengembalikan fokus ke layar KumiteMainControl
+
+            Dim winner As String = frmHanteiApp.FinalWinner
+            If winner = "AKA" Then
+                ForceDeclareWinner("AKA")
+            ElseIf winner = "AO" Then
+                ForceDeclareWinner("AO")
+            End If
+        End If
+
+        ' ---> 3. TUTUP LAYAR HITAM HANTEI SETELAH WASIT SELESAI / CANCEL <---
+        If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+            frmScoreboard.ToggleHanteiScreen(False)
+        End If
+    End Sub
+
+    ' ---> TAMBAHKAN FUNGSI EKSEKUTOR INI TEPAT DI BAWAHNYA <---
+    Private Sub ForceDeclareWinner(winnerSide As String)
+        matchTimer.Stop()
+        BtnStartTimer.Text = "Start Timer"
+        BtnStartTimer.BackColor = Color.Gold
+
+        If winnerSide = "AKA" Then
+            isAkaHanteiWin = True
+            isAoHanteiWin = False
+            firstWinnerDeclared = "AKA"
+            LblAkaWinner.Visible = True
+            LblAoWinner.Visible = False
+        ElseIf winnerSide = "AO" Then
+            isAkaHanteiWin = False
+            isAoHanteiWin = True
+            firstWinnerDeclared = "AO"
+            LblAkaWinner.Visible = False
+            LblAoWinner.Visible = True
+        End If
+
+        AudioController.PlaySound("Winner by Point")
+        blinkTimer.Start() ' Ini otomatis akan membuat layar Scoreboard raksasa berkedip!
     End Sub
 
     ' ==========================================================
@@ -893,6 +945,8 @@ Partial Public Class KumiteMainControl
 
         ' Matikan label WINNER secara paksa
         LblAkaWinner.Visible = False
+        isAkaHanteiWin = False
+        isAoHanteiWin = False
     End Sub
 
     ' Tombol Reset Score AO (Biru)
@@ -905,6 +959,8 @@ Partial Public Class KumiteMainControl
 
         ' Matikan label WINNER secara paksa
         LblAoWinner.Visible = False
+        isAkaHanteiWin = False
+        isAoHanteiWin = False
     End Sub
 
 
@@ -1745,7 +1801,8 @@ Partial Public Class KumiteMainControl
             ' Variabel deteksi pintar agar kode jauh lebih bersih dan mencakup SEMUA jenis pelanggaran berat
             Dim isAkaDisqualified As Boolean = (BtnAkaKiken.BackColor = Color.Yellow OrElse BtnAkaShikkaku.BackColor = Color.Yellow OrElse BtnAkaH.BackColor = AkaColor OrElse BtnAkaKnockedOut.BackColor = AkaColor)
             Dim isAoDisqualified As Boolean = (BtnAoKiken.BackColor = Color.Yellow OrElse BtnAoShikkaku.BackColor = Color.Yellow OrElse BtnAoH.BackColor = AoColor OrElse BtnAoKnockedOut.BackColor = AoColor)
-
+            If isAkaHanteiWin Then isAoDisqualified = True
+            If isAoHanteiWin Then isAkaDisqualified = True
 
             ' ==========================================================
             ' PRIORITAS 1: LOCK SYSTEM MUTLAK (SIAPA CEPAT DIA MENGUNCI)
@@ -2143,5 +2200,110 @@ Partial Public Class KumiteMainControl
             ' Perintahkan Scoreboard untuk "Reset" ke ukuran bawaan pabrik
             frmScoreboard.AdjustTextSize(CboAdjustPlayer.Text, "Reset", 0)
         End If
+    End Sub
+
+    ' ==========================================================
+    ' FUNGSI RESET MATCH (MENGEMBALIKAN KE KONDISI AWAL PABRIK)
+    ' ==========================================================
+    Private Sub BtnResetMatch_Click(sender As Object, e As EventArgs) Handles BtnResetMatch.Click
+        ' 1. Minta Konfirmasi Keamanan
+        If MessageBox.Show("Apakah Anda yakin ingin me-reset seluruh pertandingan?" & vbCrLf & "Semua data profil, skor, penalti, dan waktu akan dihapus bersih!", "Konfirmasi Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+
+            ' 2. Hentikan semua timer dan reset memori pemenang
+            matchTimer.Stop()
+            BtnStartTimer.Text = "Start Timer"
+            BtnStartTimer.BackColor = Color.Gold
+            StopWinnerBlinking()
+            firstWinnerDeclared = ""
+
+            ' 3. Bersihkan Profil & Antrean AKA (Merah)
+            NextAkaName = ""
+            NextAkaTeam = ""
+            NextAkaInfo = ""
+            TxtAkaName.Text = ""
+            TxtAkaNameMain.Text = ""
+            TxtAkaTeam.Text = ""
+            TxtAkaTeamInfo.Text = ""
+            PicAkaProfile.Image = Nothing
+            PicAkaTeamLogo.Image = Nothing
+
+            ' 4. Bersihkan Profil & Antrean AO (Biru)
+            NextAoName = ""
+            NextAoTeam = ""
+            NextAoInfo = ""
+            TxtAoName.Text = ""
+            TxtAoNameMain.Text = ""
+            TxtAoTeam.Text = ""
+            TxtAoTeamInfo.Text = ""
+            PicAoProfile.Image = Nothing
+            PicAoTeamLogo.Image = Nothing
+
+            ' 5. Bersihkan Tabel Skor & Label Pemenang
+            DgvAkaHistory.Rows.Clear()
+            DgvAoHistory.Rows.Clear()
+            RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+            RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+            LblAkaWinner.Visible = False
+            LblAoWinner.Visible = False
+
+            ' 6. Matikan Semua Lampu Tombol Penalti AKA & AO
+            Dim akaPenBtns() As Button = {BtnAka1C, BtnAka2C, BtnAka3C, BtnAkaHC, BtnAkaH}
+            Dim aoPenBtns() As Button = {BtnAo1C, BtnAo2C, BtnAo3C, BtnAoHC, BtnAoH}
+            For i As Integer = 0 To 4
+                akaPenBtns(i).BackColor = SystemColors.Control
+                akaPenBtns(i).ForeColor = Color.Black
+                aoPenBtns(i).BackColor = SystemColors.Control
+                aoPenBtns(i).ForeColor = Color.Black
+            Next
+
+            ' 7. Matikan Tombol Pelanggaran Berat (Kiken, Shikkaku, K.O)
+            BtnAkaKiken.BackColor = SystemColors.Control
+            BtnAkaShikkaku.BackColor = SystemColors.Control
+            BtnAkaKnockedOut.BackColor = SystemColors.Control
+            BtnAkaKnockedOut.ForeColor = Color.Black
+
+            BtnAoKiken.BackColor = SystemColors.Control
+            BtnAoShikkaku.BackColor = SystemColors.Control
+            BtnAoKnockedOut.BackColor = SystemColors.Control
+            BtnAoKnockedOut.ForeColor = Color.Black
+
+            ' 8. Matikan Senshu & Sistem Video Review (VR)
+            isAkaSenshu = False
+            isAoSenshu = False
+            BtnAkaSenshu.BackColor = SystemColors.Control
+            BtnAkaSenshu.ForeColor = Color.Black
+            BtnAoSenshu.BackColor = SystemColors.Control
+            BtnAoSenshu.ForeColor = Color.Black
+
+            isAkaVrActive = False
+            isAoVrActive = False
+            BtnAkaVR.BackColor = SystemColors.Control
+            BtnAkaVR.ForeColor = Color.Black
+            BtnAoVR.BackColor = SystemColors.Control
+            BtnAoVR.ForeColor = Color.Black
+
+            isVrBumperActive = False
+
+            BtnResetTimer_Click(Nothing, Nothing)
+
+            TxtMatchDesc.Clear()
+
+            SyncScoreboardProfile()
+            SyncScoreboardPoints()
+            SyncScoreboardPenalties()
+            UpdateSenshuUI()
+
+            If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+                frmScoreboard.LblVrAka.Visible = False
+                frmScoreboard.LblVrAo.Visible = False
+                frmScoreboard.LblVrBumper.Visible = False
+                frmScoreboard.PicMatchLogo.Image = Nothing
+            End If
+
+            MessageBox.Show("Sistem berhasil di-reset! Siap untuk pertandingan selanjutnya.", "Clear", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+
+        isAkaHanteiWin = False
+        isAoHanteiWin = False
     End Sub
 End Class

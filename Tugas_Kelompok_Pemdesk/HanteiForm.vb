@@ -2,6 +2,7 @@
 Imports System.Windows.Forms
 
 Public Class HanteiForm
+    Public FinalWinner As String = ""
     Private akaVotes As Integer = 0
     Private aoVotes As Integer = 0
 
@@ -35,7 +36,6 @@ Public Class HanteiForm
         Me.AutoSizeMode = AutoSizeMode.GrowAndShrink
         Me.StartPosition = FormStartPosition.CenterParent
         Me.BackColor = Color.FromArgb(240, 240, 240)
-        Me.TopMost = True
         Me.Text = "Manual Decision"
 
         ' 1. Judul
@@ -175,7 +175,20 @@ Public Class HanteiForm
             .Text = "Save", .Location = New Point(610, 510),
             .Size = New Size(100, 35), .BackColor = Color.AliceBlue
         }
-        AddHandler btnSave.Click, Sub(s As Object, e As EventArgs) Me.Close()
+        ' ---> GANTI FUNGSI KLIK SAVE MENJADI SEPERTI INI <---
+        AddHandler btnSave.Click, Sub(s As Object, e As EventArgs)
+                                      ' Cek siapa pemenangnya berdasarkan teks di label
+                                      If lblWin.Text.Contains("AKA") Then
+                                          FinalWinner = "AKA"
+                                      ElseIf lblWin.Text.Contains("AO") Then
+                                          FinalWinner = "AO"
+                                      Else
+                                          FinalWinner = "DRAW"
+                                      End If
+
+                                      Me.DialogResult = DialogResult.OK ' Beri sinyal sukses ke form utama
+                                      Me.Close()
+                                  End Sub
 
         Me.Controls.AddRange({btnClear, btnClose, btnSave})
 
@@ -319,10 +332,12 @@ Public Class HanteiForm
         End If
     End Sub
 
-    Private Sub ResetAll()
+    ' ---> UBAH PRIVATE MENJADI PUBLIC <--
+    Public Sub ResetAll()
         Array.Clear(akaState, 0, 4)
         Array.Clear(aoState, 0, 4)
         refereeDecision = "" ' [BARU] Reset juga pilihan juri ke kosong
+        FinalWinner = ""     ' [BARU] Bersihkan juga memori pemenang dari sistem
         RefreshUI()
     End Sub
 End Class
