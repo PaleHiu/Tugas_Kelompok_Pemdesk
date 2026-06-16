@@ -1046,6 +1046,222 @@
             MessageBox.Show("Gagal menyimpan hasil: " & ex.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+    ' =====================================================================================
+    ' =================  NEXT MATCH BAR (jiplakan dari KumiteMainControl)  =================
+    ' Ikon 👤 / tombol Next Match  -> buka ListOfCompetitor untuk memilih peserta.
+    ' Hasil pilihan masuk ke antrean Next* + ditampilkan di kotak preview atas.
+    ' Load Next Match            -> commit antrean ke Team Info AKA/AO (+sinkron scoreboard).
+    ' Swap ⇄                     -> tukar antrean AKA <-> AO.
+    ' =====================================================================================
+    Public targetSide As String = ""
+    Public NextAkaName As String = "", NextAkaTeam As String = "", NextAkaInfo As String = ""
+    Public NextAoName As String = "", NextAoTeam As String = "", NextAoInfo As String = ""
+
+    ' Ikon 👤 AKA (top bar) -> pilih peserta Next Match sisi AKA
+    Private Sub BtnAkaIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIconSearch.Click
+        OpenCompetitorList("AKA")
+    End Sub
+
+    ' Ikon 👤 AO (top bar) -> pilih peserta Next Match sisi AO
+    Private Sub BtnAoIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIconSearch.Click
+        OpenCompetitorList("AO")
+    End Sub
+
+    ' Tombol "Next Match" -> mulai memilih peserta berikutnya (default sisi AKA dulu)
+    Private Sub BtnNextMatch_Click(sender As Object, e As EventArgs) Handles BtnNextMatch.Click
+        OpenCompetitorList("AKA")
+    End Sub
+
+    Private Sub OpenCompetitorList(side As String)
+        targetSide = side
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Dipanggil balik oleh ListOfCompetitor saat user menekan "Select"
+    Public Sub SetCompetitorData(nama As String, team As String, info As String)
+        If targetSide = "AO" Then
+            NextAoName = nama : NextAoTeam = team : NextAoInfo = info
+            If TxtAoSearchDisplay IsNot Nothing Then TxtAoSearchDisplay.Text = nama & " | " & team
+        Else
+            NextAkaName = nama : NextAkaTeam = team : NextAkaInfo = info
+            If TxtAkaSearchDisplay IsNot Nothing Then TxtAkaSearchDisplay.Text = nama & " | " & team
+        End If
+    End Sub
+
+    ' Dipanggil balik oleh ListOfTeam saat user memilih tim
+    Public Sub UpdateTeamData(team As String, info As String)
+        If targetSide = "AO" Then
+            NextAoTeam = team : NextAoInfo = info
+            If NextAoName <> "" AndAlso TxtAoSearchDisplay IsNot Nothing Then TxtAoSearchDisplay.Text = NextAoName & " | " & team
+        Else
+            NextAkaTeam = team : NextAkaInfo = info
+            If NextAkaName <> "" AndAlso TxtAkaSearchDisplay IsNot Nothing Then TxtAkaSearchDisplay.Text = NextAkaName & " | " & team
+        End If
+    End Sub
+
+    ' Load Next Match -> pindahkan antrean ke panel Team Info.
+    ' Jika antrean masih kosong, langsung buka ListOfCompetitor (biar tombolnya tidak "mati").
+    Private Sub BtnLoadNextMatch_Click(sender As Object, e As EventArgs) Handles BtnLoadNextMatch.Click
+        If NextAkaName = "" AndAlso NextAoName = "" Then
+            OpenCompetitorList("AKA")
+            Return
+        End If
+
+        If NextAkaName <> "" Then
+            TxtAkaNameMain.Text = NextAkaName
+            TxtAkaTeam1.Text = NextAkaTeam
+            TxtAkaTeam2.Text = NextAkaInfo
+            LoadMatchImages(NextAkaName, NextAkaTeam, PicAkaCircle, PicAkaAvatar)
+        End If
+        If NextAoName <> "" Then
+            TxtAoNameMain.Text = NextAoName
+            TxtAoTeam1.Text = NextAoTeam
+            TxtAoTeam2.Text = NextAoInfo
+            LoadMatchImages(NextAoName, NextAoTeam, PicAoCircle, PicAoAvatar)
+        End If
+
+        SyncScoreboardProfile()
+        MessageBox.Show("Data pertandingan berhasil di-load!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End Sub
+
+    ' Swap ⇄ -> tukar antrean Next Match AKA <-> AO (termasuk teks preview)
+    Private Sub BtnSwapNextMatch_Click(sender As Object, e As EventArgs) Handles BtnSwapNextMatch.Click
+        Dim tN As String = NextAkaName : NextAkaName = NextAoName : NextAoName = tN
+        Dim tT As String = NextAkaTeam : NextAkaTeam = NextAoTeam : NextAoTeam = tT
+        Dim tI As String = NextAkaInfo : NextAkaInfo = NextAoInfo : NextAoInfo = tI
+        If TxtAkaSearchDisplay IsNot Nothing AndAlso TxtAoSearchDisplay IsNot Nothing Then
+            Dim tmp As String = TxtAkaSearchDisplay.Text
+            TxtAkaSearchDisplay.Text = TxtAoSearchDisplay.Text
+            TxtAoSearchDisplay.Text = tmp
+        End If
+    End Sub
+
+    ' Sinkron nama AKA/AO ke Scoreboard bila sedang terbuka (aman bila belum ada scoreboard).
+    Private Sub SyncScoreboardProfile()
+        Dim sb As Form = Nothing
+        For Each f As Form In Application.OpenForms
+            If f.GetType().Name = "ScoreBoard" Then
+                sb = f
+                Exit For
+            End If
+        Next
+        If sb Is Nothing Then Return
+        SetScoreboardLabel(sb, "LblAkaName", TxtAkaNameMain.Text)
+        SetScoreboardLabel(sb, "LblAoName", TxtAoNameMain.Text)
+    End Sub
+
+    Private Sub SetScoreboardLabel(f As Form, ctrlName As String, value As String)
+        Dim found() As Control = f.Controls.Find(ctrlName, True)
+        If found IsNot Nothing AndAlso found.Length > 0 Then found(0).Text = value
+    End Sub
+
+    ' ---- Pemuat gambar peserta & logo tim dari database (jiplakan dari KumiteMainControl) ----
+    Private Sub LoadMatchImages(nama As String, namaTeam As String, boxComp As PictureBox, boxTeam As PictureBox)
+        ' Paksa gambar pas-proporsional & background putih
+        boxComp.SizeMode = PictureBoxSizeMode.Zoom
+        boxTeam.SizeMode = PictureBoxSizeMode.Zoom
+        boxComp.BackColor = Color.White
+        boxTeam.BackColor = Color.White
+        boxComp.Image = Nothing
+        boxTeam.Image = Nothing
+
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+
+                ' Foto peserta di tabel competitor
+                Try
+                    Dim qComp As String = "SELECT pict_path FROM competitor WHERE name = @n AND team = @t LIMIT 1"
+                    Using cmdComp As New System.Data.SQLite.SQLiteCommand(qComp, conn)
+                        cmdComp.Parameters.AddWithValue("@n", nama)
+                        cmdComp.Parameters.AddWithValue("@t", namaTeam)
+                        Dim result = cmdComp.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxComp.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+
+                ' Logo tim di tabel team_lengkap
+                Try
+                    Dim qTeam As String = "SELECT pict_path FROM team_lengkap WHERE nama_team = @nt LIMIT 1"
+                    Using cmdTeam As New System.Data.SQLite.SQLiteCommand(qTeam, conn)
+                        cmdTeam.Parameters.AddWithValue("@nt", namaTeam)
+                        Dim result = cmdTeam.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxTeam.Image = GetSafeTeamImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Function LoadSafeImage(path As String) As Image
+        Try
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+            path = path.Trim()
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                Using ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                End Using
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
+
+    Private Function GetSafeTeamImage(pathOrFlag As String) As Image
+        Try
+            If String.IsNullOrWhiteSpace(pathOrFlag) OrElse pathOrFlag.Trim() = "No Image" Then
+                Return Nothing
+            End If
+            pathOrFlag = pathOrFlag.Trim()
+
+            If pathOrFlag.StartsWith("Flag: ") Then
+                Dim countryName As String = pathOrFlag.Replace("Flag: ", "").Trim()
+                Dim flagPathPNG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.png")
+                Dim flagPathJPG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.jpg")
+
+                Dim finalPath As String = ""
+                If System.IO.File.Exists(flagPathPNG) Then finalPath = flagPathPNG
+                If System.IO.File.Exists(flagPathJPG) Then finalPath = flagPathJPG
+
+                If finalPath <> "" Then
+                    Dim bytes As Byte() = System.IO.File.ReadAllBytes(finalPath)
+                    Dim ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                Else
+                    Dim bmp As New Bitmap(100, 60)
+                    Using g As Graphics = Graphics.FromImage(bmp)
+                        g.Clear(Color.LightGray)
+                        g.DrawRectangle(Pens.Black, 0, 0, 99, 59)
+                        g.DrawString(countryName, New Font("Segoe UI", 8, FontStyle.Bold), Brushes.Black, New PointF(5, 20))
+                    End Using
+                    Return bmp
+                End If
+            ElseIf System.IO.File.Exists(pathOrFlag) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(pathOrFlag)
+                Dim ms As New IO.MemoryStream(bytes)
+                Return Image.FromStream(ms)
+            End If
+        Catch ex As Exception
+        End Try
+
+        Return Nothing
+    End Function
+
 End Class
 
 Friend Class KataScorePicker
