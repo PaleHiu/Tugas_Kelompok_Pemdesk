@@ -1405,6 +1405,7 @@ Partial Public Class KumiteMainControl
                 LblAkaWinner.Visible = False
             Else
                 ShowTrackingKnockOutPopup(True)
+                EvaluateWinnerLogic()   ' AKA handler
             End If
             Return
         End If
@@ -1488,6 +1489,7 @@ Partial Public Class KumiteMainControl
                 LblAoWinner.Visible = False
             Else
                 ShowTrackingKnockOutPopup(False)
+                EvaluateWinnerLogic()   ' AO handler
             End If
             Return
         End If
