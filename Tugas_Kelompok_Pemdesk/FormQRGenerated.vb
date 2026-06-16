@@ -23,6 +23,9 @@ Public Class FormQRGenerated
     Private Sub FormQRGenerated_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = "QR Generated"
 
+        ' ---> AKTIFKAN SENSOR KLIK GLOBAL (UNSELECT) <---
+        PasangSensorKlikGlobal(Me)
+
         ' Default awal: pakai server aplikasi (Yabinya)
         useLocalServer = False
         BuildJudgeUrls()
@@ -35,6 +38,39 @@ Public Class FormQRGenerated
 
         tmrClock.Start()
         UpdateClock()
+    End Sub
+
+    ' ====================================================================
+    ' 1. FUNGSI UNSELECT (MENGHAPUS SELEKSI PADA TABEL QR)
+    ' ====================================================================
+    Private Sub HapusSeleksiQR()
+        lvQRValues.SelectedItems.Clear()
+    End Sub
+
+    ' ====================================================================
+    ' 2. SENSOR KLIK GLOBAL (UNTUK FORM DAN SEMUA PANEL)
+    ' ====================================================================
+    Private Sub PasangSensorKlikGlobal(induk As Control)
+        ' Pasang sensor klik pada Form dan Panel (Area kosong)
+        If TypeOf induk Is Form OrElse TypeOf induk Is Panel Then
+            AddHandler induk.MouseDown, Sub(sender_obj, ev) HapusSeleksiQR()
+        End If
+
+        ' Telusuri elemen di dalamnya secara otomatis
+        For Each elemen As Control In induk.Controls
+            PasangSensorKlikGlobal(elemen)
+        Next
+    End Sub
+
+    ' ====================================================================
+    ' 3. SENSOR AREA KOSONG KHUSUS DI DALAM TABEL (LISTVIEW)
+    ' ====================================================================
+    Private Sub lvQRValues_MouseDown(sender As Object, e As MouseEventArgs) Handles lvQRValues.MouseDown
+        Dim hit As ListViewHitTestInfo = lvQRValues.HitTest(e.X, e.Y)
+        ' Jika klik area kosong di dalam tabel (bukan teks URL)
+        If hit.Item Is Nothing Then
+            HapusSeleksiQR()
+        End If
     End Sub
 
     ' Bangun URL tiap juri sesuai mode server yang aktif.
@@ -110,13 +146,19 @@ Public Class FormQRGenerated
         lvQRValues.Items.Clear()
         For i As Integer = 0 To 6
             Dim item As New ListViewItem("J" & (i + 1))
+
+            ' 1. Matikan gaya seragam agar kita bisa membedakan font antar kolom
+            item.UseItemStyleForSubItems = False
+
+            ' 2. Jadikan teks kolom pertama (J1, J2, dst) menjadi BOLD
+            item.Font = New Font(lvQRValues.Font.FontFamily, 9.5!, FontStyle.Bold)
+
+            ' 3. Tambahkan teks URL di kolom kedua dengan gaya NORMAL (Regular)
             item.SubItems.Add(judgeUrls(i))
+            item.SubItems(1).Font = New Font(lvQRValues.Font.FontFamily, 8.5!, FontStyle.Regular)
+
             lvQRValues.Items.Add(item)
         Next
-        If lvQRValues.Items.Count > 0 Then
-            lvQRValues.Items(0).BackColor = Color.Yellow
-            lvQRValues.Items(0).ForeColor = Color.Blue
-        End If
     End Sub
 
     Private Sub UpdateClock()
@@ -265,7 +307,6 @@ Public Class FormQRGenerated
     End Sub
 
 End Class
-
 
 ' =====================================================================================
 ' ============================  SERVER LOKAL (EMBEDDED)  ===============================
@@ -508,7 +549,7 @@ Public Class LocalScoringServer
         End SyncLock
         RaiseEvent ScoreReceived(judgeNumber, side, value)
         RaiseEvent ServerLog("Skor masuk: " & side & " J" & judgeNumber & " = " &
-                             value.ToString("0.0", Globalization.CultureInfo.InvariantCulture))
+                              value.ToString("0.0", Globalization.CultureInfo.InvariantCulture))
     End Sub
 
     Public Function GetScore(side As String, judgeNumber As Integer) As Decimal
