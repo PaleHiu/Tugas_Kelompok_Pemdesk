@@ -45,6 +45,19 @@ Public Class ListOfCompetitor
         Try
             LoadTeam()
             LoadCompetitor("")
+
+            ' === WARNA TABEL KOMPETITOR ===
+            ' Baris ganjil: putih, baris genap: biru muda
+            DataGridView1.DefaultCellStyle.BackColor = Color.White
+            DataGridView1.DefaultCellStyle.ForeColor = Color.Black
+            'DataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(220, 235, 255)
+            'DataGridView1.AlternatingRowsDefaultCellStyle.ForeColor = Color.Black
+            ' Baris terpilih: biru tua kontras
+            DataGridView1.DefaultCellStyle.SelectionBackColor = Color.FromArgb(30, 80, 160)
+            DataGridView1.DefaultCellStyle.SelectionForeColor = Color.White
+            ' Background ListBox tim: abu netral
+            ListBoxTeam.BackColor = Color.FromArgb(220, 220, 220)
+
         Catch ex As Exception
             MessageBox.Show("Form gagal terbuka karena ada silent crash di dalam Load: " & vbCrLf & ex.Message,
                             "Pelacak Error Misterius", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -101,7 +114,7 @@ Public Class ListOfCompetitor
                     Dim dt As New DataTable()
                     adapter.Fill(dt)
                     DataGridView1.DataSource = dt
-
+                    WarnaiBarisBerdasarkanTim()
                     ' Percantik Grid
                     DataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
@@ -127,6 +140,7 @@ Public Class ListOfCompetitor
                         Dim dt As New DataTable()
                         adapter.Fill(dt)
                         DataGridView1.DataSource = dt
+                        WarnaiBarisBerdasarkanTim()
                     End Using
                 End Using
             Catch ex As Exception
@@ -184,22 +198,33 @@ Public Class ListOfCompetitor
         ' Bersihkan background bawaan
         e.DrawBackground()
 
-        ' 2. Atur Warna Background & Border saat dipilih vs tidak dipilih
+        ' 2. Atur Warna Background & Border
         Dim isSelected As Boolean = (e.State And DrawItemState.Selected) = DrawItemState.Selected
         Dim bgBrush As Brush
         Dim borderPen As Pen
         Dim textBrush As Brush
 
+        ' Palet warna background yang KONTRAST untuk setiap tim
+        Dim paletWarna As Color() = {
+            Color.FromArgb(41, 128, 185),   ' Biru
+            Color.FromArgb(39, 174, 96),    ' Hijau
+            Color.FromArgb(142, 68, 173),   ' Ungu
+            Color.FromArgb(211, 84, 0),     ' Oranye Gelap
+            Color.FromArgb(22, 160, 133),   ' Tosca
+            Color.FromArgb(192, 57, 43)     ' Merah Gelap
+        }
+
         If isSelected Then
-            ' Warna saat tim diklik (Biru gaya Windows)
-            bgBrush = New SolidBrush(Color.DeepSkyBlue)
-            borderPen = New Pen(Color.SteelBlue, 1)
-            textBrush = Brushes.White
+            ' Warna saat tim diklik: Kuning Gold agar sangat kontras dan menandakan sedang "aktif"
+            bgBrush = New SolidBrush(Color.Gold)
+            borderPen = New Pen(Color.DarkGoldenrod, 2)
+            textBrush = New SolidBrush(Color.Black) ' Teks Hitam agar kontras dengan Gold
         Else
-            ' Warna normal (Putih keabu-abuan dengan border abu-abu)
-            bgBrush = New SolidBrush(Color.WhiteSmoke)
-            borderPen = New Pen(Color.LightGray, 1)
-            textBrush = Brushes.Black
+            ' Warna setiap tim berbeda-beda diambil dari palet berdasarkan urutan
+            Dim warnaBg As Color = paletWarna(e.Index Mod paletWarna.Length)
+            bgBrush = New SolidBrush(warnaBg)
+            borderPen = New Pen(Color.White, 1)
+            textBrush = New SolidBrush(Color.White) ' Teks Putih agar kontras dengan background gelap
         End If
 
         ' 3. Gambar Background Kotak
@@ -213,12 +238,15 @@ Public Class ListOfCompetitor
         sf.Alignment = StringAlignment.Center
         sf.LineAlignment = StringAlignment.Center
 
-        ' Gunakan font bawaan ListBox, tapi buat sedikit Bold jika dipilih
-        Dim itemFont As Font = If(isSelected, New Font(e.Font, FontStyle.Bold), e.Font)
+        ' --- MEMBUAT TEKS SELALU BOLD DAN KONTRAS ---
+        Dim itemFont As New Font(e.Font.FontFamily, 11, FontStyle.Bold)
         e.Graphics.DrawString(itemText, itemFont, textBrush, itemRect, sf)
 
-        ' Clean up resource
-        If isSelected Then itemFont.Dispose()
+        ' Clean up resource dari memory
+        itemFont.Dispose()
+        bgBrush.Dispose()
+        borderPen.Dispose()
+        textBrush.Dispose()
     End Sub
 
     ' ====================================================================
@@ -249,5 +277,35 @@ Public Class ListOfCompetitor
             ListBoxTeam.SelectedIndex = -1
             LoadCompetitor("") ' Tampilkan semua data kembali
         End If
+    End Sub
+
+    Private Sub WarnaiBarisBerdasarkanTim()
+        ' Pastikan warna selang-seling dimatikan
+        DataGridView1.AlternatingRowsDefaultCellStyle.BackColor = Color.Empty
+
+        ' Siapkan daftar warna (Palet) untuk dibagikan ke setiap tim yang berbeda
+        Dim paletWarna As Color() = {
+            Color.LightBlue, Color.LightGreen, Color.LightPink,
+            Color.LightGoldenrodYellow, Color.PeachPuff, Color.Thistle,
+            Color.Aquamarine, Color.MistyRose
+        }
+
+        Dim warnaTim As New Dictionary(Of String, Color)
+        Dim indeksWarna As Integer = 0
+
+        For Each row As DataGridViewRow In DataGridView1.Rows
+            If Not row.IsNewRow Then
+                Dim namaTim As String = row.Cells("Nama Team").Value.ToString()
+
+                ' Jika tim belum punya warna, berikan warna baru dari palet
+                If Not warnaTim.ContainsKey(namaTim) Then
+                    warnaTim.Add(namaTim, paletWarna(indeksWarna Mod paletWarna.Length))
+                    indeksWarna += 1
+                End If
+
+                ' Terapkan warna ke baris tersebut
+                row.DefaultCellStyle.BackColor = warnaTim(namaTim)
+            End If
+        Next
     End Sub
 End Class

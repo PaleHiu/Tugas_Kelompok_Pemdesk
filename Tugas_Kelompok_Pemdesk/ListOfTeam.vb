@@ -14,6 +14,10 @@ Public Class ListOfTeam
     Dim LblHint As New Label()
     Dim WithEvents BtnSelect As New Button()
 
+    ' --- CUSTOM VALUE (ubah di sini untuk menyesuaikan tampilan) ---
+    Private Const ROW_HEIGHT As Integer = 28        ' Tinggi baris data (px)
+    Private Const HEADER_HEIGHT As Integer = 38     ' Tinggi header kolom (px)
+
     ' --- SENTRALISASI CONNECTION STRING ---
     Private Const DB_CONN As String = "Data Source=database.db;Version=3;"
 
@@ -21,7 +25,9 @@ Public Class ListOfTeam
         ' 1. Pengaturan Form Dasar
         Me.Text = "List of Team"
         Me.Size = New Size(650, 500)
-        Me.MinimumSize = New Size(650, 300)
+        Me.FormBorderStyle = FormBorderStyle.FixedDialog   ' Kunci ukuran form
+        Me.MaximizeBox = False                             ' Sembunyikan tombol maximize
+        Me.MinimizeBox = True
         Me.StartPosition = FormStartPosition.CenterParent
         Me.BackColor = Color.White
 
@@ -38,9 +44,12 @@ Public Class ListOfTeam
         LblTotal.AutoSize = True
 
         ' 3. DataGridView
-        Dgv.Location = New Point(10, 70)
-        Dgv.Size = New Size(610, 330)
-        Dgv.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        ' Form client area = 500px tinggi - ~30px title bar = ~470px
+        ' Layout: LblHeader(40) + LblTotal(~22) + margin(6) = Y mulai 68
+        ' PnlBottom = 50px (Dock Bottom), sisa untuk Dgv = 470 - 68 - 50 - 10 (margin bawah) = 342
+        Dgv.Location = New Point(10, 68)
+        Dgv.Size = New Size(620, 342)
+        Dgv.Anchor = AnchorStyles.None
         Dgv.AllowUserToAddRows = False
         Dgv.AllowUserToDeleteRows = False
         Dgv.ReadOnly = True
@@ -50,13 +59,37 @@ Public Class ListOfTeam
         Dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 200, 200)
         Dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 120, 215)
 
+        ' --- KUNCI: Larang user memperbesar/memperkecil lebar & tinggi kolom/baris ---
+        Dgv.AllowUserToResizeColumns = False
+        Dgv.AllowUserToResizeRows = False
+        Dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        Dgv.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing
+
+        ' --- HEADER KOLOM: Background kontras, teks putih bold lebih besar ---
+        Dgv.EnableHeadersVisualStyles = False
+        Dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(30, 58, 110)
+        Dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        Dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 11, FontStyle.Bold)
+        Dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        Dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(30, 58, 110)
+        Dgv.ColumnHeadersHeight = HEADER_HEIGHT
+
+        ' --- Tinggi baris default dari konstanta ---
+        Dgv.RowTemplate.Height = ROW_HEIGHT
+
         ' Tambah Kolom
-        Dgv.Columns.Add("No", "")
+        Dgv.Columns.Add("No", "No")
         Dgv.Columns.Add("Team", "Team")
         Dgv.Columns.Add("TeamInfo", "Team Info")
-        Dgv.Columns(0).Width = 30
+        Dgv.Columns(0).Width = 40
+        Dgv.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
         Dgv.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
         Dgv.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+
+        ' Kunci tiap kolom agar tidak bisa di-resize satu per satu
+        For Each col As DataGridViewColumn In Dgv.Columns
+            col.Resizable = DataGridViewTriState.False
+        Next
 
         ' Load Data
         LoadDataTimDariDatabase()
@@ -203,5 +236,27 @@ Public Class ListOfTeam
         For Each row As DataGridViewRow In Dgv.Rows
             row.Visible = True
         Next
+    End Sub
+
+    ' Fungsi generik: unselect saat diklik
+    Private Sub ClearSelectionOnEmptyClick(sender As Object, e As MouseEventArgs)
+        Dgv.ClearSelection()
+        Dgv.CurrentCell = Nothing
+    End Sub
+
+    ' Pasang handler ke semua area yang tidak punya event sendiri
+    Private Sub AttachClearSelectionHandlers() Handles MyBase.Load
+        AddHandler Me.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler Dgv.MouseClick, Sub(s, ev)
+                                       Dim hit = Dgv.HitTest(ev.X, ev.Y)
+                                       If hit.Type = DataGridViewHitTestType.None OrElse
+                                          hit.Type = DataGridViewHitTestType.ColumnHeader Then
+                                           Dgv.ClearSelection()
+                                           Dgv.CurrentCell = Nothing
+                                       End If
+                                   End Sub
+        AddHandler LblHeader.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler LblTotal.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler PnlBottom.MouseClick, AddressOf ClearSelectionOnEmptyClick
     End Sub
 End Class
