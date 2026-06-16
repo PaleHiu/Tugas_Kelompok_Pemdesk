@@ -460,12 +460,16 @@ Partial Public Class KumiteMainControl
             firstWinnerDeclared = "AKA"
             LblAkaWinner.Visible = True
             LblAoWinner.Visible = False
+            LblHanteiAka.Visible = True
+            LblHanteiAo.Visible = False
         ElseIf winnerSide = "AO" Then
             isAkaHanteiWin = False
             isAoHanteiWin = True
             firstWinnerDeclared = "AO"
             LblAkaWinner.Visible = False
             LblAoWinner.Visible = True
+            LblHanteiAka.Visible = False
+            LblHanteiAo.Visible = True
         End If
 
         AudioController.PlaySound("Winner by Point")
@@ -940,32 +944,49 @@ Partial Public Class KumiteMainControl
     ' FUNGSI RESET SKOR (AKA & AO)
     ' ==========================================================
 
-    ' Tombol Reset Score AKA (Merah)
     Private Sub BtnAkaResetScore_Click(sender As Object, e As EventArgs) Handles BtnAkaResetScore.Click
-        ' Kosongkan tabel
-        DgvAkaHistory.Rows.Clear()
-
-        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
-        RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
-
-        ' Matikan label WINNER secara paksa
-        LblAkaWinner.Visible = False
+        ' 1. MATIKAN TIMER KEDIP DAN RESET STATUS KEMENANGAN TERLEBIH DAHULU
+        If blinkTimer IsNot Nothing Then blinkTimer.Stop()
+        firstWinnerDeclared = ""
         isAkaHanteiWin = False
         isAoHanteiWin = False
+
+        ' 2. Kosongkan tabel
+        DgvAkaHistory.Rows.Clear()
+
+        ' 3. Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+
+        ' 4. MATIKAN LABEL SECARA PAKSA (Diletakkan di akhir agar tidak tertimpa proses lain)
+        LblAkaWinner.Visible = False
+        LblHanteiAka.Visible = False
+        LblHanteiAo.Visible = False
+
+        ' 5. Paksa antarmuka (UI) untuk langsung memuat ulang perubahannya
+        Me.Refresh()
     End Sub
 
     ' Tombol Reset Score AO (Biru)
     Private Sub BtnAoResetScore_Click(sender As Object, e As EventArgs) Handles BtnAoResetScore.Click
-        ' Kosongkan tabel
-        DgvAoHistory.Rows.Clear()
-
-        ' Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
-        RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
-
-        ' Matikan label WINNER secara paksa
-        LblAoWinner.Visible = False
+        ' 1. MATIKAN TIMER KEDIP DAN RESET STATUS KEMENANGAN TERLEBIH DAHULU
+        If blinkTimer IsNot Nothing Then blinkTimer.Stop()
+        firstWinnerDeclared = ""
         isAkaHanteiWin = False
         isAoHanteiWin = False
+
+        ' 2. Kosongkan tabel
+        DgvAoHistory.Rows.Clear()
+
+        ' 3. Panggil mesin penghitung agar angka raksasa dan Score Summary kembali ke 0
+        RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+
+        ' 4. MATIKAN LABEL SECARA PAKSA (Diletakkan di akhir agar tidak tertimpa proses lain)
+        LblAoWinner.Visible = False
+        LblHanteiAka.Visible = False
+        LblHanteiAo.Visible = False
+
+        ' 5. Paksa antarmuka (UI) untuk langsung memuat ulang perubahannya
+        Me.Refresh()
     End Sub
 
 
@@ -1724,6 +1745,7 @@ Partial Public Class KumiteMainControl
     ''' </summary>
     Public Sub SyncScoreboardProfile()
         If frmScoreboard IsNot Nothing AndAlso Not frmScoreboard.IsDisposed Then
+
             ' 1. Mengupdate Nama Pemain
             frmScoreboard.LblAkaName.Text = TxtAkaNameMain.Text
             frmScoreboard.LblAoName.Text = TxtAoNameMain.Text
@@ -1756,6 +1778,8 @@ Partial Public Class KumiteMainControl
 
             frmScoreboard.PicAoProfileSb.Image = PicAoProfile.Image
             frmScoreboard.PicAoTeamLogoSb.Image = PicAoTeamLogo.Image
+
+
         End If
     End Sub
 
@@ -2469,6 +2493,8 @@ Partial Public Class KumiteMainControl
             BtnAoVR.ForeColor = Color.Black
 
             isVrBumperActive = False
+            LblHanteiAka.Visible = False
+            LblHanteiAo.Visible = False
 
             BtnResetTimer_Click(Nothing, Nothing)
 
