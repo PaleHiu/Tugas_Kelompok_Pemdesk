@@ -194,6 +194,12 @@ Public Class ListOfCompetitor
                 frmKumite.SetCompetitorData(nama, tim, info)
             End If
 
+            ' Dukungan untuk jendela KATA
+            Dim frmKata As KataMainControl = TryCast(Application.OpenForms("KataMainControl"), KataMainControl)
+            If frmKata IsNot Nothing Then
+                frmKata.SetCompetitorData(nama, tim, info)
+            End If
+
             Me.Close()
         Else
             MessageBox.Show("Silakan pilih salah satu peserta terlebih dahulu!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
