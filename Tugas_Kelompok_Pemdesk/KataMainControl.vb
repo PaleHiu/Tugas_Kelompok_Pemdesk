@@ -984,12 +984,70 @@
         End If
     End Sub
 
+    Private Sub BtnSaveMatchResult_Click(sender As Object, e As EventArgs) Handles BtnSaveMatchResult.Click
+        Try
+            Dim tatami As Integer = CInt(NumTatamiId.Value)
+            Dim matchType As String = "KATA"
+            Dim matchDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+
+            Dim nameAka As String = TxtAkaNameMain.Text.Trim()
+            Dim teamAka As String = TxtAkaTeam1.Text.Trim()
+            Dim scoreAka As Double = TotalScoreAKA.Value
+
+            Dim nameAo As String = TxtAoNameMain.Text.Trim()
+            Dim teamAo As String = TxtAoTeam1.Text.Trim()
+            Dim scoreAo As Double = TotalScoreAO.Value
+
+            Dim winner As String = ""
+            If LblAkaWinner.Visible AndAlso LblAkaWinner.Text = "WINNER" Then
+                winner = "AKA"
+            ElseIf LblAoWinner.Visible AndAlso LblAoWinner.Text = "WINNER" Then
+                winner = "AO"
+            End If
+
+            ' CEK STATUS PENALTI KATA
+            Dim statusAka As String = ""
+            If BtnKikenAka.BackColor = Color.Yellow Then statusAka = "KIKEN"
+            If BtnDiskualifikasiAka.BackColor = Color.Yellow Then statusAka = "DISQUALIFICATION"
+
+            Dim statusAo As String = ""
+            If BtnKikenAo.BackColor = Color.Yellow Then statusAo = "KIKEN"
+            If BtnDiskualifikasiAo.BackColor = Color.Yellow Then statusAo = "DISQUALIFICATION"
+
+            If String.IsNullOrWhiteSpace(nameAka) AndAlso String.IsNullOrWhiteSpace(nameAo) Then
+                MessageBox.Show("Tidak ada data pertandingan untuk disimpan.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            Dim connString As String = "Data Source=database.db;Version=3;"
+            Using conn As New System.Data.SQLite.SQLiteConnection(connString)
+                conn.Open()
+                Dim sqlInsert As String = "INSERT INTO match_result (tatami, match_type, match_date, name_aka, team_aka, score_aka, name_ao, team_ao, score_ao, winner, status_aka, status_ao) " &
+                                          "VALUES (@tatami, @type, @date, @nameAka, @teamAka, @scoreAka, @nameAo, @teamAo, @scoreAo, @winner, @statusAka, @statusAo)"
+                Using cmd As New System.Data.SQLite.SQLiteCommand(sqlInsert, conn)
+                    cmd.Parameters.AddWithValue("@tatami", tatami)
+                    cmd.Parameters.AddWithValue("@type", matchType)
+                    cmd.Parameters.AddWithValue("@date", matchDate)
+                    cmd.Parameters.AddWithValue("@nameAka", nameAka)
+                    cmd.Parameters.AddWithValue("@teamAka", teamAka)
+                    cmd.Parameters.AddWithValue("@scoreAka", scoreAka)
+                    cmd.Parameters.AddWithValue("@nameAo", nameAo)
+                    cmd.Parameters.AddWithValue("@teamAo", teamAo)
+                    cmd.Parameters.AddWithValue("@scoreAo", scoreAo)
+                    cmd.Parameters.AddWithValue("@winner", winner)
+                    cmd.Parameters.AddWithValue("@statusAka", statusAka)
+                    cmd.Parameters.AddWithValue("@statusAo", statusAo)
+                    cmd.ExecuteNonQuery()
+                End Using
+            End Using
+
+            MessageBox.Show("Hasil pertandingan KATA berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Catch ex As Exception
+            MessageBox.Show("Gagal menyimpan hasil: " & ex.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class
 
-' =====================================================================================
-' JENDELA PEMILIH SKOR MANUAL (sesuai guide "J? Score": tombol 0 + 5.0 .. 10.0)
-' Dibuat sepenuhnya lewat kode sehingga tidak perlu menambah file .Designer terpisah.
-' =====================================================================================
 Friend Class KataScorePicker
     Inherits System.Windows.Forms.Form
 
