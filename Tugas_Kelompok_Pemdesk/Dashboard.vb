@@ -67,4 +67,10 @@
         End If
         frmKataApp.Show()
     End Sub
+
+    Private Sub picMatchResult_Click(sender As Object, e As EventArgs) Handles picMatchResult.Click, pnlMatchResult.Click, lblMatchResult.Click
+
+        Dim frmMatchResultApp As New FormMatchResult()
+        frmMatchResultApp.Show()
+    End Sub
 End Class

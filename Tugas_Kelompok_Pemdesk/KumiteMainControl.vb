@@ -2664,5 +2664,70 @@ Partial Public Class KumiteMainControl
             dgv2.Rows.Add(item)
         Next
     End Sub
+    Private Sub BtnSaveMatch_Click(sender As Object, e As EventArgs) Handles BtnSaveMatch.Click
+        Try
+            ' 1. Ambil Data dari Form Kumite
+            Dim tatami As Integer = CInt(NumTatami.Value)
+            Dim matchType As String = "KUMITE"
+            Dim matchDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
 
+            Dim nameAka As String = TxtAkaNameMain.Text.Trim()
+            Dim teamAka As String = TxtAkaTeam.Text.Trim()
+            Dim scoreAka As Integer = 0
+            Integer.TryParse(LblAkaMainScore.Text, scoreAka)
+
+            Dim nameAo As String = TxtAoNameMain.Text.Trim()
+            Dim teamAo As String = TxtAoTeam.Text.Trim()
+            Dim scoreAo As Integer = 0
+            Integer.TryParse(LblAoMainScore.Text, scoreAo)
+
+            Dim winner As String = firstWinnerDeclared
+
+            ' CEK STATUS PENALTI & HANTEI
+            Dim statusAka As String = ""
+            If isAkaHanteiWin Then statusAka = "HANTEI"
+            If BtnAkaKiken.BackColor = Color.Yellow Then statusAka = "KIKEN"
+            If BtnAkaShikkaku.BackColor = Color.Yellow Then statusAka = "SHIKKAKU"
+            If BtnAkaKnockedOut.BackColor <> SystemColors.Control AndAlso BtnAkaKnockedOut.BackColor <> Color.White Then statusAka = "KNOCKED OUT"
+
+            Dim statusAo As String = ""
+            If isAoHanteiWin Then statusAo = "HANTEI"
+            If BtnAoKiken.BackColor = Color.Yellow Then statusAo = "KIKEN"
+            If BtnAoShikkaku.BackColor = Color.Yellow Then statusAo = "SHIKKAKU"
+            If BtnAoKnockedOut.BackColor <> SystemColors.Control AndAlso BtnAoKnockedOut.BackColor <> Color.White Then statusAo = "KNOCKED OUT"
+
+            If String.IsNullOrWhiteSpace(nameAka) AndAlso String.IsNullOrWhiteSpace(nameAo) Then
+                MessageBox.Show("Tidak ada data pertandingan untuk disimpan. Harap isi nama peserta terlebih dahulu.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Return
+            End If
+
+            ' 3. Proses Insert ke Database (Menambahkan status_aka dan status_ao)
+            Dim connString As String = "Data Source=database.db;Version=3;"
+            Using conn As New System.Data.SQLite.SQLiteConnection(connString)
+                conn.Open()
+                Dim sqlInsert As String = "INSERT INTO match_result (tatami, match_type, match_date, name_aka, team_aka, score_aka, name_ao, team_ao, score_ao, winner, status_aka, status_ao) " &
+                                          "VALUES (@tatami, @type, @date, @nameAka, @teamAka, @scoreAka, @nameAo, @teamAo, @scoreAo, @winner, @statusAka, @statusAo)"
+                Using cmd As New System.Data.SQLite.SQLiteCommand(sqlInsert, conn)
+                    cmd.Parameters.AddWithValue("@tatami", tatami)
+                    cmd.Parameters.AddWithValue("@type", matchType)
+                    cmd.Parameters.AddWithValue("@date", matchDate)
+                    cmd.Parameters.AddWithValue("@nameAka", nameAka)
+                    cmd.Parameters.AddWithValue("@teamAka", teamAka)
+                    cmd.Parameters.AddWithValue("@scoreAka", scoreAka)
+                    cmd.Parameters.AddWithValue("@nameAo", nameAo)
+                    cmd.Parameters.AddWithValue("@teamAo", teamAo)
+                    cmd.Parameters.AddWithValue("@scoreAo", scoreAo)
+                    cmd.Parameters.AddWithValue("@winner", winner)
+                    cmd.Parameters.AddWithValue("@statusAka", statusAka)
+                    cmd.Parameters.AddWithValue("@statusAo", statusAo)
+                    cmd.ExecuteNonQuery()
+                End Using
+            End Using
+
+            MessageBox.Show("Hasil pertandingan KUMITE berhasil disimpan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal menyimpan hasil pertandingan: " & ex.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class
