@@ -1054,11 +1054,13 @@
             TxtAkaNameMain.Text = NextAkaName
             TxtAkaTeam1.Text = NextAkaTeam
             TxtAkaTeam2.Text = NextAkaInfo
+            LoadMatchImages(NextAkaName, NextAkaTeam, PicAkaCircle, PicAkaAvatar)
         End If
         If NextAoName <> "" Then
             TxtAoNameMain.Text = NextAoName
             TxtAoTeam1.Text = NextAoTeam
             TxtAoTeam2.Text = NextAoInfo
+            LoadMatchImages(NextAoName, NextAoTeam, PicAoCircle, PicAoAvatar)
         End If
 
         SyncScoreboardProfile()
@@ -1095,6 +1097,108 @@
         Dim found() As Control = f.Controls.Find(ctrlName, True)
         If found IsNot Nothing AndAlso found.Length > 0 Then found(0).Text = value
     End Sub
+
+    ' ---- Pemuat gambar peserta & logo tim dari database (jiplakan dari KumiteMainControl) ----
+    Private Sub LoadMatchImages(nama As String, namaTeam As String, boxComp As PictureBox, boxTeam As PictureBox)
+        ' Paksa gambar pas-proporsional & background putih
+        boxComp.SizeMode = PictureBoxSizeMode.Zoom
+        boxTeam.SizeMode = PictureBoxSizeMode.Zoom
+        boxComp.BackColor = Color.White
+        boxTeam.BackColor = Color.White
+        boxComp.Image = Nothing
+        boxTeam.Image = Nothing
+
+        Try
+            Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                conn.Open()
+
+                ' Foto peserta di tabel competitor
+                Try
+                    Dim qComp As String = "SELECT pict_path FROM competitor WHERE name = @n AND team = @t LIMIT 1"
+                    Using cmdComp As New System.Data.SQLite.SQLiteCommand(qComp, conn)
+                        cmdComp.Parameters.AddWithValue("@n", nama)
+                        cmdComp.Parameters.AddWithValue("@t", namaTeam)
+                        Dim result = cmdComp.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxComp.Image = LoadSafeImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+
+                ' Logo tim di tabel team_lengkap
+                Try
+                    Dim qTeam As String = "SELECT pict_path FROM team_lengkap WHERE nama_team = @nt LIMIT 1"
+                    Using cmdTeam As New System.Data.SQLite.SQLiteCommand(qTeam, conn)
+                        cmdTeam.Parameters.AddWithValue("@nt", namaTeam)
+                        Dim result = cmdTeam.ExecuteScalar()
+                        If result IsNot Nothing AndAlso result IsNot DBNull.Value Then
+                            boxTeam.Image = GetSafeTeamImage(result.ToString())
+                        End If
+                    End Using
+                Catch ex As Exception
+                End Try
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Function LoadSafeImage(path As String) As Image
+        Try
+            If String.IsNullOrWhiteSpace(path) OrElse path.Trim() = "No Image" Then
+                Return Nothing
+            End If
+            path = path.Trim()
+            If System.IO.File.Exists(path) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(path)
+                Using ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                End Using
+            End If
+        Catch ex As Exception
+        End Try
+        Return Nothing
+    End Function
+
+    Private Function GetSafeTeamImage(pathOrFlag As String) As Image
+        Try
+            If String.IsNullOrWhiteSpace(pathOrFlag) OrElse pathOrFlag.Trim() = "No Image" Then
+                Return Nothing
+            End If
+            pathOrFlag = pathOrFlag.Trim()
+
+            If pathOrFlag.StartsWith("Flag: ") Then
+                Dim countryName As String = pathOrFlag.Replace("Flag: ", "").Trim()
+                Dim flagPathPNG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.png")
+                Dim flagPathJPG As String = IO.Path.Combine(Application.StartupPath, countryName & "_Flag.jpg")
+
+                Dim finalPath As String = ""
+                If System.IO.File.Exists(flagPathPNG) Then finalPath = flagPathPNG
+                If System.IO.File.Exists(flagPathJPG) Then finalPath = flagPathJPG
+
+                If finalPath <> "" Then
+                    Dim bytes As Byte() = System.IO.File.ReadAllBytes(finalPath)
+                    Dim ms As New IO.MemoryStream(bytes)
+                    Return Image.FromStream(ms)
+                Else
+                    Dim bmp As New Bitmap(100, 60)
+                    Using g As Graphics = Graphics.FromImage(bmp)
+                        g.Clear(Color.LightGray)
+                        g.DrawRectangle(Pens.Black, 0, 0, 99, 59)
+                        g.DrawString(countryName, New Font("Segoe UI", 8, FontStyle.Bold), Brushes.Black, New PointF(5, 20))
+                    End Using
+                    Return bmp
+                End If
+            ElseIf System.IO.File.Exists(pathOrFlag) Then
+                Dim bytes As Byte() = System.IO.File.ReadAllBytes(pathOrFlag)
+                Dim ms As New IO.MemoryStream(bytes)
+                Return Image.FromStream(ms)
+            End If
+        Catch ex As Exception
+        End Try
+
+        Return Nothing
+    End Function
 
 End Class
 
