@@ -235,15 +235,16 @@ Partial Class Dashboard
         ' lblMatchResult
         ' 
         lblMatchResult.AutoSize = True
-        lblMatchResult.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
-        lblMatchResult.Location = New Point(27, 140)
+        lblMatchResult.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        lblMatchResult.Location = New Point(10, 141)
         lblMatchResult.Name = "lblMatchResult"
-        lblMatchResult.Size = New Size(137, 28)
+        lblMatchResult.Size = New Size(181, 25)
         lblMatchResult.TabIndex = 1
-        lblMatchResult.Text = "Match Result"
+        lblMatchResult.Text = "List of Match Result"
         ' 
         ' picMatchResult
         ' 
+        picMatchResult.Image = CType(resources.GetObject("picMatchResult.Image"), Image)
         picMatchResult.Location = New Point(40, 11)
         picMatchResult.Name = "picMatchResult"
         picMatchResult.Size = New Size(120, 120)
