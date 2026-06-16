@@ -984,6 +984,118 @@
         End If
     End Sub
 
+    ' =====================================================================================
+    ' =================  NEXT MATCH BAR (jiplakan dari KumiteMainControl)  =================
+    ' Ikon 👤 / tombol Next Match  -> buka ListOfCompetitor untuk memilih peserta.
+    ' Hasil pilihan masuk ke antrean Next* + ditampilkan di kotak preview atas.
+    ' Load Next Match            -> commit antrean ke Team Info AKA/AO (+sinkron scoreboard).
+    ' Swap ⇄                     -> tukar antrean AKA <-> AO.
+    ' =====================================================================================
+    Public targetSide As String = ""
+    Public NextAkaName As String = "", NextAkaTeam As String = "", NextAkaInfo As String = ""
+    Public NextAoName As String = "", NextAoTeam As String = "", NextAoInfo As String = ""
+
+    ' Ikon 👤 AKA (top bar) -> pilih peserta Next Match sisi AKA
+    Private Sub BtnAkaIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAkaIconSearch.Click
+        OpenCompetitorList("AKA")
+    End Sub
+
+    ' Ikon 👤 AO (top bar) -> pilih peserta Next Match sisi AO
+    Private Sub BtnAoIconSearch_Click(sender As Object, e As EventArgs) Handles BtnAoIconSearch.Click
+        OpenCompetitorList("AO")
+    End Sub
+
+    ' Tombol "Next Match" -> mulai memilih peserta berikutnya (default sisi AKA dulu)
+    Private Sub BtnNextMatch_Click(sender As Object, e As EventArgs) Handles BtnNextMatch.Click
+        OpenCompetitorList("AKA")
+    End Sub
+
+    Private Sub OpenCompetitorList(side As String)
+        targetSide = side
+        Try
+            Dim frm As New ListOfCompetitor()
+            frm.ShowDialog()
+        Catch ex As Exception
+            MessageBox.Show("Gagal memanggil form ListOfCompetitor: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Dipanggil balik oleh ListOfCompetitor saat user menekan "Select"
+    Public Sub SetCompetitorData(nama As String, team As String, info As String)
+        If targetSide = "AO" Then
+            NextAoName = nama : NextAoTeam = team : NextAoInfo = info
+            If TxtAoSearchDisplay IsNot Nothing Then TxtAoSearchDisplay.Text = nama & " | " & team
+        Else
+            NextAkaName = nama : NextAkaTeam = team : NextAkaInfo = info
+            If TxtAkaSearchDisplay IsNot Nothing Then TxtAkaSearchDisplay.Text = nama & " | " & team
+        End If
+    End Sub
+
+    ' Dipanggil balik oleh ListOfTeam saat user memilih tim
+    Public Sub UpdateTeamData(team As String, info As String)
+        If targetSide = "AO" Then
+            NextAoTeam = team : NextAoInfo = info
+            If NextAoName <> "" AndAlso TxtAoSearchDisplay IsNot Nothing Then TxtAoSearchDisplay.Text = NextAoName & " | " & team
+        Else
+            NextAkaTeam = team : NextAkaInfo = info
+            If NextAkaName <> "" AndAlso TxtAkaSearchDisplay IsNot Nothing Then TxtAkaSearchDisplay.Text = NextAkaName & " | " & team
+        End If
+    End Sub
+
+    ' Load Next Match -> pindahkan antrean ke panel Team Info.
+    ' Jika antrean masih kosong, langsung buka ListOfCompetitor (biar tombolnya tidak "mati").
+    Private Sub BtnLoadNextMatch_Click(sender As Object, e As EventArgs) Handles BtnLoadNextMatch.Click
+        If NextAkaName = "" AndAlso NextAoName = "" Then
+            OpenCompetitorList("AKA")
+            Return
+        End If
+
+        If NextAkaName <> "" Then
+            TxtAkaNameMain.Text = NextAkaName
+            TxtAkaTeam1.Text = NextAkaTeam
+            TxtAkaTeam2.Text = NextAkaInfo
+        End If
+        If NextAoName <> "" Then
+            TxtAoNameMain.Text = NextAoName
+            TxtAoTeam1.Text = NextAoTeam
+            TxtAoTeam2.Text = NextAoInfo
+        End If
+
+        SyncScoreboardProfile()
+        MessageBox.Show("Data pertandingan berhasil di-load!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+    End Sub
+
+    ' Swap ⇄ -> tukar antrean Next Match AKA <-> AO (termasuk teks preview)
+    Private Sub BtnSwapNextMatch_Click(sender As Object, e As EventArgs) Handles BtnSwapNextMatch.Click
+        Dim tN As String = NextAkaName : NextAkaName = NextAoName : NextAoName = tN
+        Dim tT As String = NextAkaTeam : NextAkaTeam = NextAoTeam : NextAoTeam = tT
+        Dim tI As String = NextAkaInfo : NextAkaInfo = NextAoInfo : NextAoInfo = tI
+        If TxtAkaSearchDisplay IsNot Nothing AndAlso TxtAoSearchDisplay IsNot Nothing Then
+            Dim tmp As String = TxtAkaSearchDisplay.Text
+            TxtAkaSearchDisplay.Text = TxtAoSearchDisplay.Text
+            TxtAoSearchDisplay.Text = tmp
+        End If
+    End Sub
+
+    ' Sinkron nama AKA/AO ke Scoreboard bila sedang terbuka (aman bila belum ada scoreboard).
+    Private Sub SyncScoreboardProfile()
+        Dim sb As Form = Nothing
+        For Each f As Form In Application.OpenForms
+            If f.GetType().Name = "ScoreBoard" Then
+                sb = f
+                Exit For
+            End If
+        Next
+        If sb Is Nothing Then Return
+        SetScoreboardLabel(sb, "LblAkaName", TxtAkaNameMain.Text)
+        SetScoreboardLabel(sb, "LblAoName", TxtAoNameMain.Text)
+    End Sub
+
+    Private Sub SetScoreboardLabel(f As Form, ctrlName As String, value As String)
+        Dim found() As Control = f.Controls.Find(ctrlName, True)
+        If found IsNot Nothing AndAlso found.Length > 0 Then found(0).Text = value
+    End Sub
+
 End Class
 
 ' =====================================================================================
