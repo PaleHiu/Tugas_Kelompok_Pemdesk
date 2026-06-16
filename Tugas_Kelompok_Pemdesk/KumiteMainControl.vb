@@ -2518,4 +2518,151 @@ Partial Public Class KumiteMainControl
         isAkaHanteiWin = False
         isAoHanteiWin = False
     End Sub
+
+    ' ==========================================================
+    ' FUNGSI SWAP (TUKAR POSISI AKA & AO)
+    ' ==========================================================
+    Private Sub BtnSwap_Click(sender As Object, e As EventArgs) Handles BtnSwap.Click
+        ' Kunci Evaluator (Otak Pemenang) agar tidak salah deteksi saat proses pertukaran data berjalan
+        isEvaluatingWinner = True
+
+        ' ---> TAMBAHAN BARU: SWAP VARIABEL NEXT MATCH (ANTREAN ATAS) <---
+        Dim tempNextName As String = NextAkaName
+        NextAkaName = NextAoName
+        NextAoName = tempNextName
+
+        Dim tempNextTeam As String = NextAkaTeam
+        NextAkaTeam = NextAoTeam
+        NextAoTeam = tempNextTeam
+
+        Dim tempNextInfo As String = NextAkaInfo
+        NextAkaInfo = NextAoInfo
+        NextAoInfo = tempNextInfo
+
+        ' Menukar tulisan di kotak putih bagian paling atas form
+        Dim tempTxtNext As String = TxtAkaName.Text
+        TxtAkaName.Text = TxtAoName.Text
+        TxtAoName.Text = tempTxtNext
+        ' ----------------------------------------------------------------
+
+        ' 1. SWAP PROFIL (Nama, Tim, Info & Foto di Panel Utama)
+        Dim tempName As String = TxtAkaNameMain.Text
+        TxtAkaNameMain.Text = TxtAoNameMain.Text
+        TxtAoNameMain.Text = tempName
+
+        Dim tempTeam As String = TxtAkaTeam.Text
+        TxtAkaTeam.Text = TxtAoTeam.Text
+        TxtAoTeam.Text = tempTeam
+
+        Dim tempInfo As String = TxtAkaTeamInfo.Text
+        TxtAkaTeamInfo.Text = TxtAoTeamInfo.Text
+        TxtAoTeamInfo.Text = tempInfo
+
+        Dim tempProf As Image = PicAkaProfile.Image
+        PicAkaProfile.Image = PicAoProfile.Image
+        PicAoProfile.Image = tempProf
+
+        Dim tempLogo As Image = PicAkaTeamLogo.Image
+        PicAkaTeamLogo.Image = PicAoTeamLogo.Image
+        PicAoTeamLogo.Image = tempLogo
+
+        ' 2. SWAP PENALTI & PELANGGARAN BERAT (Tombol)
+        Dim akaBtns() As Button = {BtnAka1C, BtnAka2C, BtnAka3C, BtnAkaHC, BtnAkaH, BtnAkaKiken, BtnAkaShikkaku, BtnAkaKnockedOut}
+        Dim aoBtns() As Button = {BtnAo1C, BtnAo2C, BtnAo3C, BtnAoHC, BtnAoH, BtnAoKiken, BtnAoShikkaku, BtnAoKnockedOut}
+
+        For i As Integer = 0 To 7
+            Dim tBack As Color = akaBtns(i).BackColor
+            Dim tFore As Color = akaBtns(i).ForeColor
+            Dim tText As String = akaBtns(i).Text
+
+            ' Pindahkan AO ke AKA (Konversi warna biru menjadi merah)
+            akaBtns(i).BackColor = If(aoBtns(i).BackColor = AoColor, AkaColor, aoBtns(i).BackColor)
+            akaBtns(i).ForeColor = aoBtns(i).ForeColor
+            akaBtns(i).Text = aoBtns(i).Text
+
+            ' Pindahkan AKA ke AO (Konversi warna merah menjadi biru)
+            aoBtns(i).BackColor = If(tBack = AkaColor, AoColor, tBack)
+            aoBtns(i).ForeColor = tFore
+            aoBtns(i).Text = tText
+        Next
+
+        ' 3. SWAP SENSHU
+        Dim tempSenshu As Boolean = isAkaSenshu
+        isAkaSenshu = isAoSenshu
+        isAoSenshu = tempSenshu
+        UpdateSenshuUI()
+
+        ' 4. SWAP STATUS KEMENANGAN & HANTEI
+        Dim tempAkaWin As Boolean = LblAkaWinner.Visible
+        LblAkaWinner.Visible = LblAoWinner.Visible
+        LblAoWinner.Visible = tempAkaWin
+
+        Dim tempHanteiVis As Boolean = LblHanteiAka.Visible
+        LblHanteiAka.Visible = LblHanteiAo.Visible
+        LblHanteiAo.Visible = tempHanteiVis
+
+        Dim tempHanteiStat As Boolean = isAkaHanteiWin
+        isAkaHanteiWin = isAoHanteiWin
+        isAoHanteiWin = tempHanteiStat
+
+        If firstWinnerDeclared = "AKA" Then
+            firstWinnerDeclared = "AO"
+        ElseIf firstWinnerDeclared = "AO" Then
+            firstWinnerDeclared = "AKA"
+        End If
+
+        ' 5. SWAP RIWAYAT SKOR (Tabel DataGridView)
+        SwapDataGridViews(DgvAkaHistory, DgvAoHistory)
+
+        ' Hitung ulang angka raksasa berdasarkan isi tabel yang baru saja ditukar
+        RecalculateTotalScore(DgvAkaHistory, LblAkaMainScore)
+        RecalculateTotalScore(DgvAoHistory, LblAoMainScore)
+
+        ' Buka kunci dan pastikan tidak ada logika kemenangan yang terlewat
+        isEvaluatingWinner = False
+        EvaluateWinnerLogic()
+
+        ' 6. SINKRONISASI TOTAL KE SCOREBOARD RAKSASA
+        SyncScoreboardProfile()
+        SyncScoreboardPoints()
+        SyncScoreboardPenalties()
+
+        Me.Refresh()
+    End Sub
+
+    ' ========================================================================
+    ' FUNGSI BANTUAN UNTUK MENUKAR ISI TABEL HISTORY TANPA ERROR
+    ' ========================================================================
+    Private Sub SwapDataGridViews(dgv1 As DataGridView, dgv2 As DataGridView)
+        ' Simpan data dgv1 ke dalam daftar sementara (Memory)
+        Dim tempList As New List(Of Object())
+        For Each row As DataGridViewRow In dgv1.Rows
+            If Not row.IsNewRow Then
+                Dim cellValues(row.Cells.Count - 1) As Object
+                For i As Integer = 0 To row.Cells.Count - 1
+                    cellValues(i) = row.Cells(i).Value
+                Next
+                tempList.Add(cellValues)
+            End If
+        Next
+
+        ' Pindahkan isi dgv2 ke dgv1
+        dgv1.Rows.Clear()
+        For Each row As DataGridViewRow In dgv2.Rows
+            If Not row.IsNewRow Then
+                Dim cellValues(row.Cells.Count - 1) As Object
+                For i As Integer = 0 To row.Cells.Count - 1
+                    cellValues(i) = row.Cells(i).Value
+                Next
+                dgv1.Rows.Add(cellValues)
+            End If
+        Next
+
+        ' Pindahkan data dgv1 (yang ada di memori sementara) ke dgv2
+        dgv2.Rows.Clear()
+        For Each item In tempList
+            dgv2.Rows.Add(item)
+        Next
+    End Sub
+
 End Class
