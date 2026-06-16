@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 
 Partial Public Class KumiteMainControl
 
+
     ' --- VARIABEL PENYIMPANAN SEMENTARA ---
     Public targetSide As String = ""
     Public Shared AkaColor As Color = Color.Crimson
@@ -30,6 +31,13 @@ Partial Public Class KumiteMainControl
     Private koTimerActive As Timer = Nothing
     Private isKOCountdownDone As Boolean = False
     Private frmKOTrackingActive As Form = Nothing   ' Referensi popup Tracking KO (AKA/AO KNOCKOUT)
+    Private myScoreBoard As ScoreBoard = Nothing
+
+
+
+
+
+
 
 
     ' --- FUNGSI PENERIMA DATA BARU (NAMA & TIM) ---
@@ -2664,5 +2672,99 @@ Partial Public Class KumiteMainControl
             dgv2.Rows.Add(item)
         Next
     End Sub
+
+
+    '' =======================================================
+    '' FUNGSI TOMBOL START (DISPLAY KUNING)
+    '' =======================================================
+
+    '' Fungsi untuk menyamakan semua data
+    'Private Sub SyncSemua()
+    '    If myScoreBoard IsNot Nothing AndAlso Not myScoreBoard.IsDisposed Then
+    '        ' AKA
+    '        myScoreBoard.LblAkaName.Text = TxtAkaNameMain.Text
+    '        myScoreBoard.LblAkaInfo.Text = (TxtAkaTeam.Text & " " & TxtAkaTeamInfo.Text).Trim()
+
+    '        ' Match
+    '        myScoreBoard.LblMatchDesc.Text = TxtMatchDesc.Text
+    '    End If
+    'End Sub
+
+    '' =======================================================
+    '' EVENT REAL-TIME (LANGSUNG BERUBAH)
+    '' =======================================================
+
+    '' Real-time AKA
+    'Private Sub AkaRealtime_TextChanged(sender As Object, e As EventArgs) Handles TxtAkaNameMain.TextChanged, TxtAkaTeam.TextChanged, TxtAkaTeamInfo.TextChanged
+    '    If myScoreBoard IsNot Nothing AndAlso Not myScoreBoard.IsDisposed Then
+    '        myScoreBoard.LblAkaName.Text = TxtAkaNameMain.Text
+    '        myScoreBoard.LblAkaInfo.Text = (TxtAkaTeam.Text & " " & TxtAkaTeamInfo.Text).Trim()
+    '    End If
+    'End Sub
+
+    '' Real-time Match Desc
+    'Private Sub MatchRealtime_TextChanged(sender As Object, e As EventArgs) Handles TxtMatchDesc.TextChanged
+    '    If myScoreBoard IsNot Nothing AndAlso Not myScoreBoard.IsDisposed Then
+    '        myScoreBoard.LblMatchDesc.Text = TxtMatchDesc.Text
+    '    End If
+    'End Sub
+
+    '' =================================================================
+    '' FUNGSI UTAMA UNTUK UPDATE KE SCOREBOARD (PASTI BERHASIL)
+    '' =================================================================
+    'Private Sub UpdateScoreboardRealtime()
+    '    Dim sb As ScoreBoard = TryCast(Application.OpenForms("ScoreBoard"), ScoreBoard)
+
+    '    If sb IsNot Nothing Then
+    '        ' --- POSISI AKA (MERAH) ---
+    '        sb.LblAkaName.Text = TxtAkaNameMain.Text        ' Nama Peserta
+    '        sb.LblAkaInfo.Text = TxtAkaTeamInfo.Text        ' Team Info (Di bawah nama peserta)
+
+    '        ' Ganti "LblAkaTeam" dengan nama label yang Anda gunakan di Scoreboard untuk posisi atas
+    '        sb.LblAkaDotsTop.Text = TxtAkaTeam.Text            ' Team Name (Sejajar bendera)
+
+    '        ' --- POSISI AO (BIRU) ---
+    '        ' (Pastikan variabel TxtAoNameMain, TxtAoTeam, TxtAoTeamInfo sesuai nama di proyek Anda)
+    '        sb.LblAoName.Text = TxtAoNameMain.Text          ' Nama Peserta
+    '        sb.LblAoInfo.Text = TxtAoTeamInfo.Text          ' Team Info (Di bawah nama peserta)
+
+    '        ' Ganti "LblAoTeam" dengan nama label yang Anda gunakan di Scoreboard untuk posisi atas
+    '        sb.LblAoDotsTop.Text = TxtAoTeam.Text              ' Team Name (Sejajar bendera)
+
+    '        ' --- LAIN-LAIN ---
+    '        sb.LblMatchDesc.Text = TxtMatchDesc.Text
+    '    End If
+    'End Sub
+
+    '' =================================================================
+    '' EVENT HANDLER REALTIME
+    '' =================================================================
+
+    '' Trigger untuk AKA (Merah) - Memantau 3 TextBox sekaligus
+    'Private Sub AkaTextChanged(sender As Object, e As EventArgs) Handles TxtAkaNameMain.TextChanged, TxtAkaTeam.TextChanged, TxtAkaTeamInfo.TextChanged
+    '    UpdateScoreboardRealtime()
+    'End Sub
+
+    '' Trigger untuk AO (Biru) - Memantau 3 TextBox sekaligus
+    'Private Sub AoTextChanged(sender As Object, e As EventArgs) Handles TxtAoNameMain.TextChanged, TxtAoTeam.TextChanged, TxtAoTeamInfo.TextChanged
+    '    UpdateScoreboardRealtime()
+    'End Sub
+
+    '' Trigger untuk Match
+    'Private Sub MatchTextChanged(sender As Object, e As EventArgs) Handles TxtMatchDesc.TextChanged
+    '    UpdateScoreboardRealtime()
+    'End Sub
+
+    '' Trigger untuk Tombol Display (Memastikan ScoreBoard muncul)
+    'Private Sub BtnDisplay_Click(sender As Object, e As EventArgs) Handles BtnDisplay.Click
+    '    Dim sb As ScoreBoard = TryCast(Application.OpenForms("ScoreBoard"), ScoreBoard)
+    '    If sb Is Nothing Then
+    '        sb = New ScoreBoard()
+    '        sb.Show()
+    '    End If
+    '    sb.BringToFront()
+    '    UpdateScoreboardRealtime() ' Update data saat tombol diklik
+    'End Sub
+
 
 End Class
