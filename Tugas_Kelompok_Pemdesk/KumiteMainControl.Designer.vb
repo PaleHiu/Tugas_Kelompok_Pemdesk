@@ -44,6 +44,7 @@ Partial Class KumiteMainControl
         BtnSaveMatch = New Button()
         PanelMainCenter = New Panel()
         PanelAO = New Panel()
+        LblHanteiAo = New Label()
         LblAoWinner = New Label()
         AOVR = New Button()
         LblAoTitle = New Label()
@@ -87,6 +88,7 @@ Partial Class KumiteMainControl
         BtnAoResetScore = New Button()
         BtnAoSenshu = New Button()
         PanelAKA = New Panel()
+        LblHanteiAka = New Label()
         DataGridView1 = New DataGridView()
         LblAkaWinner = New Label()
         BtnAkaKiken = New Button()
@@ -225,18 +227,17 @@ Partial Class KumiteMainControl
         PanelHeader.Controls.Add(BtnLoadNextMatch)
         PanelHeader.Dock = DockStyle.Top
         PanelHeader.Location = New Point(0, 0)
-        PanelHeader.Margin = New Padding(3, 4, 3, 4)
         PanelHeader.Name = "PanelHeader"
-        PanelHeader.Size = New Size(1200, 53)
+        PanelHeader.Size = New Size(1050, 40)
         PanelHeader.TabIndex = 0
         ' 
         ' LblNextMatch
         ' 
         LblNextMatch.BackColor = Color.Gold
-        LblNextMatch.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
-        LblNextMatch.Location = New Point(11, 11)
+        LblNextMatch.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        LblNextMatch.Location = New Point(10, 8)
         LblNextMatch.Name = "LblNextMatch"
-        LblNextMatch.Size = New Size(91, 32)
+        LblNextMatch.Size = New Size(80, 24)
         LblNextMatch.TabIndex = 0
         LblNextMatch.Text = "Next Match"
         LblNextMatch.TextAlign = ContentAlignment.MiddleCenter
@@ -244,21 +245,19 @@ Partial Class KumiteMainControl
         ' TxtAkaName
         ' 
         TxtAkaName.BorderStyle = BorderStyle.FixedSingle
-        TxtAkaName.Font = New Font("Segoe UI", 9.0F)
-        TxtAkaName.Location = New Point(114, 12)
-        TxtAkaName.Margin = New Padding(3, 4, 3, 4)
+        TxtAkaName.Font = New Font("Segoe UI", 9F)
+        TxtAkaName.Location = New Point(100, 9)
         TxtAkaName.Name = "TxtAkaName"
-        TxtAkaName.Size = New Size(171, 27)
+        TxtAkaName.Size = New Size(150, 23)
         TxtAkaName.TabIndex = 1
         ' 
         ' BtnAkaIcon
         ' 
         BtnAkaIcon.BackColor = Color.WhiteSmoke
         BtnAkaIcon.FlatStyle = FlatStyle.Flat
-        BtnAkaIcon.Location = New Point(291, 11)
-        BtnAkaIcon.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaIcon.Location = New Point(255, 8)
         BtnAkaIcon.Name = "BtnAkaIcon"
-        BtnAkaIcon.Size = New Size(34, 33)
+        BtnAkaIcon.Size = New Size(30, 25)
         BtnAkaIcon.TabIndex = 2
         BtnAkaIcon.Text = "👤"
         BtnAkaIcon.UseVisualStyleBackColor = False
@@ -266,10 +265,10 @@ Partial Class KumiteMainControl
         ' LblVS
         ' 
         LblVS.BackColor = Color.Gold
-        LblVS.Font = New Font("Segoe UI", 9.0F, FontStyle.Bold)
-        LblVS.Location = New Point(337, 11)
+        LblVS.Font = New Font("Segoe UI", 9F, FontStyle.Bold)
+        LblVS.Location = New Point(295, 8)
         LblVS.Name = "LblVS"
-        LblVS.Size = New Size(34, 32)
+        LblVS.Size = New Size(30, 24)
         LblVS.TabIndex = 3
         LblVS.Text = "VS"
         LblVS.TextAlign = ContentAlignment.MiddleCenter
@@ -278,10 +277,9 @@ Partial Class KumiteMainControl
         ' 
         BtnAoIcon.BackColor = Color.WhiteSmoke
         BtnAoIcon.FlatStyle = FlatStyle.Flat
-        BtnAoIcon.Location = New Point(383, 11)
-        BtnAoIcon.Margin = New Padding(3, 4, 3, 4)
+        BtnAoIcon.Location = New Point(335, 8)
         BtnAoIcon.Name = "BtnAoIcon"
-        BtnAoIcon.Size = New Size(34, 33)
+        BtnAoIcon.Size = New Size(30, 25)
         BtnAoIcon.TabIndex = 4
         BtnAoIcon.Text = "👤"
         BtnAoIcon.UseVisualStyleBackColor = False
@@ -289,11 +287,10 @@ Partial Class KumiteMainControl
         ' TxtAoName
         ' 
         TxtAoName.BorderStyle = BorderStyle.FixedSingle
-        TxtAoName.Font = New Font("Segoe UI", 9.0F)
-        TxtAoName.Location = New Point(423, 12)
-        TxtAoName.Margin = New Padding(3, 4, 3, 4)
+        TxtAoName.Font = New Font("Segoe UI", 9F)
+        TxtAoName.Location = New Point(370, 9)
         TxtAoName.Name = "TxtAoName"
-        TxtAoName.Size = New Size(171, 27)
+        TxtAoName.Size = New Size(150, 23)
         TxtAoName.TabIndex = 5
         ' 
         ' BtnSwap
@@ -301,10 +298,9 @@ Partial Class KumiteMainControl
         BtnSwap.BackColor = Color.Gray
         BtnSwap.FlatStyle = FlatStyle.Flat
         BtnSwap.ForeColor = Color.White
-        BtnSwap.Location = New Point(606, 11)
-        BtnSwap.Margin = New Padding(3, 4, 3, 4)
+        BtnSwap.Location = New Point(530, 8)
         BtnSwap.Name = "BtnSwap"
-        BtnSwap.Size = New Size(34, 33)
+        BtnSwap.Size = New Size(30, 25)
         BtnSwap.TabIndex = 6
         BtnSwap.Text = "⇄"
         BtnSwap.UseVisualStyleBackColor = False
@@ -314,10 +310,9 @@ Partial Class KumiteMainControl
         BtnLoadNextMatch.BackColor = Color.Gold
         BtnLoadNextMatch.FlatStyle = FlatStyle.Flat
         BtnLoadNextMatch.Font = New Font("Segoe UI", 8.25F, FontStyle.Bold)
-        BtnLoadNextMatch.Location = New Point(651, 11)
-        BtnLoadNextMatch.Margin = New Padding(3, 4, 3, 4)
+        BtnLoadNextMatch.Location = New Point(570, 8)
         BtnLoadNextMatch.Name = "BtnLoadNextMatch"
-        BtnLoadNextMatch.Size = New Size(137, 33)
+        BtnLoadNextMatch.Size = New Size(120, 25)
         BtnLoadNextMatch.TabIndex = 7
         BtnLoadNextMatch.Text = "Load Next Match"
         BtnLoadNextMatch.UseVisualStyleBackColor = False
@@ -336,20 +331,18 @@ Partial Class KumiteMainControl
         PanelFooter.Controls.Add(BtnResetMatch)
         PanelFooter.Controls.Add(BtnSaveMatch)
         PanelFooter.Dock = DockStyle.Bottom
-        PanelFooter.Location = New Point(0, 812)
-        PanelFooter.Margin = New Padding(3, 4, 3, 4)
+        PanelFooter.Location = New Point(0, 609)
         PanelFooter.Name = "PanelFooter"
-        PanelFooter.Size = New Size(1200, 63)
+        PanelFooter.Size = New Size(1050, 47)
         PanelFooter.TabIndex = 1
         ' 
         ' BtnSettings
         ' 
         BtnSettings.BackColor = Color.White
         BtnSettings.FlatStyle = FlatStyle.Flat
-        BtnSettings.Location = New Point(11, 8)
-        BtnSettings.Margin = New Padding(3, 4, 3, 4)
+        BtnSettings.Location = New Point(10, 6)
         BtnSettings.Name = "BtnSettings"
-        BtnSettings.Size = New Size(97, 44)
+        BtnSettings.Size = New Size(85, 33)
         BtnSettings.TabIndex = 2
         BtnSettings.Text = "Settings ⚙"
         BtnSettings.UseVisualStyleBackColor = False
@@ -358,10 +351,9 @@ Partial Class KumiteMainControl
         ' 
         BtnLogActivity.BackColor = Color.White
         BtnLogActivity.FlatStyle = FlatStyle.Flat
-        BtnLogActivity.Location = New Point(114, 8)
-        BtnLogActivity.Margin = New Padding(3, 4, 3, 4)
+        BtnLogActivity.Location = New Point(100, 6)
         BtnLogActivity.Name = "BtnLogActivity"
-        BtnLogActivity.Size = New Size(97, 44)
+        BtnLogActivity.Size = New Size(85, 33)
         BtnLogActivity.TabIndex = 3
         BtnLogActivity.Text = "Log Activity"
         BtnLogActivity.UseVisualStyleBackColor = False
@@ -370,10 +362,9 @@ Partial Class KumiteMainControl
         ' 
         BtnShortcut.BackColor = Color.White
         BtnShortcut.FlatStyle = FlatStyle.Flat
-        BtnShortcut.Location = New Point(217, 8)
-        BtnShortcut.Margin = New Padding(3, 4, 3, 4)
+        BtnShortcut.Location = New Point(190, 6)
         BtnShortcut.Name = "BtnShortcut"
-        BtnShortcut.Size = New Size(97, 44)
+        BtnShortcut.Size = New Size(85, 33)
         BtnShortcut.TabIndex = 4
         BtnShortcut.Text = "Shortcut ⌨"
         BtnShortcut.UseVisualStyleBackColor = False
@@ -382,10 +373,9 @@ Partial Class KumiteMainControl
         ' 
         BtnDisplay.BackColor = Color.White
         BtnDisplay.FlatStyle = FlatStyle.Flat
-        BtnDisplay.Location = New Point(457, 8)
-        BtnDisplay.Margin = New Padding(3, 4, 3, 4)
+        BtnDisplay.Location = New Point(400, 6)
         BtnDisplay.Name = "BtnDisplay"
-        BtnDisplay.Size = New Size(40, 44)
+        BtnDisplay.Size = New Size(35, 33)
         BtnDisplay.TabIndex = 5
         BtnDisplay.Text = "🖥"
         BtnDisplay.UseVisualStyleBackColor = False
@@ -394,10 +384,9 @@ Partial Class KumiteMainControl
         ' 
         BtnVolume.BackColor = Color.White
         BtnVolume.FlatStyle = FlatStyle.Flat
-        BtnVolume.Location = New Point(503, 8)
-        BtnVolume.Margin = New Padding(3, 4, 3, 4)
+        BtnVolume.Location = New Point(440, 6)
         BtnVolume.Name = "BtnVolume"
-        BtnVolume.Size = New Size(40, 44)
+        BtnVolume.Size = New Size(35, 33)
         BtnVolume.TabIndex = 6
         BtnVolume.Text = "🔊"
         BtnVolume.UseVisualStyleBackColor = False
@@ -406,10 +395,9 @@ Partial Class KumiteMainControl
         ' 
         BtnResetHantei.BackColor = Color.White
         BtnResetHantei.FlatStyle = FlatStyle.Flat
-        BtnResetHantei.Location = New Point(549, 8)
-        BtnResetHantei.Margin = New Padding(3, 4, 3, 4)
+        BtnResetHantei.Location = New Point(480, 6)
         BtnResetHantei.Name = "BtnResetHantei"
-        BtnResetHantei.Size = New Size(109, 44)
+        BtnResetHantei.Size = New Size(95, 33)
         BtnResetHantei.TabIndex = 7
         BtnResetHantei.Text = "Reset Hantei ⮌"
         BtnResetHantei.UseVisualStyleBackColor = False
@@ -418,10 +406,9 @@ Partial Class KumiteMainControl
         ' 
         BtnHantei.BackColor = Color.White
         BtnHantei.FlatStyle = FlatStyle.Flat
-        BtnHantei.Location = New Point(663, 8)
-        BtnHantei.Margin = New Padding(3, 4, 3, 4)
+        BtnHantei.Location = New Point(580, 6)
         BtnHantei.Name = "BtnHantei"
-        BtnHantei.Size = New Size(86, 44)
+        BtnHantei.Size = New Size(75, 33)
         BtnHantei.TabIndex = 8
         BtnHantei.Text = "Hantei 🏳"
         BtnHantei.UseVisualStyleBackColor = False
@@ -430,10 +417,9 @@ Partial Class KumiteMainControl
         ' 
         BtnHikiwake.BackColor = Color.White
         BtnHikiwake.FlatStyle = FlatStyle.Flat
-        BtnHikiwake.Location = New Point(754, 8)
-        BtnHikiwake.Margin = New Padding(3, 4, 3, 4)
+        BtnHikiwake.Location = New Point(660, 6)
         BtnHikiwake.Name = "BtnHikiwake"
-        BtnHikiwake.Size = New Size(143, 44)
+        BtnHikiwake.Size = New Size(125, 33)
         BtnHikiwake.TabIndex = 9
         BtnHikiwake.Text = "Hikiwake/Draw 🎌"
         BtnHikiwake.UseVisualStyleBackColor = False
@@ -442,10 +428,9 @@ Partial Class KumiteMainControl
         ' 
         BtnResetMatch.BackColor = Color.White
         BtnResetMatch.FlatStyle = FlatStyle.Flat
-        BtnResetMatch.Location = New Point(911, 8)
-        BtnResetMatch.Margin = New Padding(3, 4, 3, 4)
+        BtnResetMatch.Location = New Point(797, 6)
         BtnResetMatch.Name = "BtnResetMatch"
-        BtnResetMatch.Size = New Size(120, 44)
+        BtnResetMatch.Size = New Size(105, 33)
         BtnResetMatch.TabIndex = 17
         BtnResetMatch.Text = "Reset Match"
         BtnResetMatch.UseVisualStyleBackColor = False
@@ -454,10 +439,9 @@ Partial Class KumiteMainControl
         ' 
         BtnSaveMatch.BackColor = Color.White
         BtnSaveMatch.FlatStyle = FlatStyle.Flat
-        BtnSaveMatch.Location = New Point(1049, 8)
-        BtnSaveMatch.Margin = New Padding(3, 4, 3, 4)
+        BtnSaveMatch.Location = New Point(918, 6)
         BtnSaveMatch.Name = "BtnSaveMatch"
-        BtnSaveMatch.Size = New Size(143, 44)
+        BtnSaveMatch.Size = New Size(125, 33)
         BtnSaveMatch.TabIndex = 18
         BtnSaveMatch.Text = "Save Match Result"
         BtnSaveMatch.UseVisualStyleBackColor = False
@@ -467,17 +451,17 @@ Partial Class KumiteMainControl
         PanelMainCenter.Controls.Add(PanelAO)
         PanelMainCenter.Controls.Add(PanelAKA)
         PanelMainCenter.Dock = DockStyle.Fill
-        PanelMainCenter.Location = New Point(0, 53)
-        PanelMainCenter.Margin = New Padding(3, 4, 3, 4)
+        PanelMainCenter.Location = New Point(0, 40)
         PanelMainCenter.Name = "PanelMainCenter"
-        PanelMainCenter.Padding = New Padding(21, 25, 21, 25)
-        PanelMainCenter.Size = New Size(900, 759)
+        PanelMainCenter.Padding = New Padding(18, 19, 18, 19)
+        PanelMainCenter.Size = New Size(787, 569)
         PanelMainCenter.TabIndex = 3
         ' 
         ' PanelAO
         ' 
         PanelAO.BackColor = Color.White
         PanelAO.BorderStyle = BorderStyle.FixedSingle
+        PanelAO.Controls.Add(LblHanteiAo)
         PanelAO.Controls.Add(LblAoWinner)
         PanelAO.Controls.Add(AOVR)
         PanelAO.Controls.Add(LblAoTitle)
@@ -498,20 +482,32 @@ Partial Class KumiteMainControl
         PanelAO.Controls.Add(BtnAoResetScore)
         PanelAO.Controls.Add(BtnAoSenshu)
         PanelAO.Dock = DockStyle.Bottom
-        PanelAO.Location = New Point(21, 388)
-        PanelAO.Margin = New Padding(3, 4, 3, 4)
+        PanelAO.Location = New Point(18, 290)
         PanelAO.Name = "PanelAO"
-        PanelAO.Size = New Size(858, 346)
+        PanelAO.Size = New Size(751, 260)
         PanelAO.TabIndex = 1
+        ' 
+        ' LblHanteiAo
+        ' 
+        LblHanteiAo.BackColor = Color.Black
+        LblHanteiAo.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblHanteiAo.ForeColor = SystemColors.ControlLightLight
+        LblHanteiAo.Location = New Point(490, -1)
+        LblHanteiAo.Name = "LblHanteiAo"
+        LblHanteiAo.Size = New Size(132, 21)
+        LblHanteiAo.TabIndex = 23
+        LblHanteiAo.Text = "HANTEI"
+        LblHanteiAo.TextAlign = ContentAlignment.MiddleCenter
+        LblHanteiAo.Visible = False
         ' 
         ' LblAoWinner
         ' 
         LblAoWinner.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
         LblAoWinner.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblAoWinner.ForeColor = SystemColors.ControlLightLight
-        LblAoWinner.Location = New Point(706, -3)
+        LblAoWinner.Location = New Point(618, -2)
         LblAoWinner.Name = "LblAoWinner"
-        LblAoWinner.Size = New Size(151, 29)
+        LblAoWinner.Size = New Size(132, 22)
         LblAoWinner.TabIndex = 21
         LblAoWinner.Text = "WINNER"
         LblAoWinner.TextAlign = ContentAlignment.MiddleCenter
@@ -519,10 +515,9 @@ Partial Class KumiteMainControl
         ' 
         ' AOVR
         ' 
-        AOVR.Location = New Point(331, 288)
-        AOVR.Margin = New Padding(3, 4, 3, 4)
+        AOVR.Location = New Point(290, 216)
         AOVR.Name = "AOVR"
-        AOVR.Size = New Size(136, 33)
+        AOVR.Size = New Size(119, 25)
         AOVR.TabIndex = 0
         AOVR.Text = "AO VR Requested"
         ' 
@@ -530,11 +525,11 @@ Partial Class KumiteMainControl
         ' 
         LblAoTitle.BackColor = Color.DodgerBlue
         LblAoTitle.Dock = DockStyle.Top
-        LblAoTitle.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        LblAoTitle.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         LblAoTitle.ForeColor = Color.White
         LblAoTitle.Location = New Point(0, 0)
         LblAoTitle.Name = "LblAoTitle"
-        LblAoTitle.Size = New Size(856, 27)
+        LblAoTitle.Size = New Size(749, 20)
         LblAoTitle.TabIndex = 0
         LblAoTitle.Text = "AO"
         LblAoTitle.TextAlign = ContentAlignment.MiddleCenter
@@ -542,10 +537,9 @@ Partial Class KumiteMainControl
         ' PicAoProfile
         ' 
         PicAoProfile.BorderStyle = BorderStyle.FixedSingle
-        PicAoProfile.Location = New Point(11, 40)
-        PicAoProfile.Margin = New Padding(3, 4, 3, 4)
+        PicAoProfile.Location = New Point(10, 30)
         PicAoProfile.Name = "PicAoProfile"
-        PicAoProfile.Size = New Size(68, 79)
+        PicAoProfile.Size = New Size(60, 60)
         PicAoProfile.TabIndex = 1
         PicAoProfile.TabStop = False
         ' 
@@ -560,118 +554,105 @@ Partial Class KumiteMainControl
         PnlAoInfo.Controls.Add(LblAoTeamInfoTitle)
         PnlAoInfo.Controls.Add(TxtAoTeamInfo)
         PnlAoInfo.Controls.Add(PicAoTeamLogo)
-        PnlAoInfo.Location = New Point(91, 33)
-        PnlAoInfo.Margin = New Padding(3, 4, 3, 4)
+        PnlAoInfo.Location = New Point(80, 25)
         PnlAoInfo.Name = "PnlAoInfo"
-        PnlAoInfo.Size = New Size(366, 133)
+        PnlAoInfo.Size = New Size(320, 100)
         PnlAoInfo.TabIndex = 2
         ' 
         ' LblAoNameTitle
         ' 
         LblAoNameTitle.AutoSize = True
-        LblAoNameTitle.Location = New Point(0, 11)
+        LblAoNameTitle.Location = New Point(0, 8)
         LblAoNameTitle.Name = "LblAoNameTitle"
-        LblAoNameTitle.Size = New Size(49, 20)
+        LblAoNameTitle.Size = New Size(39, 15)
         LblAoNameTitle.TabIndex = 0
         LblAoNameTitle.Text = "Name"
         ' 
         ' TxtAoNameMain
         ' 
-        TxtAoNameMain.Location = New Point(69, 7)
-        TxtAoNameMain.Margin = New Padding(3, 4, 3, 4)
+        TxtAoNameMain.Location = New Point(60, 5)
         TxtAoNameMain.Name = "TxtAoNameMain"
-        TxtAoNameMain.Size = New Size(182, 27)
+        TxtAoNameMain.Size = New Size(160, 23)
         TxtAoNameMain.TabIndex = 1
-        TxtAoNameMain.Text = "Farhan Nugraha"
         ' 
         ' BtnAoUserIcon1
         ' 
-        BtnAoUserIcon1.Location = New Point(257, 5)
-        BtnAoUserIcon1.Margin = New Padding(3, 4, 3, 4)
+        BtnAoUserIcon1.Location = New Point(225, 4)
         BtnAoUserIcon1.Name = "BtnAoUserIcon1"
-        BtnAoUserIcon1.Size = New Size(29, 33)
+        BtnAoUserIcon1.Size = New Size(25, 25)
         BtnAoUserIcon1.TabIndex = 2
         BtnAoUserIcon1.Text = "👤"
         ' 
         ' LblAoTeamTitle
         ' 
         LblAoTeamTitle.AutoSize = True
-        LblAoTeamTitle.Location = New Point(0, 51)
+        LblAoTeamTitle.Location = New Point(0, 38)
         LblAoTeamTitle.Name = "LblAoTeamTitle"
-        LblAoTeamTitle.Size = New Size(45, 20)
+        LblAoTeamTitle.Size = New Size(36, 15)
         LblAoTeamTitle.TabIndex = 3
         LblAoTeamTitle.Text = "Team"
         ' 
         ' TxtAoTeam
         ' 
-        TxtAoTeam.Location = New Point(69, 47)
-        TxtAoTeam.Margin = New Padding(3, 4, 3, 4)
+        TxtAoTeam.Location = New Point(60, 35)
         TxtAoTeam.Name = "TxtAoTeam"
-        TxtAoTeam.Size = New Size(182, 27)
+        TxtAoTeam.Size = New Size(160, 23)
         TxtAoTeam.TabIndex = 4
-        TxtAoTeam.Text = "Dojo Rajawali"
         ' 
         ' BtnAoTeamSearch
         ' 
-        BtnAoTeamSearch.Location = New Point(257, 44)
-        BtnAoTeamSearch.Margin = New Padding(3, 4, 3, 4)
+        BtnAoTeamSearch.Location = New Point(225, 33)
         BtnAoTeamSearch.Name = "BtnAoTeamSearch"
-        BtnAoTeamSearch.Size = New Size(29, 33)
+        BtnAoTeamSearch.Size = New Size(25, 25)
         BtnAoTeamSearch.TabIndex = 5
         BtnAoTeamSearch.Text = "🔍"
         ' 
         ' LblAoTeamInfoTitle
         ' 
         LblAoTeamInfoTitle.AutoSize = True
-        LblAoTeamInfoTitle.Location = New Point(0, 91)
+        LblAoTeamInfoTitle.Location = New Point(0, 68)
         LblAoTeamInfoTitle.Name = "LblAoTeamInfoTitle"
-        LblAoTeamInfoTitle.Size = New Size(75, 20)
+        LblAoTeamInfoTitle.Size = New Size(60, 15)
         LblAoTeamInfoTitle.TabIndex = 6
         LblAoTeamInfoTitle.Text = "Team Info"
         ' 
         ' TxtAoTeamInfo
         ' 
-        TxtAoTeamInfo.Location = New Point(69, 87)
-        TxtAoTeamInfo.Margin = New Padding(3, 4, 3, 4)
+        TxtAoTeamInfo.Location = New Point(60, 65)
         TxtAoTeamInfo.Name = "TxtAoTeamInfo"
-        TxtAoTeamInfo.Size = New Size(114, 27)
+        TxtAoTeamInfo.Size = New Size(100, 23)
         TxtAoTeamInfo.TabIndex = 7
-        TxtAoTeamInfo.Text = "INKAI"
         ' 
         ' PicAoTeamLogo
         ' 
         PicAoTeamLogo.BorderStyle = BorderStyle.FixedSingle
-        PicAoTeamLogo.Location = New Point(310, 15)
-        PicAoTeamLogo.Margin = New Padding(3, 4, 3, 4)
+        PicAoTeamLogo.Location = New Point(271, 11)
         PicAoTeamLogo.Name = "PicAoTeamLogo"
-        PicAoTeamLogo.Size = New Size(44, 54)
+        PicAoTeamLogo.Size = New Size(39, 41)
         PicAoTeamLogo.TabIndex = 10
         PicAoTeamLogo.TabStop = False
         ' 
         ' BtnAoKiken
         ' 
-        BtnAoKiken.Location = New Point(11, 173)
-        BtnAoKiken.Margin = New Padding(3, 4, 3, 4)
+        BtnAoKiken.Location = New Point(10, 130)
         BtnAoKiken.Name = "BtnAoKiken"
-        BtnAoKiken.Size = New Size(80, 40)
+        BtnAoKiken.Size = New Size(70, 30)
         BtnAoKiken.TabIndex = 3
         BtnAoKiken.Text = "Kiken"
         ' 
         ' BtnAoShikkaku
         ' 
-        BtnAoShikkaku.Location = New Point(11, 220)
-        BtnAoShikkaku.Margin = New Padding(3, 4, 3, 4)
+        BtnAoShikkaku.Location = New Point(10, 165)
         BtnAoShikkaku.Name = "BtnAoShikkaku"
-        BtnAoShikkaku.Size = New Size(80, 40)
+        BtnAoShikkaku.Size = New Size(70, 30)
         BtnAoShikkaku.TabIndex = 4
         BtnAoShikkaku.Text = "Shikkaku"
         ' 
         ' BtnAoKnockedOut
         ' 
-        BtnAoKnockedOut.Location = New Point(11, 267)
-        BtnAoKnockedOut.Margin = New Padding(3, 4, 3, 4)
+        BtnAoKnockedOut.Location = New Point(10, 200)
         BtnAoKnockedOut.Name = "BtnAoKnockedOut"
-        BtnAoKnockedOut.Size = New Size(80, 53)
+        BtnAoKnockedOut.Size = New Size(70, 40)
         BtnAoKnockedOut.TabIndex = 5
         BtnAoKnockedOut.Text = "Knocked Out"
         ' 
@@ -684,64 +665,58 @@ Partial Class KumiteMainControl
         PnlAoPenalty.Controls.Add(BtnAo3C)
         PnlAoPenalty.Controls.Add(BtnAoHC)
         PnlAoPenalty.Controls.Add(BtnAoH)
-        PnlAoPenalty.Location = New Point(103, 173)
-        PnlAoPenalty.Margin = New Padding(3, 4, 3, 4)
+        PnlAoPenalty.Location = New Point(90, 130)
         PnlAoPenalty.Name = "PnlAoPenalty"
-        PnlAoPenalty.Size = New Size(308, 59)
+        PnlAoPenalty.Size = New Size(270, 45)
         PnlAoPenalty.TabIndex = 6
         ' 
         ' LabelAoPenaltyP
         ' 
         LabelAoPenaltyP.Font = New Font("Segoe UI", 20.25F, FontStyle.Bold)
-        LabelAoPenaltyP.Location = New Point(6, -1)
+        LabelAoPenaltyP.Location = New Point(5, -1)
         LabelAoPenaltyP.Name = "LabelAoPenaltyP"
-        LabelAoPenaltyP.Size = New Size(39, 52)
+        LabelAoPenaltyP.Size = New Size(34, 39)
         LabelAoPenaltyP.TabIndex = 0
         LabelAoPenaltyP.Text = "P"
         LabelAoPenaltyP.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' BtnAo1C
         ' 
-        BtnAo1C.Location = New Point(51, 7)
-        BtnAo1C.Margin = New Padding(3, 4, 3, 4)
+        BtnAo1C.Location = New Point(45, 5)
         BtnAo1C.Name = "BtnAo1C"
-        BtnAo1C.Size = New Size(40, 40)
+        BtnAo1C.Size = New Size(35, 30)
         BtnAo1C.TabIndex = 1
         BtnAo1C.Text = "1C"
         ' 
         ' BtnAo2C
         ' 
-        BtnAo2C.Location = New Point(97, 7)
-        BtnAo2C.Margin = New Padding(3, 4, 3, 4)
+        BtnAo2C.Location = New Point(85, 5)
         BtnAo2C.Name = "BtnAo2C"
-        BtnAo2C.Size = New Size(40, 40)
+        BtnAo2C.Size = New Size(35, 30)
         BtnAo2C.TabIndex = 2
         BtnAo2C.Text = "2C"
         ' 
         ' BtnAo3C
         ' 
-        BtnAo3C.Location = New Point(143, 7)
-        BtnAo3C.Margin = New Padding(3, 4, 3, 4)
+        BtnAo3C.Location = New Point(125, 5)
         BtnAo3C.Name = "BtnAo3C"
-        BtnAo3C.Size = New Size(40, 40)
+        BtnAo3C.Size = New Size(35, 30)
         BtnAo3C.TabIndex = 3
         BtnAo3C.Text = "3C"
         ' 
         ' BtnAoHC
         ' 
-        BtnAoHC.Location = New Point(189, 7)
-        BtnAoHC.Margin = New Padding(3, 4, 3, 4)
+        BtnAoHC.Location = New Point(165, 5)
         BtnAoHC.Name = "BtnAoHC"
-        BtnAoHC.Size = New Size(40, 40)
+        BtnAoHC.Size = New Size(35, 30)
         BtnAoHC.TabIndex = 4
         BtnAoHC.Text = "HC"
         ' 
         ' BtnAoH
         ' 
-        BtnAoH.Location = New Point(234, 7)
-        BtnAoH.Margin = New Padding(3, 4, 3, 4)
+        BtnAoH.Location = New Point(205, 5)
         BtnAoH.Name = "BtnAoH"
-        BtnAoH.Size = New Size(40, 40)
+        BtnAoH.Size = New Size(35, 30)
         BtnAoH.TabIndex = 5
         BtnAoH.Text = "H"
         ' 
@@ -752,10 +727,9 @@ Partial Class KumiteMainControl
         PnlAoScoreSummary.Controls.Add(LblAoIpponCount)
         PnlAoScoreSummary.Controls.Add(LblAoWazaariCount)
         PnlAoScoreSummary.Controls.Add(LblAoYukoCount)
-        PnlAoScoreSummary.Location = New Point(103, 247)
-        PnlAoScoreSummary.Margin = New Padding(3, 4, 3, 4)
+        PnlAoScoreSummary.Location = New Point(90, 185)
         PnlAoScoreSummary.Name = "PnlAoScoreSummary"
-        PnlAoScoreSummary.Size = New Size(217, 73)
+        PnlAoScoreSummary.Size = New Size(190, 55)
         PnlAoScoreSummary.TabIndex = 7
         ' 
         ' LblAoScoreSummaryTitle
@@ -764,7 +738,7 @@ Partial Class KumiteMainControl
         LblAoScoreSummaryTitle.Dock = DockStyle.Top
         LblAoScoreSummaryTitle.Location = New Point(0, 0)
         LblAoScoreSummaryTitle.Name = "LblAoScoreSummaryTitle"
-        LblAoScoreSummaryTitle.Size = New Size(215, 27)
+        LblAoScoreSummaryTitle.Size = New Size(188, 20)
         LblAoScoreSummaryTitle.TabIndex = 0
         LblAoScoreSummaryTitle.Text = "Score Summary"
         LblAoScoreSummaryTitle.TextAlign = ContentAlignment.MiddleCenter
@@ -772,36 +746,35 @@ Partial Class KumiteMainControl
         ' LblAoIpponCount
         ' 
         LblAoIpponCount.AutoSize = True
-        LblAoIpponCount.Location = New Point(6, 29)
+        LblAoIpponCount.Location = New Point(5, 22)
         LblAoIpponCount.Name = "LblAoIpponCount"
-        LblAoIpponCount.Size = New Size(64, 20)
+        LblAoIpponCount.Size = New Size(50, 15)
         LblAoIpponCount.TabIndex = 1
         LblAoIpponCount.Text = "Ippon  0"
         ' 
         ' LblAoWazaariCount
         ' 
         LblAoWazaariCount.AutoSize = True
-        LblAoWazaariCount.Location = New Point(80, 31)
+        LblAoWazaariCount.Location = New Point(70, 23)
         LblAoWazaariCount.Name = "LblAoWazaariCount"
-        LblAoWazaariCount.Size = New Size(84, 20)
+        LblAoWazaariCount.Size = New Size(65, 15)
         LblAoWazaariCount.TabIndex = 2
         LblAoWazaariCount.Text = "Waza-ari  0"
         ' 
         ' LblAoYukoCount
         ' 
         LblAoYukoCount.AutoSize = True
-        LblAoYukoCount.Location = New Point(6, 49)
+        LblAoYukoCount.Location = New Point(5, 37)
         LblAoYukoCount.Name = "LblAoYukoCount"
-        LblAoYukoCount.Size = New Size(57, 20)
+        LblAoYukoCount.Size = New Size(46, 15)
         LblAoYukoCount.TabIndex = 3
         LblAoYukoCount.Text = "Yuko  0"
         ' 
         ' BtnAoVR
         ' 
-        BtnAoVR.Location = New Point(331, 247)
-        BtnAoVR.Margin = New Padding(3, 4, 3, 4)
+        BtnAoVR.Location = New Point(290, 185)
         BtnAoVR.Name = "BtnAoVR"
-        BtnAoVR.Size = New Size(136, 33)
+        BtnAoVR.Size = New Size(119, 25)
         BtnAoVR.TabIndex = 8
         BtnAoVR.Text = "VR"
         ' 
@@ -810,12 +783,11 @@ Partial Class KumiteMainControl
         DgvAoHistory.BackgroundColor = Color.White
         DgvAoHistory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DgvAoHistory.Columns.AddRange(New DataGridViewColumn() {ColNoAo, ColTimerAo, ColTypeAo, ColActionAo})
-        DgvAoHistory.Location = New Point(480, 33)
-        DgvAoHistory.Margin = New Padding(3, 4, 3, 4)
+        DgvAoHistory.Location = New Point(420, 25)
         DgvAoHistory.Name = "DgvAoHistory"
         DgvAoHistory.RowHeadersVisible = False
         DgvAoHistory.RowHeadersWidth = 51
-        DgvAoHistory.Size = New Size(263, 227)
+        DgvAoHistory.Size = New Size(230, 170)
         DgvAoHistory.TabIndex = 9
         ' 
         ' ColNoAo
@@ -848,10 +820,10 @@ Partial Class KumiteMainControl
         ' 
         ' LblAoMainScore
         ' 
-        LblAoMainScore.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
-        LblAoMainScore.Location = New Point(720, 40)
+        LblAoMainScore.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
+        LblAoMainScore.Location = New Point(638, 27)
         LblAoMainScore.Name = "LblAoMainScore"
-        LblAoMainScore.Size = New Size(133, 80)
+        LblAoMainScore.Size = New Size(116, 60)
         LblAoMainScore.TabIndex = 10
         LblAoMainScore.Text = "0"
         LblAoMainScore.TextAlign = ContentAlignment.MiddleCenter
@@ -860,10 +832,9 @@ Partial Class KumiteMainControl
         ' 
         BtnAoIppon.BackColor = Color.LightCyan
         BtnAoIppon.FlatStyle = FlatStyle.Flat
-        BtnAoIppon.Location = New Point(749, 133)
-        BtnAoIppon.Margin = New Padding(3, 4, 3, 4)
+        BtnAoIppon.Location = New Point(655, 100)
         BtnAoIppon.Name = "BtnAoIppon"
-        BtnAoIppon.Size = New Size(91, 33)
+        BtnAoIppon.Size = New Size(80, 25)
         BtnAoIppon.TabIndex = 11
         BtnAoIppon.Text = "Ippon 3"
         BtnAoIppon.UseVisualStyleBackColor = False
@@ -872,10 +843,9 @@ Partial Class KumiteMainControl
         ' 
         BtnAoWazaari.BackColor = Color.LightCyan
         BtnAoWazaari.FlatStyle = FlatStyle.Flat
-        BtnAoWazaari.Location = New Point(749, 180)
-        BtnAoWazaari.Margin = New Padding(3, 4, 3, 4)
+        BtnAoWazaari.Location = New Point(655, 135)
         BtnAoWazaari.Name = "BtnAoWazaari"
-        BtnAoWazaari.Size = New Size(91, 33)
+        BtnAoWazaari.Size = New Size(80, 25)
         BtnAoWazaari.TabIndex = 12
         BtnAoWazaari.Text = "Waza-ari 2"
         BtnAoWazaari.UseVisualStyleBackColor = False
@@ -884,38 +854,34 @@ Partial Class KumiteMainControl
         ' 
         BtnAoYuko.BackColor = Color.LightCyan
         BtnAoYuko.FlatStyle = FlatStyle.Flat
-        BtnAoYuko.Location = New Point(749, 227)
-        BtnAoYuko.Margin = New Padding(3, 4, 3, 4)
+        BtnAoYuko.Location = New Point(655, 170)
         BtnAoYuko.Name = "BtnAoYuko"
-        BtnAoYuko.Size = New Size(91, 33)
+        BtnAoYuko.Size = New Size(80, 25)
         BtnAoYuko.TabIndex = 13
         BtnAoYuko.Text = "Yuko 1"
         BtnAoYuko.UseVisualStyleBackColor = False
         ' 
         ' BtnAoShowWinner
         ' 
-        BtnAoShowWinner.Location = New Point(480, 275)
-        BtnAoShowWinner.Margin = New Padding(3, 4, 3, 4)
+        BtnAoShowWinner.Location = New Point(420, 206)
         BtnAoShowWinner.Name = "BtnAoShowWinner"
-        BtnAoShowWinner.Size = New Size(91, 60)
+        BtnAoShowWinner.Size = New Size(80, 45)
         BtnAoShowWinner.TabIndex = 14
         BtnAoShowWinner.Text = "Show Winner"
         ' 
         ' BtnAoResetScore
         ' 
-        BtnAoResetScore.Location = New Point(600, 280)
-        BtnAoResetScore.Margin = New Padding(3, 4, 3, 4)
+        BtnAoResetScore.Location = New Point(525, 210)
         BtnAoResetScore.Name = "BtnAoResetScore"
-        BtnAoResetScore.Size = New Size(91, 40)
+        BtnAoResetScore.Size = New Size(80, 30)
         BtnAoResetScore.TabIndex = 15
         BtnAoResetScore.Text = "Reset Score"
         ' 
         ' BtnAoSenshu
         ' 
-        BtnAoSenshu.Location = New Point(720, 280)
-        BtnAoSenshu.Margin = New Padding(3, 4, 3, 4)
+        BtnAoSenshu.Location = New Point(630, 210)
         BtnAoSenshu.Name = "BtnAoSenshu"
-        BtnAoSenshu.Size = New Size(91, 40)
+        BtnAoSenshu.Size = New Size(80, 30)
         BtnAoSenshu.TabIndex = 16
         BtnAoSenshu.Text = "Senshu"
         ' 
@@ -923,6 +889,7 @@ Partial Class KumiteMainControl
         ' 
         PanelAKA.BackColor = Color.White
         PanelAKA.BorderStyle = BorderStyle.FixedSingle
+        PanelAKA.Controls.Add(LblHanteiAka)
         PanelAKA.Controls.Add(DataGridView1)
         PanelAKA.Controls.Add(LblAkaWinner)
         PanelAKA.Controls.Add(BtnAkaKiken)
@@ -944,19 +911,32 @@ Partial Class KumiteMainControl
         PanelAKA.Controls.Add(BtnAkaResetScore)
         PanelAKA.Controls.Add(BtnAkaSenshu)
         PanelAKA.Dock = DockStyle.Top
-        PanelAKA.Location = New Point(21, 25)
-        PanelAKA.Margin = New Padding(3, 4, 3, 4)
+        PanelAKA.Location = New Point(18, 19)
         PanelAKA.Name = "PanelAKA"
-        PanelAKA.Size = New Size(858, 346)
+        PanelAKA.Size = New Size(751, 260)
         PanelAKA.TabIndex = 0
+        ' 
+        ' LblHanteiAka
+        ' 
+        LblHanteiAka.BackColor = Color.Black
+        LblHanteiAka.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        LblHanteiAka.ForeColor = SystemColors.ControlLightLight
+        LblHanteiAka.Location = New Point(490, -1)
+        LblHanteiAka.Name = "LblHanteiAka"
+        LblHanteiAka.Size = New Size(132, 21)
+        LblHanteiAka.TabIndex = 22
+        LblHanteiAka.Text = "HANTEI"
+        LblHanteiAka.TextAlign = ContentAlignment.MiddleCenter
+        LblHanteiAka.Visible = False
         ' 
         ' DataGridView1
         ' 
         DataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridView1.Location = New Point(635, 344)
+        DataGridView1.Location = New Point(556, 258)
+        DataGridView1.Margin = New Padding(3, 2, 3, 2)
         DataGridView1.Name = "DataGridView1"
         DataGridView1.RowHeadersWidth = 51
-        DataGridView1.Size = New Size(299, 188)
+        DataGridView1.Size = New Size(262, 141)
         DataGridView1.TabIndex = 21
         ' 
         ' LblAkaWinner
@@ -964,9 +944,9 @@ Partial Class KumiteMainControl
         LblAkaWinner.BackColor = Color.FromArgb(CByte(255), CByte(128), CByte(0))
         LblAkaWinner.Font = New Font("Segoe UI", 10.8F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
         LblAkaWinner.ForeColor = SystemColors.ControlLightLight
-        LblAkaWinner.Location = New Point(706, -1)
+        LblAkaWinner.Location = New Point(618, -1)
         LblAkaWinner.Name = "LblAkaWinner"
-        LblAkaWinner.Size = New Size(151, 28)
+        LblAkaWinner.Size = New Size(132, 21)
         LblAkaWinner.TabIndex = 20
         LblAkaWinner.Text = "WINNER"
         LblAkaWinner.TextAlign = ContentAlignment.MiddleCenter
@@ -974,19 +954,18 @@ Partial Class KumiteMainControl
         ' 
         ' BtnAkaKiken
         ' 
-        BtnAkaKiken.Location = New Point(11, 172)
-        BtnAkaKiken.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaKiken.Location = New Point(10, 129)
         BtnAkaKiken.Name = "BtnAkaKiken"
-        BtnAkaKiken.Size = New Size(80, 40)
+        BtnAkaKiken.Size = New Size(70, 30)
         BtnAkaKiken.TabIndex = 17
         BtnAkaKiken.Text = "Kiken"
         ' 
         ' AKAVR
         ' 
-        AKAVR.Location = New Point(331, 288)
-        AKAVR.Margin = New Padding(3, 4, 3, 4)
+        AKAVR.Font = New Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        AKAVR.Location = New Point(290, 216)
         AKAVR.Name = "AKAVR"
-        AKAVR.Size = New Size(136, 33)
+        AKAVR.Size = New Size(119, 25)
         AKAVR.TabIndex = 18
         AKAVR.Text = "AKA VR Requested"
         ' 
@@ -994,11 +973,11 @@ Partial Class KumiteMainControl
         ' 
         LblAkaTitle.BackColor = Color.Crimson
         LblAkaTitle.Dock = DockStyle.Top
-        LblAkaTitle.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        LblAkaTitle.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         LblAkaTitle.ForeColor = Color.White
         LblAkaTitle.Location = New Point(0, 0)
         LblAkaTitle.Name = "LblAkaTitle"
-        LblAkaTitle.Size = New Size(856, 27)
+        LblAkaTitle.Size = New Size(749, 20)
         LblAkaTitle.TabIndex = 0
         LblAkaTitle.Text = "AKA"
         LblAkaTitle.TextAlign = ContentAlignment.MiddleCenter
@@ -1006,10 +985,9 @@ Partial Class KumiteMainControl
         ' PicAkaProfile
         ' 
         PicAkaProfile.BorderStyle = BorderStyle.FixedSingle
-        PicAkaProfile.Location = New Point(11, 40)
-        PicAkaProfile.Margin = New Padding(3, 4, 3, 4)
+        PicAkaProfile.Location = New Point(10, 30)
         PicAkaProfile.Name = "PicAkaProfile"
-        PicAkaProfile.Size = New Size(68, 79)
+        PicAkaProfile.Size = New Size(60, 60)
         PicAkaProfile.TabIndex = 1
         PicAkaProfile.TabStop = False
         ' 
@@ -1024,109 +1002,97 @@ Partial Class KumiteMainControl
         PnlAkaInfo.Controls.Add(LblAkaTeamInfoTitle)
         PnlAkaInfo.Controls.Add(TxtAkaTeamInfo)
         PnlAkaInfo.Controls.Add(PicAkaTeamLogo)
-        PnlAkaInfo.Location = New Point(91, 33)
-        PnlAkaInfo.Margin = New Padding(3, 4, 3, 4)
+        PnlAkaInfo.Location = New Point(80, 25)
         PnlAkaInfo.Name = "PnlAkaInfo"
-        PnlAkaInfo.Size = New Size(366, 133)
+        PnlAkaInfo.Size = New Size(320, 100)
         PnlAkaInfo.TabIndex = 2
         ' 
         ' LblAkaNameTitle
         ' 
         LblAkaNameTitle.AutoSize = True
-        LblAkaNameTitle.Location = New Point(0, 11)
+        LblAkaNameTitle.Location = New Point(0, 8)
         LblAkaNameTitle.Name = "LblAkaNameTitle"
-        LblAkaNameTitle.Size = New Size(49, 20)
+        LblAkaNameTitle.Size = New Size(39, 15)
         LblAkaNameTitle.TabIndex = 0
         LblAkaNameTitle.Text = "Name"
         ' 
         ' TxtAkaNameMain
         ' 
-        TxtAkaNameMain.Location = New Point(69, 7)
-        TxtAkaNameMain.Margin = New Padding(3, 4, 3, 4)
+        TxtAkaNameMain.Location = New Point(60, 5)
         TxtAkaNameMain.Name = "TxtAkaNameMain"
-        TxtAkaNameMain.Size = New Size(182, 27)
+        TxtAkaNameMain.Size = New Size(160, 23)
         TxtAkaNameMain.TabIndex = 1
-        TxtAkaNameMain.Text = "Wahyu Hidayat"
         ' 
         ' BtnAkaUserIcon1
         ' 
-        BtnAkaUserIcon1.Location = New Point(257, 5)
-        BtnAkaUserIcon1.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaUserIcon1.Location = New Point(225, 4)
         BtnAkaUserIcon1.Name = "BtnAkaUserIcon1"
-        BtnAkaUserIcon1.Size = New Size(29, 33)
+        BtnAkaUserIcon1.Size = New Size(25, 25)
         BtnAkaUserIcon1.TabIndex = 10
         BtnAkaUserIcon1.Text = "👤"
         ' 
         ' LblAkaTeamTitle
         ' 
         LblAkaTeamTitle.AutoSize = True
-        LblAkaTeamTitle.Location = New Point(0, 51)
+        LblAkaTeamTitle.Location = New Point(0, 38)
         LblAkaTeamTitle.Name = "LblAkaTeamTitle"
-        LblAkaTeamTitle.Size = New Size(45, 20)
+        LblAkaTeamTitle.Size = New Size(36, 15)
         LblAkaTeamTitle.TabIndex = 3
         LblAkaTeamTitle.Text = "Team"
         ' 
         ' TxtAkaTeam
         ' 
-        TxtAkaTeam.Location = New Point(69, 47)
-        TxtAkaTeam.Margin = New Padding(3, 4, 3, 4)
+        TxtAkaTeam.Location = New Point(60, 35)
         TxtAkaTeam.Name = "TxtAkaTeam"
-        TxtAkaTeam.Size = New Size(182, 27)
+        TxtAkaTeam.Size = New Size(160, 23)
         TxtAkaTeam.TabIndex = 4
-        TxtAkaTeam.Text = "Dojo Rajawali"
         ' 
         ' BtnAkaTeamSearch
         ' 
-        BtnAkaTeamSearch.Location = New Point(257, 44)
-        BtnAkaTeamSearch.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaTeamSearch.Location = New Point(225, 33)
         BtnAkaTeamSearch.Name = "BtnAkaTeamSearch"
-        BtnAkaTeamSearch.Size = New Size(29, 33)
+        BtnAkaTeamSearch.Size = New Size(25, 25)
         BtnAkaTeamSearch.TabIndex = 5
         BtnAkaTeamSearch.Text = "🔍"
         ' 
         ' LblAkaTeamInfoTitle
         ' 
         LblAkaTeamInfoTitle.AutoSize = True
-        LblAkaTeamInfoTitle.Location = New Point(0, 91)
+        LblAkaTeamInfoTitle.Location = New Point(0, 68)
         LblAkaTeamInfoTitle.Name = "LblAkaTeamInfoTitle"
-        LblAkaTeamInfoTitle.Size = New Size(75, 20)
+        LblAkaTeamInfoTitle.Size = New Size(60, 15)
         LblAkaTeamInfoTitle.TabIndex = 6
         LblAkaTeamInfoTitle.Text = "Team Info"
         ' 
         ' TxtAkaTeamInfo
         ' 
-        TxtAkaTeamInfo.Location = New Point(69, 87)
-        TxtAkaTeamInfo.Margin = New Padding(3, 4, 3, 4)
+        TxtAkaTeamInfo.Location = New Point(60, 65)
         TxtAkaTeamInfo.Name = "TxtAkaTeamInfo"
-        TxtAkaTeamInfo.Size = New Size(114, 27)
+        TxtAkaTeamInfo.Size = New Size(100, 23)
         TxtAkaTeamInfo.TabIndex = 7
-        TxtAkaTeamInfo.Text = "INKAI"
         ' 
         ' PicAkaTeamLogo
         ' 
         PicAkaTeamLogo.BorderStyle = BorderStyle.FixedSingle
-        PicAkaTeamLogo.Location = New Point(310, 15)
-        PicAkaTeamLogo.Margin = New Padding(3, 4, 3, 4)
+        PicAkaTeamLogo.Location = New Point(271, 11)
         PicAkaTeamLogo.Name = "PicAkaTeamLogo"
-        PicAkaTeamLogo.Size = New Size(44, 54)
+        PicAkaTeamLogo.Size = New Size(39, 41)
         PicAkaTeamLogo.TabIndex = 12
         PicAkaTeamLogo.TabStop = False
         ' 
         ' BtnAkaShikkaku
         ' 
-        BtnAkaShikkaku.Location = New Point(11, 220)
-        BtnAkaShikkaku.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaShikkaku.Location = New Point(10, 165)
         BtnAkaShikkaku.Name = "BtnAkaShikkaku"
-        BtnAkaShikkaku.Size = New Size(80, 40)
+        BtnAkaShikkaku.Size = New Size(70, 30)
         BtnAkaShikkaku.TabIndex = 4
         BtnAkaShikkaku.Text = "Shikkaku"
         ' 
         ' BtnAkaKnockedOut
         ' 
-        BtnAkaKnockedOut.Location = New Point(11, 267)
-        BtnAkaKnockedOut.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaKnockedOut.Location = New Point(10, 200)
         BtnAkaKnockedOut.Name = "BtnAkaKnockedOut"
-        BtnAkaKnockedOut.Size = New Size(80, 53)
+        BtnAkaKnockedOut.Size = New Size(70, 40)
         BtnAkaKnockedOut.TabIndex = 5
         BtnAkaKnockedOut.Text = "Knocked Out"
         ' 
@@ -1139,64 +1105,58 @@ Partial Class KumiteMainControl
         PnlAkaPenalty.Controls.Add(BtnAka3C)
         PnlAkaPenalty.Controls.Add(BtnAkaHC)
         PnlAkaPenalty.Controls.Add(BtnAkaH)
-        PnlAkaPenalty.Location = New Point(103, 173)
-        PnlAkaPenalty.Margin = New Padding(3, 4, 3, 4)
+        PnlAkaPenalty.Location = New Point(90, 130)
         PnlAkaPenalty.Name = "PnlAkaPenalty"
-        PnlAkaPenalty.Size = New Size(308, 59)
+        PnlAkaPenalty.Size = New Size(270, 45)
         PnlAkaPenalty.TabIndex = 6
         ' 
         ' Label1
         ' 
         Label1.Font = New Font("Segoe UI", 20.25F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        Label1.Location = New Point(6, -1)
+        Label1.Location = New Point(5, -1)
         Label1.Name = "Label1"
-        Label1.Size = New Size(39, 52)
+        Label1.Size = New Size(34, 39)
         Label1.TabIndex = 18
         Label1.Text = "P"
         Label1.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' BtnAka1C
         ' 
-        BtnAka1C.Location = New Point(51, 7)
-        BtnAka1C.Margin = New Padding(3, 4, 3, 4)
+        BtnAka1C.Location = New Point(45, 5)
         BtnAka1C.Name = "BtnAka1C"
-        BtnAka1C.Size = New Size(40, 40)
+        BtnAka1C.Size = New Size(35, 30)
         BtnAka1C.TabIndex = 1
         BtnAka1C.Text = "1C"
         ' 
         ' BtnAka2C
         ' 
-        BtnAka2C.Location = New Point(97, 7)
-        BtnAka2C.Margin = New Padding(3, 4, 3, 4)
+        BtnAka2C.Location = New Point(85, 5)
         BtnAka2C.Name = "BtnAka2C"
-        BtnAka2C.Size = New Size(40, 40)
+        BtnAka2C.Size = New Size(35, 30)
         BtnAka2C.TabIndex = 2
         BtnAka2C.Text = "2C"
         ' 
         ' BtnAka3C
         ' 
-        BtnAka3C.Location = New Point(143, 7)
-        BtnAka3C.Margin = New Padding(3, 4, 3, 4)
+        BtnAka3C.Location = New Point(125, 5)
         BtnAka3C.Name = "BtnAka3C"
-        BtnAka3C.Size = New Size(40, 40)
+        BtnAka3C.Size = New Size(35, 30)
         BtnAka3C.TabIndex = 3
         BtnAka3C.Text = "3C"
         ' 
         ' BtnAkaHC
         ' 
-        BtnAkaHC.Location = New Point(189, 7)
-        BtnAkaHC.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaHC.Location = New Point(165, 5)
         BtnAkaHC.Name = "BtnAkaHC"
-        BtnAkaHC.Size = New Size(40, 40)
+        BtnAkaHC.Size = New Size(35, 30)
         BtnAkaHC.TabIndex = 4
         BtnAkaHC.Text = "HC"
         ' 
         ' BtnAkaH
         ' 
-        BtnAkaH.Location = New Point(234, 7)
-        BtnAkaH.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaH.Location = New Point(205, 5)
         BtnAkaH.Name = "BtnAkaH"
-        BtnAkaH.Size = New Size(40, 40)
+        BtnAkaH.Size = New Size(35, 30)
         BtnAkaH.TabIndex = 5
         BtnAkaH.Text = "H"
         ' 
@@ -1207,10 +1167,9 @@ Partial Class KumiteMainControl
         PnlAkaScoreSummary.Controls.Add(LblAkaIpponCount)
         PnlAkaScoreSummary.Controls.Add(LblAkaWazaariCount)
         PnlAkaScoreSummary.Controls.Add(LblAkaYukoCount)
-        PnlAkaScoreSummary.Location = New Point(103, 247)
-        PnlAkaScoreSummary.Margin = New Padding(3, 4, 3, 4)
+        PnlAkaScoreSummary.Location = New Point(90, 185)
         PnlAkaScoreSummary.Name = "PnlAkaScoreSummary"
-        PnlAkaScoreSummary.Size = New Size(217, 73)
+        PnlAkaScoreSummary.Size = New Size(190, 55)
         PnlAkaScoreSummary.TabIndex = 7
         ' 
         ' LblAkaScoreSummaryTitle
@@ -1219,7 +1178,7 @@ Partial Class KumiteMainControl
         LblAkaScoreSummaryTitle.Dock = DockStyle.Top
         LblAkaScoreSummaryTitle.Location = New Point(0, 0)
         LblAkaScoreSummaryTitle.Name = "LblAkaScoreSummaryTitle"
-        LblAkaScoreSummaryTitle.Size = New Size(215, 27)
+        LblAkaScoreSummaryTitle.Size = New Size(188, 20)
         LblAkaScoreSummaryTitle.TabIndex = 0
         LblAkaScoreSummaryTitle.Text = "Score Summary"
         LblAkaScoreSummaryTitle.TextAlign = ContentAlignment.MiddleCenter
@@ -1227,36 +1186,35 @@ Partial Class KumiteMainControl
         ' LblAkaIpponCount
         ' 
         LblAkaIpponCount.AutoSize = True
-        LblAkaIpponCount.Location = New Point(6, 28)
+        LblAkaIpponCount.Location = New Point(5, 21)
         LblAkaIpponCount.Name = "LblAkaIpponCount"
-        LblAkaIpponCount.Size = New Size(64, 20)
+        LblAkaIpponCount.Size = New Size(50, 15)
         LblAkaIpponCount.TabIndex = 1
         LblAkaIpponCount.Text = "Ippon  0"
         ' 
         ' LblAkaWazaariCount
         ' 
         LblAkaWazaariCount.AutoSize = True
-        LblAkaWazaariCount.Location = New Point(80, 29)
+        LblAkaWazaariCount.Location = New Point(70, 22)
         LblAkaWazaariCount.Name = "LblAkaWazaariCount"
-        LblAkaWazaariCount.Size = New Size(84, 20)
+        LblAkaWazaariCount.Size = New Size(65, 15)
         LblAkaWazaariCount.TabIndex = 2
         LblAkaWazaariCount.Text = "Waza-ari  0"
         ' 
         ' LblAkaYukoCount
         ' 
         LblAkaYukoCount.AutoSize = True
-        LblAkaYukoCount.Location = New Point(6, 51)
+        LblAkaYukoCount.Location = New Point(5, 38)
         LblAkaYukoCount.Name = "LblAkaYukoCount"
-        LblAkaYukoCount.Size = New Size(57, 20)
+        LblAkaYukoCount.Size = New Size(46, 15)
         LblAkaYukoCount.TabIndex = 3
         LblAkaYukoCount.Text = "Yuko  0"
         ' 
         ' BtnAkaVR
         ' 
-        BtnAkaVR.Location = New Point(331, 247)
-        BtnAkaVR.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaVR.Location = New Point(290, 185)
         BtnAkaVR.Name = "BtnAkaVR"
-        BtnAkaVR.Size = New Size(136, 33)
+        BtnAkaVR.Size = New Size(119, 25)
         BtnAkaVR.TabIndex = 8
         BtnAkaVR.Text = "VR"
         ' 
@@ -1265,12 +1223,11 @@ Partial Class KumiteMainControl
         DgvAkaHistory.BackgroundColor = Color.White
         DgvAkaHistory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
         DgvAkaHistory.Columns.AddRange(New DataGridViewColumn() {ColNo, ColTimer, ColType, ColActionAka})
-        DgvAkaHistory.Location = New Point(480, 33)
-        DgvAkaHistory.Margin = New Padding(3, 4, 3, 4)
+        DgvAkaHistory.Location = New Point(420, 25)
         DgvAkaHistory.Name = "DgvAkaHistory"
         DgvAkaHistory.RowHeadersVisible = False
         DgvAkaHistory.RowHeadersWidth = 51
-        DgvAkaHistory.Size = New Size(263, 227)
+        DgvAkaHistory.Size = New Size(230, 170)
         DgvAkaHistory.TabIndex = 10
         ' 
         ' ColNo
@@ -1303,10 +1260,10 @@ Partial Class KumiteMainControl
         ' 
         ' LblAkaMainScore
         ' 
-        LblAkaMainScore.Font = New Font("Segoe UI", 36.0F, FontStyle.Bold)
-        LblAkaMainScore.Location = New Point(715, 44)
+        LblAkaMainScore.Font = New Font("Segoe UI", 36F, FontStyle.Bold)
+        LblAkaMainScore.Location = New Point(643, 23)
         LblAkaMainScore.Name = "LblAkaMainScore"
-        LblAkaMainScore.Size = New Size(125, 80)
+        LblAkaMainScore.Size = New Size(109, 60)
         LblAkaMainScore.TabIndex = 11
         LblAkaMainScore.Text = "0"
         LblAkaMainScore.TextAlign = ContentAlignment.MiddleCenter
@@ -1315,10 +1272,9 @@ Partial Class KumiteMainControl
         ' 
         BtnAkaIppon.BackColor = Color.MistyRose
         BtnAkaIppon.FlatStyle = FlatStyle.Flat
-        BtnAkaIppon.Location = New Point(749, 132)
-        BtnAkaIppon.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaIppon.Location = New Point(655, 99)
         BtnAkaIppon.Name = "BtnAkaIppon"
-        BtnAkaIppon.Size = New Size(91, 33)
+        BtnAkaIppon.Size = New Size(80, 25)
         BtnAkaIppon.TabIndex = 12
         BtnAkaIppon.Text = "Ippon 3"
         BtnAkaIppon.UseVisualStyleBackColor = False
@@ -1327,10 +1283,9 @@ Partial Class KumiteMainControl
         ' 
         BtnAkaWazaari.BackColor = Color.MistyRose
         BtnAkaWazaari.FlatStyle = FlatStyle.Flat
-        BtnAkaWazaari.Location = New Point(749, 179)
-        BtnAkaWazaari.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaWazaari.Location = New Point(655, 134)
         BtnAkaWazaari.Name = "BtnAkaWazaari"
-        BtnAkaWazaari.Size = New Size(91, 33)
+        BtnAkaWazaari.Size = New Size(80, 25)
         BtnAkaWazaari.TabIndex = 13
         BtnAkaWazaari.Text = "Waza-ari 2"
         BtnAkaWazaari.UseVisualStyleBackColor = False
@@ -1339,38 +1294,34 @@ Partial Class KumiteMainControl
         ' 
         BtnAkaYuko.BackColor = Color.MistyRose
         BtnAkaYuko.FlatStyle = FlatStyle.Flat
-        BtnAkaYuko.Location = New Point(749, 227)
-        BtnAkaYuko.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaYuko.Location = New Point(655, 170)
         BtnAkaYuko.Name = "BtnAkaYuko"
-        BtnAkaYuko.Size = New Size(91, 33)
+        BtnAkaYuko.Size = New Size(80, 25)
         BtnAkaYuko.TabIndex = 14
         BtnAkaYuko.Text = "Yuko 1"
         BtnAkaYuko.UseVisualStyleBackColor = False
         ' 
         ' BtnAkaShowWinner
         ' 
-        BtnAkaShowWinner.Location = New Point(480, 271)
-        BtnAkaShowWinner.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaShowWinner.Location = New Point(420, 203)
         BtnAkaShowWinner.Name = "BtnAkaShowWinner"
-        BtnAkaShowWinner.Size = New Size(91, 60)
+        BtnAkaShowWinner.Size = New Size(80, 45)
         BtnAkaShowWinner.TabIndex = 15
         BtnAkaShowWinner.Text = "Show Winner"
         ' 
         ' BtnAkaResetScore
         ' 
-        BtnAkaResetScore.Location = New Point(600, 280)
-        BtnAkaResetScore.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaResetScore.Location = New Point(525, 210)
         BtnAkaResetScore.Name = "BtnAkaResetScore"
-        BtnAkaResetScore.Size = New Size(91, 40)
+        BtnAkaResetScore.Size = New Size(80, 30)
         BtnAkaResetScore.TabIndex = 16
         BtnAkaResetScore.Text = "Reset Score"
         ' 
         ' BtnAkaSenshu
         ' 
-        BtnAkaSenshu.Location = New Point(720, 280)
-        BtnAkaSenshu.Margin = New Padding(3, 4, 3, 4)
+        BtnAkaSenshu.Location = New Point(630, 210)
         BtnAkaSenshu.Name = "BtnAkaSenshu"
-        BtnAkaSenshu.Size = New Size(91, 40)
+        BtnAkaSenshu.Size = New Size(80, 30)
         BtnAkaSenshu.TabIndex = 17
         BtnAkaSenshu.Text = "Senshu"
         ' 
@@ -1399,28 +1350,27 @@ Partial Class KumiteMainControl
         PanelSidebarRight.Controls.Add(PnlWaitingTimer)
         PanelSidebarRight.Controls.Add(PanelMatchTimer)
         PanelSidebarRight.Dock = DockStyle.Right
-        PanelSidebarRight.Location = New Point(900, 53)
-        PanelSidebarRight.Margin = New Padding(3, 4, 3, 4)
+        PanelSidebarRight.Location = New Point(787, 40)
         PanelSidebarRight.Name = "PanelSidebarRight"
-        PanelSidebarRight.Size = New Size(300, 759)
+        PanelSidebarRight.Size = New Size(263, 569)
         PanelSidebarRight.TabIndex = 2
         ' 
         ' BtnSendMatchInfo
         ' 
-        BtnSendMatchInfo.Font = New Font("Segoe UI", 35.0F)
-        BtnSendMatchInfo.Location = New Point(246, 171)
+        BtnSendMatchInfo.Font = New Font("Segoe UI", 35F)
+        BtnSendMatchInfo.Location = New Point(215, 128)
+        BtnSendMatchInfo.Margin = New Padding(3, 2, 3, 2)
         BtnSendMatchInfo.Name = "BtnSendMatchInfo"
-        BtnSendMatchInfo.Size = New Size(41, 86)
+        BtnSendMatchInfo.Size = New Size(36, 64)
         BtnSendMatchInfo.TabIndex = 18
         BtnSendMatchInfo.Text = "⬆️"
         BtnSendMatchInfo.UseVisualStyleBackColor = True
         ' 
         ' BtnSaveWinPoint
         ' 
-        BtnSaveWinPoint.Location = New Point(191, 269)
-        BtnSaveWinPoint.Margin = New Padding(3, 4, 3, 4)
+        BtnSaveWinPoint.Location = New Point(167, 202)
         BtnSaveWinPoint.Name = "BtnSaveWinPoint"
-        BtnSaveWinPoint.Size = New Size(50, 31)
+        BtnSaveWinPoint.Size = New Size(44, 23)
         BtnSaveWinPoint.TabIndex = 17
         BtnSaveWinPoint.Text = "Save"
         BtnSaveWinPoint.UseVisualStyleBackColor = True
@@ -1429,10 +1379,9 @@ Partial Class KumiteMainControl
         ' 
         ResetTimer.BackColor = Color.Gold
         ResetTimer.FlatStyle = FlatStyle.Flat
-        ResetTimer.Location = New Point(29, 677)
-        ResetTimer.Margin = New Padding(3, 4, 3, 4)
+        ResetTimer.Location = New Point(25, 508)
         ResetTimer.Name = "ResetTimer"
-        ResetTimer.Size = New Size(237, 37)
+        ResetTimer.Size = New Size(207, 28)
         ResetTimer.TabIndex = 10
         ResetTimer.Text = "Reset Timer"
         ResetTimer.UseVisualStyleBackColor = False
@@ -1441,9 +1390,9 @@ Partial Class KumiteMainControl
         ' 
         LblScboardType.AutoSize = True
         LblScboardType.Font = New Font("Segoe UI", 8.25F)
-        LblScboardType.Location = New Point(10, 12)
+        LblScboardType.Location = New Point(9, 9)
         LblScboardType.Name = "LblScboardType"
-        LblScboardType.Size = New Size(93, 19)
+        LblScboardType.Size = New Size(76, 13)
         LblScboardType.TabIndex = 0
         LblScboardType.Text = "SCBoard Type"
         ' 
@@ -1451,9 +1400,9 @@ Partial Class KumiteMainControl
         ' 
         LblSenshuStyle.AutoSize = True
         LblSenshuStyle.Font = New Font("Segoe UI", 8.25F)
-        LblSenshuStyle.Location = New Point(150, 12)
+        LblSenshuStyle.Location = New Point(131, 9)
         LblSenshuStyle.Name = "LblSenshuStyle"
-        LblSenshuStyle.Size = New Size(86, 19)
+        LblSenshuStyle.Size = New Size(72, 13)
         LblSenshuStyle.TabIndex = 1
         LblSenshuStyle.Text = "Senshu Style"
         ' 
@@ -1461,9 +1410,9 @@ Partial Class KumiteMainControl
         ' 
         LblAdjustScboard.AutoSize = True
         LblAdjustScboard.Font = New Font("Segoe UI", 8.25F)
-        LblAdjustScboard.Location = New Point(10, 75)
+        LblAdjustScboard.Location = New Point(9, 56)
         LblAdjustScboard.Name = "LblAdjustScboard"
-        LblAdjustScboard.Size = New Size(156, 19)
+        LblAdjustScboard.Size = New Size(130, 13)
         LblAdjustScboard.TabIndex = 2
         LblAdjustScboard.Text = "Adjust Scboard Text Size"
         ' 
@@ -1471,10 +1420,9 @@ Partial Class KumiteMainControl
         ' 
         CboAdjustPlayer.FormattingEnabled = True
         CboAdjustPlayer.Items.AddRange(New Object() {"Player Name", "Team Name"})
-        CboAdjustPlayer.Location = New Point(13, 100)
-        CboAdjustPlayer.Margin = New Padding(3, 4, 3, 4)
+        CboAdjustPlayer.Location = New Point(11, 75)
         CboAdjustPlayer.Name = "CboAdjustPlayer"
-        CboAdjustPlayer.Size = New Size(90, 28)
+        CboAdjustPlayer.Size = New Size(79, 23)
         CboAdjustPlayer.TabIndex = 3
         CboAdjustPlayer.Text = "Player Name"
         ' 
@@ -1482,39 +1430,35 @@ Partial Class KumiteMainControl
         ' 
         NumAdjustSize.DecimalPlaces = 1
         NumAdjustSize.Increment = New Decimal(New Integer() {5, 0, 0, 65536})
-        NumAdjustSize.Location = New Point(110, 100)
-        NumAdjustSize.Margin = New Padding(3, 4, 3, 4)
+        NumAdjustSize.Location = New Point(96, 75)
         NumAdjustSize.Name = "NumAdjustSize"
-        NumAdjustSize.Size = New Size(50, 27)
+        NumAdjustSize.Size = New Size(44, 23)
         NumAdjustSize.TabIndex = 4
         NumAdjustSize.Value = New Decimal(New Integer() {15, 0, 0, 65536})
         ' 
         ' BtnAdjustR
         ' 
-        BtnAdjustR.Location = New Point(165, 97)
-        BtnAdjustR.Margin = New Padding(3, 4, 3, 4)
+        BtnAdjustR.Location = New Point(144, 73)
         BtnAdjustR.Name = "BtnAdjustR"
-        BtnAdjustR.Size = New Size(30, 31)
+        BtnAdjustR.Size = New Size(26, 23)
         BtnAdjustR.TabIndex = 5
         BtnAdjustR.Text = "R"
         BtnAdjustR.UseVisualStyleBackColor = True
         ' 
         ' BtnAdjustMin
         ' 
-        BtnAdjustMin.Location = New Point(200, 97)
-        BtnAdjustMin.Margin = New Padding(3, 4, 3, 4)
+        BtnAdjustMin.Location = New Point(175, 73)
         BtnAdjustMin.Name = "BtnAdjustMin"
-        BtnAdjustMin.Size = New Size(30, 31)
+        BtnAdjustMin.Size = New Size(26, 23)
         BtnAdjustMin.TabIndex = 6
         BtnAdjustMin.Text = "-"
         BtnAdjustMin.UseVisualStyleBackColor = True
         ' 
         ' BtnAdjustPlus
         ' 
-        BtnAdjustPlus.Location = New Point(235, 97)
-        BtnAdjustPlus.Margin = New Padding(3, 4, 3, 4)
+        BtnAdjustPlus.Location = New Point(206, 73)
         BtnAdjustPlus.Name = "BtnAdjustPlus"
-        BtnAdjustPlus.Size = New Size(30, 31)
+        BtnAdjustPlus.Size = New Size(26, 23)
         BtnAdjustPlus.TabIndex = 7
         BtnAdjustPlus.Text = "+"
         BtnAdjustPlus.UseVisualStyleBackColor = True
@@ -1523,21 +1467,19 @@ Partial Class KumiteMainControl
         ' 
         TabMatchDetail.Controls.Add(PageMatchDetail)
         TabMatchDetail.Controls.Add(PageMatchLogo)
-        TabMatchDetail.Location = New Point(13, 144)
-        TabMatchDetail.Margin = New Padding(3, 4, 3, 4)
+        TabMatchDetail.Location = New Point(11, 108)
         TabMatchDetail.Name = "TabMatchDetail"
         TabMatchDetail.SelectedIndex = 0
-        TabMatchDetail.Size = New Size(228, 119)
+        TabMatchDetail.Size = New Size(200, 89)
         TabMatchDetail.TabIndex = 8
         ' 
         ' PageMatchDetail
         ' 
         PageMatchDetail.Controls.Add(TxtMatchDesc)
-        PageMatchDetail.Location = New Point(4, 29)
-        PageMatchDetail.Margin = New Padding(3, 4, 3, 4)
+        PageMatchDetail.Location = New Point(4, 24)
         PageMatchDetail.Name = "PageMatchDetail"
-        PageMatchDetail.Padding = New Padding(3, 4, 3, 4)
-        PageMatchDetail.Size = New Size(220, 86)
+        PageMatchDetail.Padding = New Padding(3)
+        PageMatchDetail.Size = New Size(192, 61)
         PageMatchDetail.TabIndex = 0
         PageMatchDetail.Text = "Match Detail"
         PageMatchDetail.UseVisualStyleBackColor = True
@@ -1546,11 +1488,10 @@ Partial Class KumiteMainControl
         ' 
         TxtMatchDesc.Dock = DockStyle.Fill
         TxtMatchDesc.ForeColor = Color.Gray
-        TxtMatchDesc.Location = New Point(3, 4)
-        TxtMatchDesc.Margin = New Padding(3, 4, 3, 4)
+        TxtMatchDesc.Location = New Point(3, 3)
         TxtMatchDesc.Multiline = True
         TxtMatchDesc.Name = "TxtMatchDesc"
-        TxtMatchDesc.Size = New Size(214, 78)
+        TxtMatchDesc.Size = New Size(186, 55)
         TxtMatchDesc.TabIndex = 0
         TxtMatchDesc.Text = "Match Description..."
         ' 
@@ -1559,11 +1500,10 @@ Partial Class KumiteMainControl
         PageMatchLogo.Controls.Add(PicPreviewLogo)
         PageMatchLogo.Controls.Add(BtnSelectLogo)
         PageMatchLogo.Controls.Add(BtnRemoveLogo)
-        PageMatchLogo.Location = New Point(4, 29)
-        PageMatchLogo.Margin = New Padding(3, 4, 3, 4)
+        PageMatchLogo.Location = New Point(4, 24)
         PageMatchLogo.Name = "PageMatchLogo"
-        PageMatchLogo.Padding = New Padding(3, 4, 3, 4)
-        PageMatchLogo.Size = New Size(220, 86)
+        PageMatchLogo.Padding = New Padding(3)
+        PageMatchLogo.Size = New Size(192, 61)
         PageMatchLogo.TabIndex = 1
         PageMatchLogo.Text = "Match Logo"
         PageMatchLogo.UseVisualStyleBackColor = True
@@ -1571,30 +1511,27 @@ Partial Class KumiteMainControl
         ' PicPreviewLogo
         ' 
         PicPreviewLogo.BorderStyle = BorderStyle.FixedSingle
-        PicPreviewLogo.Location = New Point(7, 8)
-        PicPreviewLogo.Margin = New Padding(3, 4, 3, 4)
+        PicPreviewLogo.Location = New Point(6, 6)
         PicPreviewLogo.Name = "PicPreviewLogo"
-        PicPreviewLogo.Size = New Size(57, 66)
+        PicPreviewLogo.Size = New Size(50, 50)
         PicPreviewLogo.SizeMode = PictureBoxSizeMode.Zoom
         PicPreviewLogo.TabIndex = 0
         PicPreviewLogo.TabStop = False
         ' 
         ' BtnSelectLogo
         ' 
-        BtnSelectLogo.Location = New Point(74, 8)
-        BtnSelectLogo.Margin = New Padding(3, 4, 3, 4)
+        BtnSelectLogo.Location = New Point(65, 6)
         BtnSelectLogo.Name = "BtnSelectLogo"
-        BtnSelectLogo.Size = New Size(103, 31)
+        BtnSelectLogo.Size = New Size(90, 23)
         BtnSelectLogo.TabIndex = 1
         BtnSelectLogo.Text = "Select Image"
         BtnSelectLogo.UseVisualStyleBackColor = True
         ' 
         ' BtnRemoveLogo
         ' 
-        BtnRemoveLogo.Location = New Point(74, 44)
-        BtnRemoveLogo.Margin = New Padding(3, 4, 3, 4)
+        BtnRemoveLogo.Location = New Point(65, 33)
         BtnRemoveLogo.Name = "BtnRemoveLogo"
-        BtnRemoveLogo.Size = New Size(103, 31)
+        BtnRemoveLogo.Size = New Size(90, 23)
         BtnRemoveLogo.TabIndex = 2
         BtnRemoveLogo.Text = "Remove.."
         BtnRemoveLogo.UseVisualStyleBackColor = True
@@ -1602,27 +1539,25 @@ Partial Class KumiteMainControl
         ' LblWinPoint
         ' 
         LblWinPoint.AutoSize = True
-        LblWinPoint.Location = New Point(13, 275)
+        LblWinPoint.Location = New Point(11, 206)
         LblWinPoint.Name = "LblWinPoint"
-        LblWinPoint.Size = New Size(75, 20)
+        LblWinPoint.Size = New Size(62, 15)
         LblWinPoint.TabIndex = 9
         LblWinPoint.Text = "Win. Point"
         ' 
         ' NumWinPoint
         ' 
-        NumWinPoint.Location = New Point(85, 272)
-        NumWinPoint.Margin = New Padding(3, 4, 3, 4)
+        NumWinPoint.Location = New Point(74, 204)
         NumWinPoint.Name = "NumWinPoint"
-        NumWinPoint.Size = New Size(40, 27)
+        NumWinPoint.Size = New Size(35, 23)
         NumWinPoint.TabIndex = 10
         NumWinPoint.Value = New Decimal(New Integer() {8, 0, 0, 0})
         ' 
         ' BtnEditWinPoint
         ' 
-        BtnEditWinPoint.Location = New Point(135, 269)
-        BtnEditWinPoint.Margin = New Padding(3, 4, 3, 4)
+        BtnEditWinPoint.Location = New Point(118, 202)
         BtnEditWinPoint.Name = "BtnEditWinPoint"
-        BtnEditWinPoint.Size = New Size(50, 31)
+        BtnEditWinPoint.Size = New Size(44, 23)
         BtnEditWinPoint.TabIndex = 11
         BtnEditWinPoint.Text = "Edit"
         BtnEditWinPoint.UseVisualStyleBackColor = True
@@ -1630,27 +1565,25 @@ Partial Class KumiteMainControl
         ' LblTatami
         ' 
         LblTatami.AutoSize = True
-        LblTatami.Location = New Point(13, 312)
+        LblTatami.Location = New Point(11, 234)
         LblTatami.Name = "LblTatami"
-        LblTatami.Size = New Size(53, 20)
+        LblTatami.Size = New Size(43, 15)
         LblTatami.TabIndex = 12
         LblTatami.Text = "Tatami"
         ' 
         ' NumTatami
         ' 
-        NumTatami.Location = New Point(85, 309)
-        NumTatami.Margin = New Padding(3, 4, 3, 4)
+        NumTatami.Location = New Point(74, 232)
         NumTatami.Name = "NumTatami"
-        NumTatami.Size = New Size(40, 27)
+        NumTatami.Size = New Size(35, 23)
         NumTatami.TabIndex = 13
         NumTatami.Value = New Decimal(New Integer() {1, 0, 0, 0})
         ' 
         ' BtnSwitchPosition
         ' 
-        BtnSwitchPosition.Location = New Point(135, 308)
-        BtnSwitchPosition.Margin = New Padding(3, 4, 3, 4)
+        BtnSwitchPosition.Location = New Point(118, 231)
         BtnSwitchPosition.Name = "BtnSwitchPosition"
-        BtnSwitchPosition.Size = New Size(101, 31)
+        BtnSwitchPosition.Size = New Size(88, 23)
         BtnSwitchPosition.TabIndex = 14
         BtnSwitchPosition.Text = "Switch Position"
         BtnSwitchPosition.UseVisualStyleBackColor = True
@@ -1664,53 +1597,49 @@ Partial Class KumiteMainControl
         PnlWaitingTimer.Controls.Add(LblWaitColon)
         PnlWaitingTimer.Controls.Add(NumWaitSec)
         PnlWaitingTimer.Controls.Add(BtnStartWait)
-        PnlWaitingTimer.Location = New Point(13, 349)
-        PnlWaitingTimer.Margin = New Padding(3, 4, 3, 4)
+        PnlWaitingTimer.Location = New Point(11, 262)
         PnlWaitingTimer.Name = "PnlWaitingTimer"
-        PnlWaitingTimer.Size = New Size(269, 74)
+        PnlWaitingTimer.Size = New Size(236, 56)
         PnlWaitingTimer.TabIndex = 15
         ' 
         ' LblWaitingTimerTitle
         ' 
         LblWaitingTimerTitle.AutoSize = True
-        LblWaitingTimerTitle.Location = New Point(5, 7)
+        LblWaitingTimerTitle.Location = New Point(4, 5)
         LblWaitingTimerTitle.Name = "LblWaitingTimerTitle"
-        LblWaitingTimerTitle.Size = New Size(213, 20)
+        LblWaitingTimerTitle.Size = New Size(172, 15)
         LblWaitingTimerTitle.TabIndex = 0
         LblWaitingTimerTitle.Text = "Waiting Timer (minute second)"
         ' 
         ' NumWaitMin
         ' 
-        NumWaitMin.Location = New Point(10, 31)
-        NumWaitMin.Margin = New Padding(3, 4, 3, 4)
+        NumWaitMin.Location = New Point(9, 23)
         NumWaitMin.Name = "NumWaitMin"
-        NumWaitMin.Size = New Size(40, 27)
+        NumWaitMin.Size = New Size(35, 23)
         NumWaitMin.TabIndex = 1
         NumWaitMin.Value = New Decimal(New Integer() {2, 0, 0, 0})
         ' 
         ' LblWaitColon
         ' 
         LblWaitColon.AutoSize = True
-        LblWaitColon.Location = New Point(55, 33)
+        LblWaitColon.Location = New Point(48, 25)
         LblWaitColon.Name = "LblWaitColon"
-        LblWaitColon.Size = New Size(12, 20)
+        LblWaitColon.Size = New Size(10, 15)
         LblWaitColon.TabIndex = 2
         LblWaitColon.Text = ":"
         ' 
         ' NumWaitSec
         ' 
-        NumWaitSec.Location = New Point(70, 31)
-        NumWaitSec.Margin = New Padding(3, 4, 3, 4)
+        NumWaitSec.Location = New Point(61, 23)
         NumWaitSec.Name = "NumWaitSec"
-        NumWaitSec.Size = New Size(40, 27)
+        NumWaitSec.Size = New Size(35, 23)
         NumWaitSec.TabIndex = 3
         ' 
         ' BtnStartWait
         ' 
-        BtnStartWait.Location = New Point(150, 29)
-        BtnStartWait.Margin = New Padding(3, 4, 3, 4)
+        BtnStartWait.Location = New Point(131, 22)
         BtnStartWait.Name = "BtnStartWait"
-        BtnStartWait.Size = New Size(101, 31)
+        BtnStartWait.Size = New Size(88, 23)
         BtnStartWait.TabIndex = 4
         BtnStartWait.Text = "Start"
         BtnStartWait.UseVisualStyleBackColor = True
@@ -1729,10 +1658,9 @@ Partial Class KumiteMainControl
         PanelMatchTimer.Controls.Add(PnlYellowTimerBox)
         PanelMatchTimer.Controls.Add(BtnStartScoreboard)
         PanelMatchTimer.Controls.Add(BtnStartTimer)
-        PanelMatchTimer.Location = New Point(13, 437)
-        PanelMatchTimer.Margin = New Padding(3, 4, 3, 4)
+        PanelMatchTimer.Location = New Point(11, 328)
         PanelMatchTimer.Name = "PanelMatchTimer"
-        PanelMatchTimer.Size = New Size(269, 231)
+        PanelMatchTimer.Size = New Size(236, 174)
         PanelMatchTimer.TabIndex = 16
         ' 
         ' LblMatchTimerTitle
@@ -1742,65 +1670,60 @@ Partial Class KumiteMainControl
         LblMatchTimerTitle.Font = New Font("Segoe UI", 8.25F, FontStyle.Bold)
         LblMatchTimerTitle.Location = New Point(0, 0)
         LblMatchTimerTitle.Name = "LblMatchTimerTitle"
-        LblMatchTimerTitle.Size = New Size(267, 25)
+        LblMatchTimerTitle.Size = New Size(234, 19)
         LblMatchTimerTitle.TabIndex = 0
         LblMatchTimerTitle.Text = "Match Timer (minute:second)"
         LblMatchTimerTitle.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' BtnTime130
         ' 
-        BtnTime130.Location = New Point(15, 37)
-        BtnTime130.Margin = New Padding(3, 4, 3, 4)
+        BtnTime130.Location = New Point(13, 28)
         BtnTime130.Name = "BtnTime130"
-        BtnTime130.Size = New Size(59, 31)
+        BtnTime130.Size = New Size(52, 23)
         BtnTime130.TabIndex = 1
         BtnTime130.Text = "1:30"
         BtnTime130.UseVisualStyleBackColor = True
         ' 
         ' BtnTime200
         ' 
-        BtnTime200.Location = New Point(85, 37)
-        BtnTime200.Margin = New Padding(3, 4, 3, 4)
+        BtnTime200.Location = New Point(74, 28)
         BtnTime200.Name = "BtnTime200"
-        BtnTime200.Size = New Size(59, 31)
+        BtnTime200.Size = New Size(52, 23)
         BtnTime200.TabIndex = 2
         BtnTime200.Text = "2:00"
         BtnTime200.UseVisualStyleBackColor = True
         ' 
         ' BtnTime300
         ' 
-        BtnTime300.Location = New Point(155, 37)
-        BtnTime300.Margin = New Padding(3, 4, 3, 4)
+        BtnTime300.Location = New Point(136, 28)
         BtnTime300.Name = "BtnTime300"
-        BtnTime300.Size = New Size(59, 31)
+        BtnTime300.Size = New Size(52, 23)
         BtnTime300.TabIndex = 3
         BtnTime300.Text = "3:00"
         BtnTime300.UseVisualStyleBackColor = True
         ' 
         ' NumMatchMin
         ' 
-        NumMatchMin.Location = New Point(40, 81)
-        NumMatchMin.Margin = New Padding(3, 4, 3, 4)
+        NumMatchMin.Location = New Point(35, 61)
         NumMatchMin.Name = "NumMatchMin"
-        NumMatchMin.Size = New Size(50, 27)
+        NumMatchMin.Size = New Size(44, 23)
         NumMatchMin.TabIndex = 4
         NumMatchMin.Value = New Decimal(New Integer() {2, 0, 0, 0})
         ' 
         ' LblMatchColon
         ' 
         LblMatchColon.AutoSize = True
-        LblMatchColon.Location = New Point(95, 84)
+        LblMatchColon.Location = New Point(83, 63)
         LblMatchColon.Name = "LblMatchColon"
-        LblMatchColon.Size = New Size(12, 20)
+        LblMatchColon.Size = New Size(10, 15)
         LblMatchColon.TabIndex = 5
         LblMatchColon.Text = ":"
         ' 
         ' NumMatchSec
         ' 
-        NumMatchSec.Location = New Point(110, 81)
-        NumMatchSec.Margin = New Padding(3, 4, 3, 4)
+        NumMatchSec.Location = New Point(96, 61)
         NumMatchSec.Name = "NumMatchSec"
-        NumMatchSec.Size = New Size(50, 27)
+        NumMatchSec.Size = New Size(44, 23)
         NumMatchSec.TabIndex = 6
         ' 
         ' PnlYellowTimerBox
@@ -1810,47 +1733,44 @@ Partial Class KumiteMainControl
         PnlYellowTimerBox.Controls.Add(LblMatchTimerValue)
         PnlYellowTimerBox.Controls.Add(BtnMatchTimeMinus)
         PnlYellowTimerBox.Controls.Add(BtnMatchTimePlus)
-        PnlYellowTimerBox.Location = New Point(10, 125)
-        PnlYellowTimerBox.Margin = New Padding(3, 4, 3, 4)
+        PnlYellowTimerBox.Location = New Point(9, 94)
         PnlYellowTimerBox.Name = "PnlYellowTimerBox"
-        PnlYellowTimerBox.Size = New Size(248, 51)
+        PnlYellowTimerBox.Size = New Size(217, 38)
         PnlYellowTimerBox.TabIndex = 7
         ' 
         ' LblAdjustTimerTitle
         ' 
         LblAdjustTimerTitle.AutoSize = True
-        LblAdjustTimerTitle.Location = New Point(5, 15)
+        LblAdjustTimerTitle.Location = New Point(4, 11)
         LblAdjustTimerTitle.Name = "LblAdjustTimerTitle"
-        LblAdjustTimerTitle.Size = New Size(93, 20)
+        LblAdjustTimerTitle.Size = New Size(75, 15)
         LblAdjustTimerTitle.TabIndex = 0
         LblAdjustTimerTitle.Text = "Adjust Timer"
         ' 
         ' LblMatchTimerValue
         ' 
         LblMatchTimerValue.AutoSize = True
-        LblMatchTimerValue.Font = New Font("Segoe UI", 12.0F, FontStyle.Bold)
-        LblMatchTimerValue.Location = New Point(90, 11)
+        LblMatchTimerValue.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
+        LblMatchTimerValue.Location = New Point(79, 8)
         LblMatchTimerValue.Name = "LblMatchTimerValue"
-        LblMatchTimerValue.Size = New Size(70, 28)
+        LblMatchTimerValue.Size = New Size(54, 21)
         LblMatchTimerValue.TabIndex = 1
         LblMatchTimerValue.Text = "2:00.0"
         ' 
         ' BtnMatchTimeMinus
         ' 
-        BtnMatchTimeMinus.Location = New Point(170, 9)
-        BtnMatchTimeMinus.Margin = New Padding(3, 4, 3, 4)
+        BtnMatchTimeMinus.Location = New Point(149, 7)
         BtnMatchTimeMinus.Name = "BtnMatchTimeMinus"
-        BtnMatchTimeMinus.Size = New Size(30, 31)
+        BtnMatchTimeMinus.Size = New Size(26, 23)
         BtnMatchTimeMinus.TabIndex = 2
         BtnMatchTimeMinus.Text = "-"
         BtnMatchTimeMinus.UseVisualStyleBackColor = True
         ' 
         ' BtnMatchTimePlus
         ' 
-        BtnMatchTimePlus.Location = New Point(205, 9)
-        BtnMatchTimePlus.Margin = New Padding(3, 4, 3, 4)
+        BtnMatchTimePlus.Location = New Point(179, 7)
         BtnMatchTimePlus.Name = "BtnMatchTimePlus"
-        BtnMatchTimePlus.Size = New Size(30, 31)
+        BtnMatchTimePlus.Size = New Size(26, 23)
         BtnMatchTimePlus.TabIndex = 3
         BtnMatchTimePlus.Text = "+"
         BtnMatchTimePlus.UseVisualStyleBackColor = True
@@ -1859,10 +1779,9 @@ Partial Class KumiteMainControl
         ' 
         BtnStartScoreboard.BackColor = Color.PaleGreen
         BtnStartScoreboard.FlatStyle = FlatStyle.Flat
-        BtnStartScoreboard.Location = New Point(15, 181)
-        BtnStartScoreboard.Margin = New Padding(3, 4, 3, 4)
+        BtnStartScoreboard.Location = New Point(13, 136)
         BtnStartScoreboard.Name = "BtnStartScoreboard"
-        BtnStartScoreboard.Size = New Size(115, 37)
+        BtnStartScoreboard.Size = New Size(101, 28)
         BtnStartScoreboard.TabIndex = 8
         BtnStartScoreboard.Text = "Start Scoreboard"
         BtnStartScoreboard.UseVisualStyleBackColor = False
@@ -1871,10 +1790,9 @@ Partial Class KumiteMainControl
         ' 
         BtnStartTimer.BackColor = Color.Gold
         BtnStartTimer.FlatStyle = FlatStyle.Flat
-        BtnStartTimer.Location = New Point(135, 181)
-        BtnStartTimer.Margin = New Padding(3, 4, 3, 4)
+        BtnStartTimer.Location = New Point(118, 136)
         BtnStartTimer.Name = "BtnStartTimer"
-        BtnStartTimer.Size = New Size(115, 37)
+        BtnStartTimer.Size = New Size(101, 28)
         BtnStartTimer.TabIndex = 9
         BtnStartTimer.Text = "Start Timer"
         BtnStartTimer.UseVisualStyleBackColor = False
@@ -1890,15 +1808,14 @@ Partial Class KumiteMainControl
         ' 
         ' KumiteMainControl
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.White
-        ClientSize = New Size(1200, 875)
+        ClientSize = New Size(1050, 656)
         Controls.Add(PanelMainCenter)
         Controls.Add(PanelSidebarRight)
         Controls.Add(PanelFooter)
         Controls.Add(PanelHeader)
-        Margin = New Padding(3, 4, 3, 4)
         Name = "KumiteMainControl"
         Text = "Kumite Main Control"
         PanelHeader.ResumeLayout(False)
@@ -2109,5 +2026,7 @@ Partial Class KumiteMainControl
     Friend WithEvents ColActionAka As DataGridViewButtonColumn
     Friend WithEvents BtnSaveWinPoint As Button
     Friend WithEvents BtnSendMatchInfo As Button
+    Friend WithEvents LblHanteiAo As Label
+    Friend WithEvents LblHanteiAka As Label
 
 End Class

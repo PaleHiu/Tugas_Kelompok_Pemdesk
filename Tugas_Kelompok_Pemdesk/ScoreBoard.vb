@@ -45,7 +45,7 @@ Partial Public Class ScoreBoard
         ' 3. Aktifkan fitur geser (Drag) ke Form dan seluruh isinya
         EnableBorderlessDrag(Me)
 
-        ' 4. Aktifkan pembacaan keyboard (F11/ESC/Enter)
+        ' 4. Aktifkan pembacaan keyboard (F11/Enter = fullscreen, ESC = tutup)
         Me.KeyPreview = True
     End Sub
 
@@ -123,7 +123,11 @@ Partial Public Class ScoreBoard
     End Sub
 
     Private Sub ScoreBoard_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyCode = Keys.Escape OrElse e.KeyCode = Keys.F11 OrElse e.KeyCode = Keys.Enter Then
+        If e.KeyCode = Keys.Escape Then
+            ' ESC = tutup Scoreboard
+            Me.Close()
+        ElseIf e.KeyCode = Keys.F11 OrElse e.KeyCode = Keys.Enter Then
+            ' F11 / Enter = toggle fullscreen (perilaku lama dipertahankan)
             ToggleFullScreen(Nothing, Nothing)
         End If
     End Sub
@@ -170,5 +174,112 @@ Partial Public Class ScoreBoard
             ' Jika ada error, jangan diam, tapi teriak lewat popup
             MessageBox.Show("Gagal mengganti font Match Detail: " & ex.Message, "Error Scoreboard", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
+    End Sub
+
+    Private originalBaseFonts As New Dictionary(Of Control, Single)
+
+    Public Sub AdjustTextSize(category As String, action As String, amount As Single)
+        ' 1. Simpan ukuran font bawaan asli pertama kali (Untuk kebutuhan tombol Reset 'R')
+        If originalBaseFonts.Count = 0 Then
+            For Each kvp In ctrlFonts
+                originalBaseFonts(kvp.Key) = kvp.Value
+            Next
+        End If
+
+        ' 2. Tentukan elemen mana saja yang akan diubah ukurannya berdasarkan pilihan Dropdown
+        Dim targets As New List(Of Control)
+
+        If category = "All" Or category = "Player Name" Then
+            targets.AddRange({LblAkaName, LblAoName})
+        End If
+        ' Pindahkan target ke Label Titik Kuning (Untuk Team Name)
+        If category = "All" Or category = "Team" Then
+            targets.AddRange({LblAkaDotsTop, LblAoDotsTop})
+        End If
+        ' Pindahkan target ke Label Titik Putih (Untuk Team Info)
+        If category = "All" Or category = "Team Info" Then
+            targets.AddRange({LblAkaDotsBot, LblAoDotsBot})
+        End If
+        If category = "All" Or category = "Score" Then
+            targets.AddRange({LblAkaScore, LblAoScore})
+        End If
+        If category = "All" Or category = "Timer" Then
+            targets.AddRange({LblTimerMain, LblTimerMilli})
+        End If
+        If category = "All" Or category = "Tatami" Then
+            targets.AddRange({LblTatamiNum, LblTatamiTitle})
+        End If
+        If category = "All" Or category = "Match Detail" Or category = "Category" Then
+            targets.Add(LblMatchDesc)
+        End If
+
+        ' 3. Eksekusi penambahan (+), pengurangan (-), atau reset (R)
+        For Each ctrl In targets
+            If ctrl IsNot Nothing AndAlso ctrlFonts.ContainsKey(ctrl) Then
+                If action = "Plus" Then
+                    ctrlFonts(ctrl) += amount ' Tambah ukuran
+                ElseIf action = "Minus" Then
+                    ctrlFonts(ctrl) -= amount ' Kurangi ukuran
+                ElseIf action = "Reset" Then
+                    ctrlFonts(ctrl) = originalBaseFonts(ctrl) ' Kembalikan ke ukuran asli
+                End If
+            End If
+        Next
+
+        ' 4. Paksa layar Scoreboard untuk menggambar ulang (Refresh) dengan ukuran baru
+        ScoreBoard_SizeChanged(Nothing, Nothing)
+    End Sub
+    ' ==========================================================
+    ' LAYAR KHUSUS HANTEI (ANIMASI FADE IN/OUT)
+    ' ==========================================================
+    Public LblHanteiBumper As Label
+    Private WithEvents fadeTimer As New Timer() With {.Interval = 15}
+    Private isFadeIn As Boolean = False
+    Private currentAlpha As Integer = 0
+
+    Public Sub ToggleHanteiScreen(isShow As Boolean)
+        ' Pastikan objek dibuat hanya sekali
+        If LblHanteiBumper Is Nothing Then
+            LblHanteiBumper = New Label()
+            LblHanteiBumper.Dock = DockStyle.Fill
+            LblHanteiBumper.BackColor = Color.FromArgb(0, 20, 20, 20)
+            LblHanteiBumper.ForeColor = Color.FromArgb(0, 255, 255, 255)
+            LblHanteiBumper.Font = New Font("Segoe UI", 90, FontStyle.Bold)
+            LblHanteiBumper.TextAlign = ContentAlignment.MiddleCenter
+            LblHanteiBumper.Text = "HANTEI" & vbCrLf & "(Judge Decision)"
+            LblHanteiBumper.Visible = False
+            Me.Controls.Add(LblHanteiBumper)
+        End If
+
+        isFadeIn = isShow
+
+        If isShow Then
+            LblHanteiBumper.BringToFront()
+            LblHanteiBumper.Visible = True
+        End If
+
+        fadeTimer.Start()
+    End Sub
+
+    Private Sub fadeTimer_Tick(sender As Object, e As EventArgs) Handles fadeTimer.Tick
+        Dim fadeSpeed As Integer = 15
+
+        If isFadeIn Then
+            currentAlpha += fadeSpeed
+            If currentAlpha >= 255 Then
+                currentAlpha = 255
+                fadeTimer.Stop()
+            End If
+        Else
+            currentAlpha -= fadeSpeed
+            If currentAlpha <= 0 Then
+                currentAlpha = 0
+                fadeTimer.Stop()
+                LblHanteiBumper.Visible = False
+            End If
+        End If
+
+        LblHanteiBumper.BackColor = Color.FromArgb(currentAlpha, 20, 20, 20)
+        LblHanteiBumper.ForeColor = Color.FromArgb(currentAlpha, 255, 255, 255)
     End Sub
 End Class

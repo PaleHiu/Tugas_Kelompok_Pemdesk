@@ -14,11 +14,20 @@ Public Class ListOfTeam
     Dim LblHint As New Label()
     Dim WithEvents BtnSelect As New Button()
 
+    ' --- CUSTOM VALUE (ubah di sini untuk menyesuaikan tampilan) ---
+    Private Const ROW_HEIGHT As Integer = 28        ' Tinggi baris data (px)
+    Private Const HEADER_HEIGHT As Integer = 38     ' Tinggi header kolom (px)
+
+    ' --- SENTRALISASI CONNECTION STRING ---
+    Private Const DB_CONN As String = "Data Source=database.db;Version=3;"
+
     Private Sub ListOfTeam_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' 1. Pengaturan Form Dasar
         Me.Text = "List of Team"
         Me.Size = New Size(650, 500)
-        Me.MinimumSize = New Size(650, 300)
+        Me.FormBorderStyle = FormBorderStyle.FixedDialog   ' Kunci ukuran form
+        Me.MaximizeBox = False                             ' Sembunyikan tombol maximize
+        Me.MinimizeBox = True
         Me.StartPosition = FormStartPosition.CenterParent
         Me.BackColor = Color.White
 
@@ -35,9 +44,12 @@ Public Class ListOfTeam
         LblTotal.AutoSize = True
 
         ' 3. DataGridView
-        Dgv.Location = New Point(10, 70)
-        Dgv.Size = New Size(610, 330)
-        Dgv.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        ' Form client area = 500px tinggi - ~30px title bar = ~470px
+        ' Layout: LblHeader(40) + LblTotal(~22) + margin(6) = Y mulai 68
+        ' PnlBottom = 50px (Dock Bottom), sisa untuk Dgv = 470 - 68 - 50 - 10 (margin bawah) = 342
+        Dgv.Location = New Point(10, 68)
+        Dgv.Size = New Size(620, 342)
+        Dgv.Anchor = AnchorStyles.None
         Dgv.AllowUserToAddRows = False
         Dgv.AllowUserToDeleteRows = False
         Dgv.ReadOnly = True
@@ -47,17 +59,39 @@ Public Class ListOfTeam
         Dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(255, 200, 200)
         Dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 120, 215)
 
+        ' --- KUNCI: Larang user memperbesar/memperkecil lebar & tinggi kolom/baris ---
+        Dgv.AllowUserToResizeColumns = False
+        Dgv.AllowUserToResizeRows = False
+        Dgv.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        Dgv.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing
+
+        ' --- HEADER KOLOM: Background kontras, teks putih bold lebih besar ---
+        Dgv.EnableHeadersVisualStyles = False
+        Dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(30, 58, 110)
+        Dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+        Dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 11, FontStyle.Bold)
+        Dgv.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        Dgv.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(30, 58, 110)
+        Dgv.ColumnHeadersHeight = HEADER_HEIGHT
+
+        ' --- Tinggi baris default dari konstanta ---
+        Dgv.RowTemplate.Height = ROW_HEIGHT
+
         ' Tambah Kolom
-        Dgv.Columns.Add("No", "")
+        Dgv.Columns.Add("No", "No")
         Dgv.Columns.Add("Team", "Team")
         Dgv.Columns.Add("TeamInfo", "Team Info")
-        Dgv.Columns(0).Width = 30
+        Dgv.Columns(0).Width = 40
+        Dgv.Columns(0).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
         Dgv.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
         Dgv.Columns(2).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
 
-        ' ----------------------------------------------------
-        ' DATA DUMMY EVOS/RRQ SUDAH DIHAPUS. KITA PANGGIL DATABASE!
-        ' ----------------------------------------------------
+        ' Kunci tiap kolom agar tidak bisa di-resize satu per satu
+        For Each col As DataGridViewColumn In Dgv.Columns
+            col.Resizable = DataGridViewTriState.False
+        Next
+
+        ' Load Data
         LoadDataTimDariDatabase()
 
         ' 4. Panel Bawah (Merah Crimson)
@@ -95,31 +129,30 @@ Public Class ListOfTeam
         BtnSelect.FlatStyle = FlatStyle.Flat
         BtnSelect.FlatAppearance.BorderColor = Color.White
         BtnSelect.FlatAppearance.BorderSize = 1
+
         PnlBottom.Controls.AddRange(New Control() {TxtSearch, BtnSearch, BtnClear, LblHint, BtnSelect})
         BtnSelect.BringToFront()
         BtnSelect.Location = New Point(PnlBottom.Width - 145, 10)
         BtnSelect.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+
         Me.Controls.AddRange(New Control() {LblHeader, LblTotal, Dgv, PnlBottom})
     End Sub
+
     Private Sub LoadDataTimDariDatabase()
         Dgv.Rows.Clear()
 
-        ' String koneksi persis seperti di ListOfCompetitor
-        Dim connString As String = "Data Source=database.db;Version=3;"
-
         Try
-            Using conn As New SQLiteConnection(connString)
+            Using conn As New SQLiteConnection(DB_CONN)
                 conn.Open()
 
-                ' Mengambil nama tim dan info secara unik (DISTINCT agar tidak ada tim kembar) 
-                ' dari tabel competitor, lalu diurutkan sesuai abjad
-                Dim query As String = "SELECT DISTINCT team, team_info FROM competitor ORDER BY team ASC"
+                ' --- PERBAIKAN: Ambil data langsung dari team_lengkap agar semua tim terdaftar masuk, 
+                ' bukan hanya dari data competitor. Jika ingin kembali ke cara lama, ganti tabel menjadi competitor
+                Dim query As String = "SELECT nama_team as team, team_info FROM team_lengkap ORDER BY nama_team ASC"
 
                 Using cmd As New SQLiteCommand(query, conn)
                     Using reader = cmd.ExecuteReader()
                         Dim nomor As Integer = 1
                         While reader.Read()
-                            ' Memasukkan data ke DataGridView (No, Team, Team Info)
                             Dgv.Rows.Add(nomor, reader("team").ToString(), reader("team_info").ToString())
                             nomor += 1
                         End While
@@ -127,16 +160,29 @@ Public Class ListOfTeam
                 End Using
             End Using
         Catch ex As Exception
-            MessageBox.Show("Gagal memuat tim: " & ex.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            ' Fallback ke query lama jika tabel team_lengkap belum ada
+            Try
+                Using conn As New SQLiteConnection(DB_CONN)
+                    conn.Open()
+                    Dim query As String = "SELECT DISTINCT team, team_info FROM competitor ORDER BY team ASC"
+                    Using cmd As New SQLiteCommand(query, conn)
+                        Using reader = cmd.ExecuteReader()
+                            Dim nomor As Integer = 1
+                            While reader.Read()
+                                Dgv.Rows.Add(nomor, reader("team").ToString(), reader("team_info").ToString())
+                                nomor += 1
+                            End While
+                        End Using
+                    End Using
+                End Using
+            Catch innerEx As Exception
+                MessageBox.Show("Gagal memuat tim: " & innerEx.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
         End Try
 
-        ' Setelah selesai, otomatis update label jumlah data di pojok kiri atas
         LblTotal.Text = "Total Records : " & Dgv.Rows.Count.ToString()
     End Sub
 
-    ' ===============================================
-    ' LOGIKA MEMILIH TIM DAN MENGIRIMNYA KE KUMITE
-    ' ===============================================
     Private Sub PilihTim()
         If Dgv.SelectedRows.Count > 0 Then
             Dim selectedTeam As String = Dgv.SelectedRows(0).Cells(1).Value.ToString()
@@ -145,6 +191,11 @@ Public Class ListOfTeam
             Dim mainFrm As KumiteMainControl = TryCast(Application.OpenForms("KumiteMainControl"), KumiteMainControl)
             If mainFrm IsNot Nothing Then
                 mainFrm.UpdateTeamData(selectedTeam, selectedInfo)
+            End If
+
+            Dim kataFrm As KataMainControl = TryCast(Application.OpenForms("KataMainControl"), KataMainControl)
+            If kataFrm IsNot Nothing Then
+                kataFrm.UpdateTeamData(selectedTeam, selectedInfo)
             End If
 
             Me.Close()
@@ -163,11 +214,14 @@ Public Class ListOfTeam
         End If
     End Sub
 
-    ' Logika Pencarian Tabel (Tidak perlu ke database, cukup filter isi tabel yang sudah ada)
     Private Sub BtnSearch_Click(sender As Object, e As EventArgs) Handles BtnSearch.Click
         Dim keyword As String = TxtSearch.Text.ToLower()
+
+        ' --- PERBAIKAN: Melepaskan kaitan memori/fokus pada DataGridView ---
+        ' Ini WAJIB dilakukan sebelum menyembunyikan row, jika tidak aplikasi akan crash (Error: "Row associated with the currency manager's position cannot be made invisible.")
+        Dgv.CurrentCell = Nothing
+
         For Each row As DataGridViewRow In Dgv.Rows
-            ' Filter supaya tidak error jika datanya Nothing
             Dim tName As String = If(row.Cells(1).Value IsNot Nothing, row.Cells(1).Value.ToString().ToLower(), "")
             Dim tInfo As String = If(row.Cells(2).Value IsNot Nothing, row.Cells(2).Value.ToString().ToLower(), "")
 
@@ -181,8 +235,33 @@ Public Class ListOfTeam
 
     Private Sub BtnClear_Click(sender As Object, e As EventArgs) Handles BtnClear.Click
         TxtSearch.Text = ""
+        ' --- PERBAIKAN: Sama seperti di atas ---
+        Dgv.CurrentCell = Nothing
+
         For Each row As DataGridViewRow In Dgv.Rows
             row.Visible = True
         Next
+    End Sub
+
+    ' Fungsi generik: unselect saat diklik
+    Private Sub ClearSelectionOnEmptyClick(sender As Object, e As MouseEventArgs)
+        Dgv.ClearSelection()
+        Dgv.CurrentCell = Nothing
+    End Sub
+
+    ' Pasang handler ke semua area yang tidak punya event sendiri
+    Private Sub AttachClearSelectionHandlers() Handles MyBase.Load
+        AddHandler Me.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler Dgv.MouseClick, Sub(s, ev)
+                                       Dim hit = Dgv.HitTest(ev.X, ev.Y)
+                                       If hit.Type = DataGridViewHitTestType.None OrElse
+                                          hit.Type = DataGridViewHitTestType.ColumnHeader Then
+                                           Dgv.ClearSelection()
+                                           Dgv.CurrentCell = Nothing
+                                       End If
+                                   End Sub
+        AddHandler LblHeader.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler LblTotal.MouseClick, AddressOf ClearSelectionOnEmptyClick
+        AddHandler PnlBottom.MouseClick, AddressOf ClearSelectionOnEmptyClick
     End Sub
 End Class

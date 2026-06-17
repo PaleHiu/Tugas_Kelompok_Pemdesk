@@ -1,8 +1,5 @@
 ﻿Imports System.Drawing
 Imports System.Windows.Forms
-' ==========================================================
-' WAJIB DITAMBAHKAN UNTUK MEMANGGIL API WINDOWS
-' ==========================================================
 Imports System.Runtime.InteropServices
 
 Public Class WinnerForm
@@ -31,7 +28,7 @@ Public Class WinnerForm
     Public Sub New(isAka As Boolean, winnerName As String, winnerTeam As String)
         ' 1. Pengaturan Jendela Form (Borderless & Normal Size)
         Me.FormBorderStyle = FormBorderStyle.None
-        Me.WindowState = FormWindowState.Normal ' Berubah dari Maximized ke Normal
+        Me.WindowState = FormWindowState.Normal
         Me.StartPosition = FormStartPosition.CenterScreen
 
         ' ==========================================================
@@ -39,49 +36,60 @@ Public Class WinnerForm
         ' ==========================================================
         Dim frmSb As Form = Application.OpenForms("ScoreBoard")
         If frmSb IsNot Nothing Then
-            Me.Size = frmSb.Size ' Meniru ukuran presisi dari ScoreBoard yang sedang menyala
+            Me.Size = frmSb.Size
         Else
-            Me.Size = New Size(1366, 768) ' Ukuran cadangan jika Scoreboard belum dibuka
+            Me.Size = New Size(1366, 768)
         End If
 
         ' Setel warna latar belakang solid sesuai bendera tim pemenang
         If isAka Then
-            Me.BackColor = Color.Crimson ' Merah Tegas AKA
+            Me.BackColor = Color.Crimson
         Else
-            Me.BackColor = Color.DodgerBlue ' Biru Tegas AO
+            Me.BackColor = Color.DodgerBlue
         End If
 
-        ' 2. Merakit Komponen UI
+        ' ==========================================================
+        ' 2. MERAKIT KOMPONEN UI
+        ' Layout: [WINNER] atas, [NAMA ATLET] tengah, [TIM] bawah
+        ' ==========================================================
+
         ' A. Label Judul Atas: "WINNER"
         lblTitle = New Label()
         lblTitle.Text = "WINNER"
-        lblTitle.Font = New Font("Segoe UI", 60.0F, FontStyle.Bold)
+        lblTitle.Font = New Font("Segoe UI", 52.0F, FontStyle.Bold)
         lblTitle.ForeColor = Color.White
         lblTitle.TextAlign = ContentAlignment.MiddleCenter
         lblTitle.Dock = DockStyle.Top
-        lblTitle.Height = 200
+        lblTitle.Height = CInt(Me.Height * 0.22) ' ~22% tinggi form
 
-        ' B. Label Tengah: Nama Atlet
+        ' B. Label Tengah: Nama Atlet (Fill sisa ruang di antara atas & bawah)
         lblName = New Label()
         lblName.Text = winnerName.ToUpper()
-        lblName.Font = New Font("Segoe UI", 85.0F, FontStyle.Bold)
+        lblName.Font = New Font("Segoe UI", 90.0F, FontStyle.Bold)
         lblName.ForeColor = Color.White
         lblName.TextAlign = ContentAlignment.MiddleCenter
         lblName.Dock = DockStyle.Fill
 
-        ' C. Label Bawah: Informasi Kontingen / Tim
+        ' C. Label Bawah: Nama Tim / Kontingen
         lblTeam = New Label()
-        lblTeam.Text = winnerTeam.ToUpper()
-        lblTeam.Font = New Font("Segoe UI", 40.0F, FontStyle.Bold)
+        ' Jika winnerTeam kosong, sembunyikan area bawah agar nama tetap terlihat besar
+        If String.IsNullOrWhiteSpace(winnerTeam) Then
+            lblTeam.Text = ""
+            lblTeam.Height = 0
+        Else
+            lblTeam.Text = winnerTeam.ToUpper()
+            lblTeam.Height = CInt(Me.Height * 0.22) ' ~22% tinggi form
+        End If
+        lblTeam.Font = New Font("Segoe UI", 42.0F, FontStyle.Bold)
         lblTeam.ForeColor = Color.White
         lblTeam.TextAlign = ContentAlignment.MiddleCenter
         lblTeam.Dock = DockStyle.Bottom
-        lblTeam.Height = 200
 
-        ' Masukkan semua komponen ke dalam layar utama Form
-        Me.Controls.Add(lblName)
-        Me.Controls.Add(lblTitle)
-        Me.Controls.Add(lblTeam)
+        ' Urutan penambahan PENTING untuk DockStyle:
+        ' Fill harus ditambahkan PERTAMA, lalu Top & Bottom
+        Me.Controls.Add(lblName)   ' Fill - ditambah dulu
+        Me.Controls.Add(lblTitle)  ' Top  - lalu ini
+        Me.Controls.Add(lblTeam)   ' Bottom - terakhir
 
         ' 3. Fitur Fleksibilitas UX: Double-Click atau ESC/Spasi/Enter untuk menutup overlay
         Me.KeyPreview = True

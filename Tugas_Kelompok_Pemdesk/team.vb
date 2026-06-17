@@ -42,6 +42,13 @@ Public Class team
         UpdateTotalRecordsTeam()
     End Sub
 
+    Private Sub team_VisibleChanged(sender As Object, e As EventArgs) Handles MyBase.VisibleChanged
+        ' Jika form ini sedang tampil di layar, DAN proses Load pertama sudah selesai
+        If Me.Visible AndAlso isFormLoaded Then
+            LoadTeamsFromDatabase()
+        End If
+    End Sub
+
     Private Sub gridEntriesTeam_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles gridEntriesTeam.DataError
         e.ThrowException = False
     End Sub
@@ -122,7 +129,7 @@ Public Class team
     End Sub
 
     ' FUNGSI MEMUAT GAMBAR AMAN
-    Private Function GetTeamImage(pathOrFlag As String) As Image
+    Public Function GetTeamImage(pathOrFlag As String) As Image
         Try
             If pathOrFlag.StartsWith("Flag: ") Then
                 Dim countryName As String = pathOrFlag.Replace("Flag: ", "")
@@ -185,12 +192,36 @@ Public Class team
         Dim displayImage As Image = GetTeamImage(teamPictPath)
 
         If editRowIndex >= 0 Then
+            ' 1. AMBIL NAMA TIM LAMA SEBELUM DIUBAH
+            Dim oldTeamName As String = gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamGrid").Value.ToString()
+
+            ' 2. UPDATE GRID LAYAR TIM
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamGrid").Value = teamName
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamInfoGrid").Value = teamInfo
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamPictGrid").Value = displayImage
             gridEntriesTeam.Rows(editRowIndex).Cells("ColTeamPictPath").Value = teamPictPath
+
+            ' 3. UPDATE OTOMATIS KE TABEL PESERTA (CASCADE UPDATE)
+            If oldTeamName <> teamName Then
+                Try
+                    Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                        conn.Open()
+                        Dim queryUpdate As String = "UPDATE competitor SET team = @newTeam WHERE team = @oldTeam"
+                        Using cmd As New System.Data.SQLite.SQLiteCommand(queryUpdate, conn)
+                            cmd.Parameters.AddWithValue("@newTeam", teamName)
+                            cmd.Parameters.AddWithValue("@oldTeam", oldTeamName)
+                            cmd.ExecuteNonQuery()
+                        End Using
+                    End Using
+                Catch ex As Exception
+                End Try
+            End If
+
             editRowIndex = -1
+            btnAddTeam.Text = "Add"
+            btnAddTeam.BackColor = Color.DeepSkyBlue
         Else
+            ' LOGIKA ADD TIM BARU
             Dim idx As Integer = gridEntriesTeam.Rows.Add()
             Dim row As DataGridViewRow = gridEntriesTeam.Rows(idx)
             row.Cells("ColRowNoTeam").Value = ""
@@ -204,7 +235,11 @@ Public Class team
 
         UpdateRowNumbers()
         UpdateTotalRecordsTeam()
-        SyncTeamsToPeserta()
+        SaveAllTeamsToDatabase() ' Simpan perubahan layar tim ke database
+
+        ' 4. TRIGGER REFRESH LAYAR SEBELAH
+        TriggerRefreshPeserta()
+
         ClearInputTeam()
     End Sub
 
@@ -247,11 +282,32 @@ Public Class team
         If e.RowIndex >= 0 AndAlso Not gridEntriesTeam.Rows(e.RowIndex).IsNewRow Then
 
             If e.ColumnIndex = gridEntriesTeam.Columns("ColDeleteTeam").Index Then
-                If MessageBox.Show("Hapus tim ini?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                If MessageBox.Show("Hapus tim ini beserta seluruh pesertanya?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                    Dim teamName As String = gridEntriesTeam.Rows(e.RowIndex).Cells("ColTeamGrid").Value.ToString()
+
+                    ' 1. Hapus dari Database Permanen (Tabel Tim & Tabel Peserta)
+                    Try
+                        Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                            conn.Open()
+                            ' Hapus Tim
+                            Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM team_lengkap WHERE nama_team = @nama", conn)
+                                cmd.Parameters.AddWithValue("@nama", teamName)
+                                cmd.ExecuteNonQuery()
+                            End Using
+                            ' Hapus Peserta yang ada di tim tersebut (Cascade Delete)
+                            Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM competitor WHERE team = @nama", conn)
+                                cmd.Parameters.AddWithValue("@nama", teamName)
+                                cmd.ExecuteNonQuery()
+                            End Using
+                        End Using
+                    Catch ex As Exception
+                    End Try
+
+                    ' 2. Hapus dari Layar & Refresh
                     gridEntriesTeam.Rows.RemoveAt(e.RowIndex)
                     UpdateRowNumbers()
                     UpdateTotalRecordsTeam()
-                    SyncTeamsToPeserta()
+                    TriggerRefreshPeserta() ' <-- Perintah penyapu layar sebelah
                 End If
             End If
 
@@ -299,11 +355,24 @@ Public Class team
 
     ' DELETE ALL
     Private Sub btnDeleteAllTeam_Click(sender As Object, e As EventArgs) Handles btnDeleteAllTeam.Click
-        If MessageBox.Show("Hapus SEMUA data Tim?", "Peringatan", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+        If MessageBox.Show("Hapus SEMUA data Tim beserta SEMUA pesertanya?", "Peringatan", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
+            Try
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM team_lengkap", conn)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                    Using cmd As New System.Data.SQLite.SQLiteCommand("DELETE FROM competitor", conn)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                End Using
+            Catch ex As Exception
+            End Try
+
             gridEntriesTeam.Rows.Clear()
             UpdateRowNumbers()
             UpdateTotalRecordsTeam()
-            SyncTeamsToPeserta()
+            TriggerRefreshPeserta() ' <-- Perintah penyapu layar sebelah
         End If
     End Sub
 
@@ -375,44 +444,66 @@ Public Class team
         ofd.Filter = "CSV Files (*.csv)|*.csv"
         If ofd.ShowDialog() = DialogResult.OK Then
             Try
-                Dim sr As New StreamReader(ofd.FileName)
-                Dim isHeader As Boolean = True
-                While Not sr.EndOfStream
-                    Dim line As String = sr.ReadLine()
-                    If isHeader Then
-                        isHeader = False
-                        Continue While
-                    End If
+                Dim importCount As Integer = 0
 
-                    Dim data As String()
-                    If line.Contains(";") Then
-                        data = line.Split(";"c)
-                    Else
-                        data = line.Split(","c)
-                    End If
+                ' 1. BUKA KONEKSI & TRANSAKSI DATABASE
+                Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
+                    conn.Open()
+                    Using trans = conn.BeginTransaction()
 
-                    If data.Length >= 2 Then
-                        Dim pictPath As String = "No Image"
-                        Dim displayImage As Image = GetTeamImage(pictPath)
+                        ' 2. QUERY ANTI-DUPLIKAT (Hanya insert jika nama_team belum ada)
+                        Dim query As String = "INSERT INTO team_lengkap (nama_team, team_info, pict_path) SELECT @nama, @info, @path WHERE NOT EXISTS (SELECT 1 FROM team_lengkap WHERE nama_team = @nama)"
 
-                        Dim idx As Integer = gridEntriesTeam.Rows.Add()
-                        Dim row As DataGridViewRow = gridEntriesTeam.Rows(idx)
-                        row.Cells("ColRowNoTeam").Value = ""
-                        row.Cells("ColDeleteTeam").Value = "❌"
-                        row.Cells("ColEditTeam").Value = "📝"
+                        Using cmd As New System.Data.SQLite.SQLiteCommand(query, conn)
+                            cmd.Parameters.Add("@nama", System.Data.DbType.String)
+                            cmd.Parameters.Add("@info", System.Data.DbType.String)
+                            cmd.Parameters.Add("@path", System.Data.DbType.String)
 
-                        row.Cells("ColTeamGrid").Value = data(0)
-                        row.Cells("ColTeamInfoGrid").Value = data(1)
+                            Dim sr As New StreamReader(ofd.FileName)
+                            Dim isHeader As Boolean = True
 
-                        row.Cells("ColTeamPictGrid").Value = displayImage
-                        row.Cells("ColTeamPictPath").Value = pictPath
-                    End If
-                End While
-                sr.Close()
-                UpdateRowNumbers()
-                UpdateTotalRecordsTeam()
-                SyncTeamsToPeserta()
-                MessageBox.Show("Data berhasil diimport!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            While Not sr.EndOfStream
+                                Dim line As String = sr.ReadLine()
+                                If isHeader Then
+                                    isHeader = False
+                                    Continue While
+                                End If
+
+                                ' Deteksi separator otomatis (koma atau titik koma)
+                                Dim data As String() = If(line.Contains(";"), line.Split(";"c), line.Split(","c))
+
+                                If data.Length >= 2 Then
+                                    Dim tName As String = data(0).Trim()
+                                    Dim tInfo As String = data(1).Trim()
+
+                                    If tName <> "" Then
+                                        cmd.Parameters("@nama").Value = tName
+                                        cmd.Parameters("@info").Value = tInfo
+                                        cmd.Parameters("@path").Value = "No Image"
+
+                                        ' Jika Insert berhasil (bukan duplikat), rowsAffected akan bernilai > 0
+                                        Dim rowsAffected As Integer = cmd.ExecuteNonQuery()
+                                        If rowsAffected > 0 Then
+                                            importCount += 1
+                                        End If
+                                    End If
+                                End If
+                            End While
+                            sr.Close()
+                        End Using
+                        trans.Commit()
+                    End Using
+                End Using
+
+                ' 3. REFRESH LAYAR & SINKRONISASI
+                If importCount > 0 Then
+                    LoadTeamsFromDatabase() ' Panggil ulang data bersih dari database ke layar
+                    SyncTeamsToPeserta()    ' Sinkronkan ke dropdown form Peserta yang sedang terbuka
+                    MessageBox.Show(importCount & " Tim baru berhasil diimport tanpa duplikasi!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Else
+                    MessageBox.Show("Tidak ada tim baru yang ditambahkan. Semua tim di Excel sudah ada di sistem (Duplikat).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                End If
+
             Catch ex As Exception
                 MessageBox.Show("Error: " & ex.Message, "Gagal", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
@@ -475,7 +566,7 @@ Public Class team
     End Sub
 
     ' --- FUNGSI MEMANGGIL TIM DARI DATABASE ---
-    Private Sub LoadTeamsFromDatabase()
+    Public Sub LoadTeamsFromDatabase()
         Try
             gridEntriesTeam.Rows.Clear()
             Using conn As New System.Data.SQLite.SQLiteConnection("Data Source=database.db;Version=3;")
@@ -506,5 +597,16 @@ Public Class team
             UpdateTotalRecordsTeam()
         Catch ex As Exception
         End Try
+    End Sub
+
+    ' --- FUNGSI UNTUK MENYURUH FORM PESERTA REFRESH ---
+    Public Sub TriggerRefreshPeserta()
+        For Each frm As Form In Application.OpenForms
+            If TypeOf frm Is Peserta Then
+                Dim formPeserta As Peserta = DirectCast(frm, Peserta)
+                formPeserta.LoadDataPeserta()
+                formPeserta.LoadTeamsToComboBox()
+            End If
+        Next
     End Sub
 End Class
